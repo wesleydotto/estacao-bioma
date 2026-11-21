@@ -5,8 +5,7 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { scene } from './cena.js';
 import { animated, circles, std, addBox, addCyl, makeCanvas, toTex, woodTex, solarTex, boardTex, makePostBoard } from './construcao.js';
 import { LAKE, WATER_Y, PIER_Y, lakeR, U, P0, PIER_DIR, PIER_PERP, PATH, PIPE_A, PIPE_DIR, PIPE_M, groundHeight, onPier } from './mapa.js';
-import { rr, clamp, lerp, FONT } from './utils.js';
-import { Q } from './estado.js';
+import { rr, lerp, FONT } from './utils.js';
 
 // =====================================================================
 //  LAGO EUTROFIZADO
@@ -224,18 +223,18 @@ export function buildLake() {
 }
 
 // =====================================================================
-//  SAÚDE DO LAGO (tudo muda conforme a restauração avança)
+//  VISUAL DA SAÚDE DO LAGO (tudo muda conforme a restauração avança)
+//  h = saúde de 0 (eutrofizado) a 1 (recuperado). Quem calcula o h é a
+//  missão do lago (js/missoes/lago/index.js); aqui só mudamos o visual.
+//  filtered = o biofiltro já foi instalado? (a mancha de esgoto some)
 // =====================================================================
-// Quanto o lago deve melhorar com o que já foi feito (0 a 1)
-export const healthTarget = () => (Q.filter ? 0.34 : 0) + Q.plants / 6 * 0.33 + (Q.aerator ? 0.33 : 0);
-export function updateLakeHealth(dt, t) {
-  Q.health += clamp(healthTarget() - Q.health, -dt * 0.12, dt * 0.12);
-  const h = Q.health, L = lakeFx;
+export function updateLakeVisual(dt, h, filtered) {
+  const L = lakeFx;
   waterHealth.value = h;
   L.waterMat.envMapIntensity = lerp(0.1, 0.7, h);
   L.algae.count = Math.round(260 * Math.pow(1 - h, 1.6));
   L.bubbles.count = Math.round(30 * (1 - h));
-  L.plume.material.opacity = Q.filter ? Math.max(0, L.plume.material.opacity - dt * 0.2) : 1;
+  L.plume.material.opacity = filtered ? Math.max(0, L.plume.material.opacity - dt * 0.2) : 1;
   L.fishes.forEach(f => { f.visible = h < 0.45; });
   L.live.forEach(f => {
     if (h < 0.6) { f.m.visible = false; return; }

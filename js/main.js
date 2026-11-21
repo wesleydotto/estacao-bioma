@@ -16,25 +16,29 @@
 //    audio.js       sons
 //    controles.js   teclado, mouse e toque
 //    interface.js   textos na tela, mini-mapa, diálogos e janelas
-//    estado.js      progresso da missão (Q), etapa (stage) e teclas
-//    minigames.js   as atividades da missão (Secchi, sonda, microscópio…)
-//    quest.js       interações com E, marcador amarelo e rastreador
+//    estado.js      teclas, câmera e qual missão está ativa
+//    quest.js       motor de missões: interações com E, marcador, rastreador,
+//                   mural e caderno
+//    missoes/       uma pasta para cada missão (lista em missoes/index.js)
+//      lago/        "Salvar o Lago da Mata": estado.js (Q e stage),
+//                   minigames.js (atividades) e index.js (o pacote da missão)
 // =====================================================================
 import * as THREE from 'three';
 import { renderer, scene, camera } from './cena.js';
 import { animated } from './construcao.js';
 import { LAB, lakeNorm } from './mapa.js';
 import { rr, isTouch } from './utils.js';
-import { Q, stage, input, cam } from './estado.js';
+import { input, cam } from './estado.js';
+import { Q, stage } from './missoes/lago/estado.js';
 import { buildTerrain } from './terreno.js';
 import { buildLab, updateDoor } from './lab.js';
-import { buildLake, updateLakeHealth, waterTime } from './lake.js';
+import { buildLake, waterTime } from './lake.js';
 import { buildVegetation, grassTime } from './vegetacao.js';
 import { player, buildPlayer, updatePlayer, updateCamera, tickWaterWarn } from './player.js';
 import { initAudio, audioReady, bird, frog } from './audio.js';
 import { buildMapBg, drawMap, setZone, updateHud, panelOpen, dlgOpen, closePanel, promptEl, btnE } from './interface.js';
-import { openKit, microGame, chemGame, muralPanel, amostrasBench, winPanel } from './minigames.js';
-import { setupInteractions, updateInteract, updateQuest, startMission, objTarget } from './quest.js';
+import { openKit, microGame, chemGame, diagnosticoPanel, amostrasBench, winPanel } from './missoes/lago/minigames.js';
+import { setupInteractions, updateInteract, updateQuest, updateMissoes, novoJogo, muralPanel, notebook, objTarget } from './quest.js';
 import './controles.js';   // só de importar, os controles já começam a "ouvir" o teclado e o mouse
 
 // Espera a fonte carregar (para os letreiros desenhados em canvas ficarem bonitos)
@@ -52,7 +56,7 @@ buildVegetation();
 buildMapBg();
 const rig = buildPlayer();
 setupInteractions();
-window.__game = { player, Q, stage, openKit, microGame, chemGame, muralPanel, amostrasBench, winPanel, closePanel, cam: (y, p) => { cam.yaw = y; cam.pitch = p; } };   // atalho para testes no console
+window.__game = { player, Q, stage, openKit, microGame, chemGame, diagnosticoPanel, muralPanel, notebook, amostrasBench, winPanel, closePanel, cam: (y, p) => { cam.yaw = y; cam.pitch = p; } };   // atalho para testes no console
 cam.yaw = 0;                          // câmera atrás do jogador, olhando para o laboratório
 player.yaw = Math.PI;
 
@@ -65,7 +69,7 @@ playBtn.addEventListener('click', () => {
   const cvs = renderer.domElement;
   if (!isTouch) { try { const p = cvs.requestPointerLock(); if (p && p.catch) p.catch(() => {}); } catch (e) {} }
   setZone('🏢 Praça da Estação');
-  startMission();
+  novoJogo();
 });
 
 addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
@@ -98,7 +102,7 @@ renderer.setAnimationLoop(() => {
     updateDoor(dt, elapsed); updateWorld(dt); updateQuest(dt, elapsed);
   }
   else { rig.g.position.copy(player.pos); rig.g.rotation.y = player.yaw; cam.yaw = Math.sin(elapsed * 0.1) * 0.5; }
-  updateLakeHealth(dt, elapsed);
+  updateMissoes(dt, elapsed);
   animated.forEach(f => f(dt, elapsed));
   updateCamera(dt);
   drawMap(player, objTarget);

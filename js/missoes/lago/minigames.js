@@ -1,12 +1,13 @@
-// Arquivo: minigames.js — as janelas de cada atividade da missão do lago:
+// Arquivo: missoes/lago/minigames.js — as janelas de cada atividade da missão do lago:
 // kit de campo (Secchi, sonda, frasco), laboratório (microscópio, química,
-// coliformes), diagnóstico no mural, vitória e caderno de campo.
-import { Q, stage, STAGES, SAMPLE_TIME, INCUB_TIME } from './estado.js';
-import { openPanel, closePanel, panelToken, $, holdButton, mixHex, say } from './interface.js';
-import { chime, blip, buzz, tone } from './audio.js';
-import { clamp, lerp, rr, rand, mulberry32, FONT } from './utils.js';
-import { lakeFx } from './lake.js';
-import { boardTex } from './construcao.js';
+// coliformes), diagnóstico, vitória e a tabela de resultados do caderno.
+// (Os "../../" sobem duas pastas: de js/missoes/lago/ para js/.)
+import { Q, stage, SAMPLE_TIME, INCUB_TIME } from './estado.js';
+import { openPanel, closePanel, panelToken, $, holdButton, mixHex, say } from '../../interface.js';
+import { chime, blip, buzz, tone } from '../../audio.js';
+import { clamp, lerp, rr, rand, mulberry32, FONT } from '../../utils.js';
+import { lakeFx } from '../../lake.js';
+import { boardTex } from '../../construcao.js';
 
 // Leituras da sonda (pioram/melhoram com a saúde do lago)
 export const probeValues = (h) => ({ od: lerp(2.1, 7.6, h), ph: lerp(8.9, 7.3, h), temp: lerp(27, 25, h) });
@@ -305,7 +306,7 @@ export function benchNeedsSample(name) {
 }
 
 // ---------- Mural: diagnóstico ----------
-export function muralPanel() {
+export function diagnosticoPanel() {
   const s = stage();
   if (s < 4) { say(['O diagnóstico abre quando <b>todas as análises</b> estiverem prontas. Aperte <b>C</b> para ver o caderno de campo.'], '📋 Mural de missões'); return; }
   openPanel('📋 Diagnóstico do Lago da Mata', (b) => {
@@ -343,12 +344,13 @@ export function winPanel() {
       <div class="row"><button class="btn" id="go">Continuar explorando</button></div>`;
     $(b, '#go').onclick = closePanel;
     tone(523, 0.15, { vol: 0.09 }); tone(659, 0.15, { vol: 0.09, when: 0.15 }); tone(784, 0.15, { vol: 0.09, when: 0.3 }); tone(1047, 0.4, { vol: 0.09, when: 0.45 });
-    // placa de monitoramento atualizada
-    lakeFx.monBoard.userData.face.material.map = boardTex('LAGO DA MATA', ['Oxigênio dissolvido: BOM ✔', 'Algas: EQUILIBRADAS ✔', 'Nitrogênio e fósforo: OK ✔', 'Situação: EM RECUPERAÇÃO 🌿'], { accent: '#2b8a3e', size: 50 });
-    lakeFx.monBoard.userData.face.material.needsUpdate = true;
+    placaRecuperada();
   });
 }
 
-export function notebook() {
-  openPanel('📓 Caderno de campo', (b) => { b.innerHTML = `<p class="tip"><b>Objetivo agora:</b> ${STAGES[stage()].now}</p>${resultsHTML()}`; });
+// Troca a placa de monitoramento do lago pela versão "recuperado"
+export function placaRecuperada() {
+  lakeFx.monBoard.userData.face.material.map = boardTex('LAGO DA MATA', ['Oxigênio dissolvido: BOM ✔', 'Algas: EQUILIBRADAS ✔', 'Nitrogênio e fósforo: OK ✔', 'Situação: EM RECUPERAÇÃO 🌿'], { accent: '#2b8a3e', size: 50 });
+  lakeFx.monBoard.userData.face.material.needsUpdate = true;
 }
+

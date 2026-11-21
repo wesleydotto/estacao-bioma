@@ -239,20 +239,11 @@ export function buildLab() {
     for (const side of [1, -1]) { const sp = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 0.8), new THREE.MeshStandardMaterial({ map: st })); sp.position.set(x, 6.3, -4.5 + side * 0.03); if (side < 0) sp.rotation.y = Math.PI; g.add(sp); }
     for (const dx of [-1.3, 1.3]) addCyl(g, 0.01, 0.01, 2.0, metal, x + dx, 7.7, -4.5, 4);
   }
-  // Mural de missões (vazio por enquanto) na parede do fundo
-  const muralTex = (() => {
-    const [c, gg] = makeCanvas(1024, 480);
-    gg.fillStyle = '#c89b63'; gg.fillRect(0, 0, 1024, 480); speckle(gg, 1024, 480, 6000, 0.12);
-    gg.strokeStyle = '#6e4b26'; gg.lineWidth = 26; gg.strokeRect(0, 0, 1024, 480);
-    gg.fillStyle = '#fff'; gg.font = `700 64px ${FONT}`; gg.textAlign = 'center'; gg.fillText('MURAL DE MISSÕES', 512, 95);
-    gg.save(); gg.translate(512, 290); gg.rotate(-0.03);
-    gg.fillStyle = '#fff59d'; gg.fillRect(-230, -110, 460, 220);
-    gg.fillStyle = '#e03131'; gg.beginPath(); gg.arc(0, -96, 12, 0, 7); gg.fill();
-    gg.fillStyle = '#3b3b3b'; gg.font = `600 40px ${FONT}`; gg.fillText('Nenhuma missão ainda.', 0, -20);
-    gg.fillText('Converse com os', 0, 35); gg.fillText('pesquisadores da mata!', 0, 82);
-    gg.restore();
-    return toTex(c);
-  })();
+  // Mural de missões na parede do fundo (o desenho é feito por desenharMural, lá embaixo)
+  const [mc, mg] = makeCanvas(1024, 480);
+  const muralTex = toTex(mc);
+  labFx.mural = { canvas: mc, ctx: mg, tex: muralTex, fundo: null };
+  desenharMural([]);
   const mural = new THREE.Mesh(new THREE.PlaneGeometry(7, 3.28), new THREE.MeshStandardMaterial({ map: muralTex }));
   mural.position.set(0, 3.6, -hd + T + 0.02); g.add(mural);
   // Placa de segurança (lava-olhos) na parede oeste
@@ -323,6 +314,41 @@ export function buildLab() {
   gm.fillStyle = '#9be7c9'; gm.font = `700 58px ${FONT}`; gm.textAlign = 'center'; gm.textBaseline = 'middle'; gm.fillText('BEM-VINDO(A)!', 256, 128);
   const mat = new THREE.Mesh(new THREE.PlaneGeometry(4, 2), new THREE.MeshStandardMaterial({ map: toTex(cm), polygonOffset: true, polygonOffsetFactor: -2 }));
   mat.rotation.x = -Math.PI / 2; mat.position.set(0, FLOOR_Y + 0.01, hd - 2); mat.receiveShadow = true; g.add(mat);
+}
+
+// ---------- Mural de missões: desenha um "post-it" para cada missão ----------
+// itens = [{ icone, titulo, situacao, cor }] (até 3 cabem no mural)
+export function desenharMural(itens) {
+  const { canvas: c, ctx: g, tex } = labFx.mural;
+  // fundo de cortiça: desenhado uma vez só e guardado (as pintinhas são aleatórias)
+  if (!labFx.mural.fundo) {
+    const [fc, fg] = makeCanvas(1024, 480);
+    fg.fillStyle = '#c89b63'; fg.fillRect(0, 0, 1024, 480); speckle(fg, 1024, 480, 6000, 0.12);
+    fg.strokeStyle = '#6e4b26'; fg.lineWidth = 26; fg.strokeRect(0, 0, 1024, 480);
+    fg.fillStyle = '#fff'; fg.font = `700 64px ${FONT}`; fg.textAlign = 'center'; fg.fillText('MURAL DE MISSÕES', 512, 95);
+    labFx.mural.fundo = fc;
+  }
+  g.drawImage(labFx.mural.fundo, 0, 0);
+  g.textAlign = 'center';
+  // lista vazia: o bilhete antigo
+  const notas = itens.length ? itens.slice(0, 3) : [{ icone: '', titulo: 'Nenhuma missão ainda.', situacao: '', cor: '#3b3b3b' }];
+  const W = notas.length === 1 ? 460 : 290, gap = 26, total = notas.length * W + (notas.length - 1) * gap;
+  notas.forEach((n, i) => {
+    const x = 512 - total / 2 + i * (W + gap) + W / 2;
+    g.save(); g.translate(x, 290); g.rotate([-0.03, 0.025, -0.015][i]);
+    g.fillStyle = '#fff59d'; g.fillRect(-W / 2, -110, W, 220);                      // papel
+    g.fillStyle = '#e03131'; g.beginPath(); g.arc(0, -96, 12, 0, 7); g.fill();       // alfinete
+    g.fillStyle = '#3b3b3b';
+    if (n.icone) { g.font = `600 52px ${FONT}`; g.fillText(n.icone, 0, -30); }
+    // título em até 2 linhas
+    g.font = `700 ${notas.length === 1 ? 44 : 30}px ${FONT}`;
+    const palavras = n.titulo.split(' '), linhas = [''];
+    for (const p of palavras) { const t = (linhas[linhas.length - 1] + ' ' + p).trim(); if (g.measureText(t).width > W - 30 && linhas[linhas.length - 1]) linhas.push(p); else linhas[linhas.length - 1] = t; }
+    linhas.slice(0, 2).forEach((l, k) => g.fillText(l, 0, (n.icone ? 22 : 0) + k * 38));
+    if (n.situacao) { g.fillStyle = n.cor; g.font = `700 28px ${FONT}`; g.fillText(n.situacao, 0, 96); }
+    g.restore();
+  });
+  tex.needsUpdate = true;   // avisa o Three.js que o desenho mudou
 }
 
 // ---------- Porta automática (abre/fecha e anima as folhas) ----------

@@ -2,10 +2,10 @@
 // quer fazer (em keys, input e cam); quem age é o resto do jogo.
 import { renderer } from './cena.js';
 import { isTouch, clamp } from './utils.js';
-import { keys, joy, input, cam, Q } from './estado.js';
+import { keys, joy, input, cam } from './estado.js';
 import { initAudio, toggleMute } from './audio.js';
 import { dlgOpen, nextLine, panelOpen, closePanel, showToast } from './interface.js';
-import { notebook } from './minigames.js';
+import { notebook, cadernoDisponivel } from './quest.js';
 
 // =====================================================================
 //  ENTRADA (teclado, mouse, toque)
@@ -15,7 +15,7 @@ addEventListener('keydown', e => {
   if (dlgOpen() && ['KeyE', 'Enter', 'Space'].includes(e.code)) { e.preventDefault(); if (!e.repeat) nextLine(); return; }
   // com painel aberto, Esc (ou C) fecha; o resto do teclado fica com o painel
   if (panelOpen()) { if (e.code === 'Escape' || e.code === 'KeyC') closePanel(); return; }
-  if (e.code === 'KeyC' && Q.started) { notebook(); return; }
+  if (e.code === 'KeyC' && cadernoDisponivel()) { notebook(); return; }
   keys[e.code] = true;
   if (e.code === 'Space') { input.jumpQueued = true; e.preventDefault(); }
   if (e.code === 'KeyE') input.interactQueued = true;

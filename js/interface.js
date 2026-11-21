@@ -3,7 +3,7 @@
 import { makeCanvas } from './construcao.js';
 import { rand, rr, clamp, lerp, FONT } from './utils.js';
 import { PATH, LAKE, lakeR } from './mapa.js';
-import { keys, Q } from './estado.js';
+import { keys } from './estado.js';
 import { blip } from './audio.js';
 
 // =====================================================================
@@ -50,7 +50,7 @@ export function drawMap(player, objTarget) {
   mctx.fillStyle = '#ffd43b'; mctx.strokeStyle = '#24302b'; mctx.lineWidth = 3;
   mctx.beginPath(); mctx.moveTo(0, -14); mctx.lineTo(10, 10); mctx.lineTo(0, 5); mctx.lineTo(-10, 10); mctx.closePath(); mctx.fill(); mctx.stroke();
   mctx.restore();
-  if (objTarget && Q.started) {   // objetivo atual no mini-mapa
+  if (objTarget) {   // objetivo atual no mini-mapa (só existe com missão em andamento)
     const [ox, oy] = toMap(objTarget.x, objTarget.z), r = 7 + Math.sin(performance.now() * 0.006) * 2;
     mctx.fillStyle = '#ffd43b'; mctx.strokeStyle = '#24302b'; mctx.lineWidth = 3;
     mctx.beginPath(); mctx.arc(clamp(ox, 8, 332), clamp(oy, 8, 332), r, 0, 7); mctx.fill(); mctx.stroke();

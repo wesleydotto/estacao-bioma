@@ -1,49 +1,41 @@
-// Arquivo: quest.js — a missão rodando: o que acontece ao apertar E perto
-// de cada coisa, o marcador amarelo, o rastreador de objetivos e as falas
-// quando muda de etapa. (O progresso em si, Q e stage(), fica em estado.js.)
+// =====================================================================
+//  MOTOR DE MISSÕES
+//  Arquivo: quest.js — roda QUALQUER missão da lista (js/missoes/index.js):
+//  - interações com a tecla E (porta, mural e as de cada missão)
+//  - rastreador no canto da tela e marcador amarelo (da missão ativa)
+//  - falas quando o jogador avança de etapa
+//  - mural de missões e caderno de campo (tecla C)
+//  As regras de cada missão ficam na pasta dela (ex.: js/missoes/lago/).
+// =====================================================================
 import * as THREE from 'three';
 import { scene } from './cena.js';
-import { Q, stage, STAGES, input } from './estado.js';
-import { openKit, chemGame, microGame, muralPanel, amostrasBench, benchNeedsSample } from './minigames.js';
-import { say, showToast, panelOpen, dlgOpen, promptEl, promptText, btnE } from './interface.js';
-import { door, labFx, DOOR_POS } from './lab.js';
-import { lakeFx } from './lake.js';
-import { LAB, FLOOR_Y, PIER_Y, PIPE_M, PIPE_DIR, groundHeight } from './mapa.js';
+import { input, jogo } from './estado.js';
+import { MISSOES, missao } from './missoes/index.js';
+import { openPanel, closePanel, panelOpen, dlgOpen, promptEl, promptText, btnE } from './interface.js';
+import { door, DOOR_POS, desenharMural } from './lab.js';
+import { LAB } from './mapa.js';
 import { player } from './player.js';
-import { chime, buzz, doorSound } from './audio.js';
+import { doorSound, chime } from './audio.js';
 import { isTouch } from './utils.js';
 
-// Posição de cada bancada do laboratório (onde o jogador aperta E)
-export const BENCH = { chem: new THREE.Vector3(-12.5, FLOOR_Y, -2.4), amostras: new THREE.Vector3(0, FLOOR_Y, -2.4), micro: new THREE.Vector3(12.5, FLOOR_Y, -2.4), mural: new THREE.Vector3(0, FLOOR_Y, -9.3) };
-
+// Missão que o jogador está seguindo agora
+export const ativa = () => missao(jogo.ativa);
+// Posição do mural de missões (parede do fundo do laboratório)
+const MURAL_POS = new THREE.Vector2(0, -9.3);
 
 // =====================================================================
 //  INTERAÇÕES NO MUNDO (aparece "[E] ..." quando você chega perto)
 // =====================================================================
 export const interactables = [];
 export const addInteract = (pos, r, label, act) => interactables.push({ pos, r, label, act });
-export let currentInteract = null;
-export const PIPE_SPOT = () => PIPE_M.clone().addScaledVector(PIPE_DIR, 2.5);
-export const SACK_SPOT = () => PIPE_M.clone().addScaledVector(PIPE_DIR, 10).addScaledVector(new THREE.Vector2(PIPE_DIR.y, -PIPE_DIR.x), -2.5);
+let currentInteract = null;
 export function setupInteractions() {
+  // porta automática do laboratório
   addInteract(() => DOOR_POS, 4.8, () => door.target ? 'Fechar porta' : 'Abrir porta', () => { door.target = door.target ? 0 : 1; doorSound(door.target === 1); door.closeTimer = 0; });
-  addInteract(() => lakeFx.ring, 2.6, () => stage() === 5 && !Q.aerator ? 'Instalar aerador solar' : 'Kit de campo', () => {
-    if (stage() === 5 && !Q.aerator) { Q.aerator = true; lakeFx.aer.visible = true; chime(); say(['☀️ Aerador instalado! Movido a energia solar, ele joga a água para o alto e <b>mistura ar</b> nela, devolvendo oxigênio para os peixes.'], '✔ Restauração'); }
-    else openKit();
-  });
-  addInteract(() => new THREE.Vector2(BENCH.amostras.x, BENCH.amostras.z), 2.6, () => !Q.stored && Q.sample ? 'Guardar amostra na geladeira' : Q.coli === 1 ? `Estufa: ${Math.ceil(Q.coliT)} s` : 'Bancada AMOSTRAS', amostrasBench);
-  addInteract(() => new THREE.Vector2(BENCH.chem.x, BENCH.chem.z), 2.6, () => 'Bancada QUÍMICA', () => { if (!benchNeedsSample('os testes químicos')) chemGame(); });
-  addInteract(() => new THREE.Vector2(BENCH.micro.x, BENCH.micro.z), 2.6, () => 'Microscópio', () => { if (!benchNeedsSample('o microscópio')) microGame(); });
-  addInteract(() => new THREE.Vector2(BENCH.mural.x, BENCH.mural.z), 3.2, () => stage() >= 4 ? 'Fazer o diagnóstico' : 'Mural de missões', muralPanel);
-  addInteract(PIPE_SPOT, 3.4, () => Q.filter ? null : stage() === 5 ? 'Instalar biofiltro' : 'Examinar o cano', () => {
-    if (stage() === 5) { Q.filter = true; lakeFx.bio.visible = true; lakeFx.flow.visible = false; chime(); say(['🟩 Biofiltro instalado! Pedras, areia e plantas <b>filtram o esgoto</b> antes de chegar ao lago. A ilha flutuante de plantas absorve o resto dos nutrientes.'], '✔ Restauração'); }
-    else say(['Um cano despejando água escura e fedida direto no lago… 🤢 Isso parece <b>esgoto</b>! Guarde essa pista.'], '🔎 Pista');
-  });
-  addInteract(SACK_SPOT, 2.8, () => Q.plants >= 6 ? null : 'Examinar os sacos', () => say(['Sacos de <b>ADUBO N-P-K</b> rasgados. Quando chove, a água leva o adubo para o lago… N = nitrogênio, P = fósforo!'], '🔎 Pista'));
-  lakeFx.spots.forEach(sp => addInteract(() => new THREE.Vector2(sp.x, sp.z), 1.8, () => stage() === 5 && !sp.done ? `Plantar muda (${Q.plants + 1}/6)` : null, () => {
-    sp.done = true; sp.mark.visible = false; sp.sap.visible = true; Q.plants++; chime();
-    if (Q.plants === 6) { lakeFx.sacks.forEach(m => m.visible = false); say(['🌳 Mata ciliar plantada! As raízes seguram o solo e <b>barram o adubo</b> que escorre com a chuva. (E os sacos de adubo foram recolhidos!)'], '✔ Restauração'); }
-  }));
+  // mural de missões (a missão ativa pode trocar o texto, ex.: "fazer o diagnóstico")
+  addInteract(() => MURAL_POS, 3.2, () => ativa().rotuloMural?.() || 'Mural de missões', muralPanel);
+  // interações de cada missão
+  for (const m of MISSOES) for (const it of m.interacoes()) addInteract(it.pos, it.r, it.label, it.act);
 }
 export function updateInteract() {
   const p = player.pos; currentInteract = null; let best = 1e9;
@@ -60,25 +52,6 @@ export function updateInteract() {
 // =====================================================================
 //  OBJETIVOS, MARCADOR E RASTREADOR
 // =====================================================================
-export function objectiveTarget() {
-  const s = stage(), v3 = (v2, y = 0) => new THREE.Vector3(v2.x, y, v2.y);
-  const ringY = PIER_Y;
-  if (s === 1 || s === 6) return v3(lakeFx.ring, ringY);
-  if (s === 2) return BENCH.amostras;
-  if (s === 3) {
-    if (Q.coli === 0 || Q.coli === 2) return BENCH.amostras;
-    if (!Q.micro) return BENCH.micro;
-    if (!(Q.chemP && Q.chemN)) return BENCH.chem;
-    return BENCH.amostras;
-  }
-  if (s === 4) return BENCH.mural;
-  if (s === 5) {
-    if (!Q.filter) { const p = PIPE_SPOT(); return v3(p, groundHeight(p.x, p.y)); }
-    const sp = lakeFx.spots.find(x => !x.done); if (sp) return new THREE.Vector3(sp.x, groundHeight(sp.x, sp.z), sp.z);
-    return v3(lakeFx.ring, ringY);
-  }
-  return null;
-}
 // Marcador amarelo flutuante + feixe de luz (dá pra ver de longe)
 export const marker = new THREE.Group(); scene.add(marker);
 {
@@ -87,53 +60,102 @@ export const marker = new THREE.Group(); scene.add(marker);
   const beam = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 40, 8, 1, true), new THREE.MeshBasicMaterial({ color: '#ffd43b', transparent: true, opacity: 0.22, depthWrite: false, fog: false }));
   beam.position.y = 22; marker.add(beam); marker.userData.beam = beam;
 }
+marker.visible = false;
 export const questEl = document.getElementById('quest');
-export let questTick = 0, lastStage = -1, objTarget = null;
+let questTick = 0;
+export let objTarget = null;          // posição do objetivo atual (o mini-mapa também usa)
+const ultimaEtapa = {};               // última etapa já "falada" de cada missão (por id)
+
+// Roda todo quadro, mesmo antes de clicar em "Explorar" (ex.: a saúde do lago)
+export function updateMissoes(dt, t) {
+  for (const m of MISSOES) m.update?.(dt, t);
+}
+
+// Roda todo quadro depois que o jogo começou
 export function updateQuest(dt, t) {
-  // amostra estragando
-  if (Q.sample && !Q.stored) { Q.sampleT -= dt; if (Q.sampleT <= 0) { Q.sample = false; buzz(); say(['Ops… a amostra passou do tempo e <b>estragou</b> (as bactérias mudaram o resultado). Volte ao píer e colete outra — dessa vez, corra! (Shift)'], '📻 Dra. Iara · rádio'); } }
-  // estufa
-  if (Q.coli === 1) { Q.coliT -= dt; labFx.incub.emissiveIntensity = 0.6 + Math.sin(t * 4) * 0.4; if (Q.coliT <= 0) { Q.coli = 2; chime(); showToast('🧫 A placa de coliformes está pronta!', '#2b8a3e'); } }
-  else labFx.incub.emissiveIntensity = Q.coli === 2 ? 1.2 : 0.2;
-  // falas quando muda de etapa
-  const s = stage();
-  if (s !== lastStage && !panelOpen() && !dlgOpen()) {
-    if (s > lastStage) {
-      if (s === 2) say(['Amostra coletada! Ela vale por <b>3 minutos</b>. Siga o marcador amarelo até a bancada <b>AMOSTRAS</b> no laboratório. Dica: segure <b>Shift</b> para correr!']);
-      if (s === 3) say(['Amostra guardada na geladeira. ❄️', 'Agora são 3 análises: <b>coliformes</b>, <b>microscópio</b> e <b>testes químicos</b>. Comece pelos coliformes: a placa precisa de um tempo na estufa!']);
-      if (s === 4) say(['Todas as análises prontas! 🎉 Vá ao <b>mural</b> no fundo do laboratório e descubra o que está causando o problema.']);
-      if (s === 5) say(['Hora de agir! Siga o marcador: <b>biofiltro</b> no cano, <b>6 mudas</b> de mata ciliar e o <b>aerador solar</b> no píer.']);
-      if (s === 6) say(['Olha só, a água já está mudando de cor! 💧 Volte ao píer e meça o <b>oxigênio</b> de novo com a sonda.']);
+  // falas quando alguma missão muda de etapa (espera fechar janelas e diálogos)
+  if (!panelOpen() && !dlgOpen()) {
+    for (const m of MISSOES) {
+      if (!m.iniciada()) continue;
+      const s = m.etapa();
+      if (ultimaEtapa[m.id] === undefined) ultimaEtapa[m.id] = s;      // acabou de começar: não fala nada
+      else if (s !== ultimaEtapa[m.id]) { if (s > ultimaEtapa[m.id]) m.falaDaEtapa?.(s); ultimaEtapa[m.id] = s; }
     }
-    lastStage = s;
   }
-  // rastreador na tela (atualiza 4x por segundo)
-  if ((questTick -= dt) <= 0 && Q.started) {
-    questTick = 0.25;
-    const st = STAGES[s], subs = st.subs ? st.subs() : [];
-    if (s === 1 && lakeFx.ring && Math.hypot(player.pos.x - lakeFx.ring.x, player.pos.z - lakeFx.ring.y) < 4) subs[0][1] = true;
+  const m = ativa(), on = m.iniciada();
+  questEl.style.display = on ? 'block' : 'none';
+  // rastreador na tela e mural 3D (atualizam 4x por segundo)
+  if ((questTick -= dt) <= 0) { questTick = 0.25; atualizarMural3D(); }
+  if (questTick === 0.25 && on) {
+    const { numero, agora, subs } = m.rastreador(player);
     const dist = objTarget ? Math.round(Math.hypot(player.pos.x - objTarget.x, player.pos.z - objTarget.z)) : 0;
-    questEl.innerHTML = `<h3>MISSÃO · SALVAR O LAGO DA MATA</h3><div class="now">${s < 7 ? s + '. ' : ''}${st.now}${objTarget && dist > 3 ? ` <small style="color:#fff;opacity:.7">· ${dist} m</small>` : ''}</div>` +
+    questEl.innerHTML = `<h3>MISSÃO · ${m.titulo.toUpperCase()}</h3><div class="now">${numero !== null ? numero + '. ' : ''}${agora}${objTarget && dist > 3 ? ` <small style="color:#fff;opacity:.7">· ${dist} m</small>` : ''}</div>` +
       subs.map(([txt, ok]) => `<div class="sub ${ok ? 'ok' : ''}">${ok ? '✔' : '•'} ${txt}</div>`).join('');
   }
   // marcador
-  objTarget = objectiveTarget();
-  marker.visible = !!objTarget && Q.started;
+  objTarget = on ? m.alvo() : null;
+  marker.visible = !!objTarget;
   if (objTarget) {
     marker.position.copy(objTarget);
     marker.userData.gem.position.y = 2.6 + Math.sin(t * 3) * 0.2; marker.userData.gem.rotation.y = t * 2;
     const inLab = Math.abs(objTarget.x) < LAB.w / 2 && Math.abs(objTarget.z) < LAB.d / 2;
     marker.userData.beam.visible = !inLab;
   }
-  // covas visíveis só na etapa de restauração
-  lakeFx.spots.forEach(sp => sp.mark.visible = s === 5 && !sp.done);
 }
 
-// ---------- Começo da missão (chamado quando o jogador clica em "Explorar") ----------
-export function startMission() {
-  setTimeout(() => say([
-    'Oi, pesquisador(a)! Aqui é a <b>Dra. Iara</b>, da Estação Bioma. 👋',
-    'Moradores avisaram que o <b>Lago da Mata</b> ficou verde, com cheiro forte e peixes morrendo. Precisamos descobrir o porquê!',
-    'Siga o <b>marcador amarelo</b> (e a trilha de terra) até o píer. Lá está o seu <b>kit de campo</b>. Aperte <b>E</b> para interagir.',
-  ], '📻 Dra. Iara · rádio', () => { Q.started = true; questEl.style.display = 'block'; lastStage = 1; }), 1200);
+// =====================================================================
+//  MURAL DE MISSÕES (parede do fundo do laboratório)
+// =====================================================================
+// Situação de uma missão, em texto e cor
+export function situacao(m) {
+  if (m.concluida()) return { txt: '✔ Concluída', cor: '#2b8a3e' };
+  if (m.iniciada()) return { txt: m.id === jogo.ativa ? '▶ Seguindo agora' : '… Em andamento', cor: '#f08c00' };
+  return { txt: '★ Disponível', cor: '#1c7ed6' };
+}
+// Redesenha o mural da parede só quando a situação de alguma missão muda
+let muralAntes = '';
+function atualizarMural3D() {
+  const itens = MISSOES.map(m => { const s = situacao(m); return { icone: m.icone, titulo: m.titulo, situacao: s.txt, cor: s.cor }; });
+  const chave = JSON.stringify(itens);
+  if (chave !== muralAntes) { muralAntes = chave; desenharMural(itens); }
+}
+
+export function muralPanel() {
+  openPanel('📋 Mural de missões', (b) => {
+    b.innerHTML = `<p class="tip">Escolha qual missão seguir. O <b>marcador amarelo</b> e o quadro no canto da tela mostram a missão escolhida.</p><div class="tools"></div>`;
+    const box = b.querySelector('.tools');
+    for (const m of MISSOES) {
+      const sit = situacao(m);
+      const d = document.createElement('div'); d.className = 'tool';
+      d.innerHTML = `<div class="ic">${m.icone}</div><div><div class="nm">${m.titulo}</div><div class="ds">${m.resumo}</div><div class="ds" style="color:${sit.cor};font-weight:700;margin-top:4px">${sit.txt}</div></div><div class="st"></div>`;
+      const st = d.querySelector('.st');
+      const botao = (texto, acao, ghost = false) => { const bt = document.createElement('button'); bt.className = ghost ? 'btn ghost' : 'btn'; bt.textContent = texto; bt.onclick = acao; bt.style.margin = '3px 0'; st.appendChild(bt); st.appendChild(document.createElement('br')); };
+      // botões extras da própria missão (ex.: diagnóstico do lago)
+      for (const a of (m.acoesMural?.() || [])) botao(a.texto, a.acao, !a.destaque);
+      if (!m.iniciada()) botao('Começar', () => { jogo.ativa = m.id; closePanel(); m.iniciar(); });
+      else if (!m.concluida() && m.id !== jogo.ativa) botao('Seguir esta', () => { jogo.ativa = m.id; chime(); muralPanel(); });
+      box.appendChild(d);
+    }
+  });
+}
+
+// =====================================================================
+//  CADERNO DE CAMPO (tecla C): uma página para cada missão já começada
+// =====================================================================
+export const cadernoDisponivel = () => MISSOES.some(m => m.iniciada());
+export function notebook(id = jogo.ativa) {
+  const lista = MISSOES.filter(m => m.iniciada());
+  if (!lista.length) return;
+  if (!lista.some(m => m.id === id)) id = lista[0].id;
+  openPanel('📓 Caderno de campo', (b) => {
+    // abas (só aparecem quando há mais de uma missão começada)
+    const abas = lista.length > 1 ? `<div class="row" style="justify-content:flex-start">${lista.map(m => `<button class="btn ${m.id === id ? '' : 'ghost'}" data-id="${m.id}">${m.icone} ${m.titulo}</button>`).join('')}</div>` : '';
+    b.innerHTML = abas + missao(id).caderno();
+    b.querySelectorAll('[data-id]').forEach(bt => bt.onclick = () => notebook(bt.dataset.id));
+  });
+}
+
+// ---------- Começo do jogo (chamado quando o jogador clica em "Explorar") ----------
+export function novoJogo() {
+  setTimeout(() => ativa().iniciar(), 1200);
 }
