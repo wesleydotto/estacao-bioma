@@ -18,6 +18,7 @@ O jogador é um pesquisador de campo. Tem um laboratório (Estação Bioma) no m
 - Na primeira vez: `npm install`.
 - Desenvolver: `npm run dev` e abrir o endereço que aparecer (ex.: http://localhost:5173). A página recarrega sozinha ao salvar.
 - Versão final (para publicar): `npm run build`. Ela é gerada na pasta `dist/`.
+- Arquivo único para abrir com duplo clique (sem servidor): `npm run unico` → `dist-unico/estacao-bioma.html` e `estacao-bioma-teste.html` (este já com save depois do lago).
 
 ## Organização dos arquivos
 - `index.html`: a tela (HUD, painéis, tela inicial) e o CSS. Carrega `js/main.js`.
@@ -28,7 +29,7 @@ O jogador é um pesquisador de campo. Tem um laboratório (Estação Bioma) no m
 - `js/player.js`: personagem, movimento, colisão e câmera. `js/boneco.js`: modelo de pessoa (jogador e NPCs).
 - `js/npc.js`: `addNPC({nome, x, z, cores, falas | aoFalar, temMissao})`. `js/save.js`: salva no localStorage a cada 5 s.
 - `js/economia.js` (verba, inventário, loja, relatórios; itens do tipo `equipamento` liberam testes), `js/prefeitura.js` (prédio e secretária), `js/construir.js` (lugares marcados para construir).
-- `js/fazenda.js`: cenário da Fazenda Boa Safra (Missão 2), ao norte do lago (centro em (-45, 160), `FAZENDA` em `mapa.js`). O fazendeiro (Seu Geraldo) é criado pela missão.
+- `js/fazenda.js`: cenário da Fazenda Boa Safra (Missão 2), ao norte do lago (centro em (-45, 160), `FAZENDA` em `mapa.js`), com o fragmento de mata e os pontos de coleta. O fazendeiro (Seu Geraldo) e a bancada SOLO do laboratório são criados pela missão (`js/missoes/adubo/`).
 - `js/audio.js`, `js/controles.js` (teclado, mouse e toque), `js/interface.js` (zona, avisos, mini-mapa, diálogos `say()` e painéis `openPanel()`).
 - `js/estado.js`: estado compartilhado (`keys`, `input`, `cam` e `jogo.ativa` = missão seguida agora).
 - `js/quest.js`: **motor de missões** (interações com E, rastreador, marcador, falas por etapa, mural e caderno).
@@ -52,7 +53,7 @@ O estado da missão fica no objeto `Q` e a etapa atual é calculada por `stage()
 As interações com E da missão ficam em `interacoes()`, em `js/missoes/lago/index.js`. O motor (`js/quest.js`) registra todas.
 
 ## Ideias para depois
-- O plano de novas missões está em `PLANO_MISSOES.md`. As Fases 0 (base de missões) e 1 (economia) estão prontas; a Missão 2 (monocultura) está em andamento (fatias A e B prontas, veja o `HISTORICO.md`). A energia só é liberada na Missão 3.
+- O plano de novas missões está em `PLANO_MISSOES.md`. As Fases 0 (base de missões) e 1 (economia) estão prontas; a Missão 2 (monocultura) está pronta (veja o `HISTORICO.md`). A energia (placa solar e cata-vento) segue travada na loja até a Missão 3.
 - Trocar os modelos feitos com formas simples por modelos .glb.
 - NPCs na floresta com novas missões (o mural do laboratório já existe para isso).
 - Novos lagos e rios com outros problemas: metais pesados (espectrofotômetro), condutividade.

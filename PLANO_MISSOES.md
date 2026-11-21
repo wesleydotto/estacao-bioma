@@ -36,7 +36,10 @@ Base para o jogador **ganhar verba, comprar e construir**. As missões seguintes
 
 ---
 
-## Missão 2: "De onde veio o adubo?" (Monocultura e solo) · **M/G**
+## Missão 2: "De onde veio o adubo?" (Monocultura e solo) · **M/G** ✔ PRONTA
+
+> Feita (veja o `HISTORICO.md`). Mudanças em relação ao plano abaixo: equipamentos pagos na loja (kit de infiltração, lupa, balança com estufa, sonda), adiantamentos de verba por etapa, relatório com estrelas, 30 dias de espera antes de medir de novo. Texto original do plano:
+
 
 - **Conteúdo / BNCC:** impactos nos ecossistemas (EF07CI07, EF07CI08) e ações para recuperar o equilíbrio ambiental (EF08CI16). O tema solo também aparece em Geografia do 6º ano.
 - **Onde:** uma fazenda de monocultura (soja) depois da mata, ao norte do lago. Os sacos de adubo ficam no caminho, e a chuva leva o adubo até o lago.

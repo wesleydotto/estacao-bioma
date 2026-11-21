@@ -11,7 +11,9 @@ import { player } from './player.js';
 import { salvarEco, carregarEco } from './economia.js';
 import { salvarLotes, carregarLotes } from './construir.js';
 
-const CHAVE = 'estacao-bioma-save-v1';   // nome da "gaveta" no navegador (mude o v1 se o formato mudar)
+// nome da "gaveta" no navegador (mude o v1 se o formato mudar).
+// O arquivo de TESTE (npm run unico) define window.__SAVE_KEY para usar outra gaveta e não misturar com o seu jogo normal.
+const CHAVE = (typeof window !== 'undefined' && window.__SAVE_KEY) || 'estacao-bioma-save-v1';
 
 // Já existe jogo salvo? (try/catch: alguns navegadores bloqueiam o localStorage)
 export function temSave() {
