@@ -21,12 +21,13 @@ export const eco = {
 // ---------- Catálogo da loja ----------
 // tipo: 'construir' = vai para um lugar marcado no mundo; 'ferramenta' = fica com você;
 //       'equipamento' = compra única que libera um teste no laboratório/campo (precisa para fazer a análise).
+// bloqueado (opcional): texto de quando o item abre (ex.: 'Missão 3'). Enquanto tiver isso, a loja não vende.
 // watts (só equipamentos): consumo de energia. Ainda não aparece no jogo: a Missão 3 (energia) vai usar.
 export const ITENS = {
   muda:      { nome: 'Muda nativa (ipê)', icone: '🌱', preco: 40, tipo: 'construir', desc: 'Árvore nativa do Cerrado. Planta num canteiro marcado. Precisa de pá.' },
   sementes:  { nome: 'Sementes de adubação verde', icone: '🫘', preco: 25, tipo: 'construir', desc: 'Feijão-de-porco: cobre o solo e devolve nitrogênio a ele. Precisa de pá.' },
-  placa:     { nome: 'Placa solar', icone: '☀️', preco: 600, tipo: 'construir', desc: 'Transforma a luz do Sol em eletricidade. Vai numa base de energia.' },
-  catavento: { nome: 'Cata-vento (turbina eólica)', icone: '🌬️', preco: 450, tipo: 'construir', desc: 'Transforma o vento em eletricidade. Vai numa base de energia.' },
+  placa:     { nome: 'Placa solar', icone: '☀️', preco: 600, tipo: 'construir', bloqueado: 'Missão 3', desc: 'Transforma a luz do Sol em eletricidade. Vai numa base de energia.' },
+  catavento: { nome: 'Cata-vento (turbina eólica)', icone: '🌬️', preco: 450, tipo: 'construir', bloqueado: 'Missão 3', desc: 'Transforma o vento em eletricidade. Vai numa base de energia.' },
   pa:        { nome: 'Pá', icone: '🪏', preco: 60, tipo: 'ferramenta', desc: 'Ferramenta para cavar e plantar. Compre uma vez e use sempre.' },
   kitInfiltracao: { nome: 'Kit de infiltração (anel + cronômetro)', icone: '🥤', preco: 180, tipo: 'equipamento', watts: 0, desc: 'Mede quanto tempo a água leva para entrar no solo. Libera o teste de infiltração (Missão 2).' },
   lupaCampo:      { nome: 'Lupa de campo e peneira', icone: '🔍', preco: 120, tipo: 'equipamento', watts: 0, desc: 'Para contar minhocas e insetos do solo. Libera a contagem de fauna (Missão 2).' },
@@ -110,7 +111,7 @@ function mostrarLoja(box) {
     const jaTem = (it.tipo === 'ferramenta' || it.tipo === 'equipamento') && qtd(id) > 0;   // ferramenta e equipamento: só precisa de um
     const d = document.createElement('div'); d.className = 'tool';
     d.innerHTML = `<div class="ic">${it.icone}</div><div><div class="nm">${it.nome}</div><div class="ds">${it.desc}</div><div class="ds">Você tem: <b>${qtd(id)}</b></div></div><div class="st">${reais(it.preco)}<br></div>`;
-    const bt = document.createElement('button'); bt.className = 'btn'; bt.textContent = jaTem ? 'Já tem' : 'Comprar'; bt.disabled = jaTem;
+    const bt = document.createElement('button'); bt.className = 'btn'; bt.textContent = it.bloqueado ? '🔒 ' + it.bloqueado : jaTem ? 'Já tem' : 'Comprar'; bt.disabled = jaTem || !!it.bloqueado;
     bt.onclick = () => {
       if (eco.verba < it.preco) { buzz(); fb.className = 'fb bad'; fb.textContent = `Falta ${reais(it.preco - eco.verba)} para comprar ${it.nome}.`; return; }
       eco.verba -= it.preco; addItem(id); atualizarHudVerba(); chime();

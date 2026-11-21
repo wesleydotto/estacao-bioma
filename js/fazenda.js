@@ -9,6 +9,7 @@
 //  montada depois de tudo, sem mudar a posição das árvores.
 // =====================================================================
 import * as THREE from 'three';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { scene } from './cena.js';
 import { std, addBox, addCyl, addCollider, circles, makeCanvas, toTex, corrugTex, boardTex, makePostBoard } from './construcao.js';
 import { FAZENDA, PIPE_M, PIPE_DIR, PONTO_MATA, PONTO_LAVOURA, walkHeight } from './mapa.js';
@@ -88,12 +89,20 @@ export function buildFazenda() {
   const sulco = std('#6d3a24', 1);
   for (const z of linhas) addBox(g, campo.x1 - campo.x0, 0.08, 0.55, sulco, (campo.x0 + campo.x1) / 2, y0 + 0.04, z, { cast: false });
   const porLinha = Math.floor((campo.x1 - campo.x0) / 0.9);
-  const soja = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(0.22, 0), std('#ffffff', 0.85), linhas.length * porLinha);
+  // a plantinha: um caule fino e dois andares de folhas achatadas (trifólio, como a soja de verdade)
+  const partes = [];
+  const caule = new THREE.CylinderGeometry(0.02, 0.03, 0.4, 5); caule.translate(0, 0.2, 0); partes.push(caule.toNonIndexed());
+  for (const [altura, giro] of [[0.22, 0], [0.38, 1]]) for (let i = 0; i < 3; i++) {
+    const folha = new THREE.SphereGeometry(0.15, 6, 4); folha.scale(1, 0.22, 1.5); folha.translate(0.14, altura, 0);
+    folha.rotateY(i * 2.094 + giro); partes.push(folha.toNonIndexed());
+  }
+  const sojaGeo = mergeGeometries(partes);
+  const soja = new THREE.InstancedMesh(sojaGeo, std('#ffffff', 0.85), linhas.length * porLinha);
   const m4 = new THREE.Matrix4(), cor = new THREE.Color();
   let n = 0;
   for (const z of linhas) for (let i = 0; i < porLinha; i++) {
     const s = 0.8 + aleat() * 0.5;
-    m4.compose(new THREE.Vector3(campo.x0 + 0.5 + i * 0.9, y0 + 0.28 * s, z), new THREE.Quaternion(), new THREE.Vector3(s, s * 1.15, s));
+    m4.compose(new THREE.Vector3(campo.x0 + 0.5 + i * 0.9, y0, z), new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), aleat() * 6.28), new THREE.Vector3(s, s, s));
     soja.setMatrixAt(n, m4);
     soja.setColorAt(n, cor.setHSL(0.22 + aleat() * 0.06, 0.55, 0.32 + aleat() * 0.1));
     n++;

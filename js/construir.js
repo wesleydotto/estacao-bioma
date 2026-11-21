@@ -4,7 +4,8 @@
 //  Cada LOTE tem uma posição, um tipo e a lista de itens que aceita.
 //  Chegando perto e apertando E, o item sai do inventário e aparece no mundo.
 //
-//  Para criar lotes novos (ex.: numa missão): addLote({ nome, x, z, tipo, aceita })
+//  Para criar lotes novos (ex.: numa missão): addLote({ nome, x, z, tipo, aceita, ativo })
+//    ativo (opcional): função que diz se o lote já pode ser usado (ex.: () => A.conv.feito). Devolve o lote criado.
 //    tipo: 'canteiro' (terra, para plantar) ou 'energia' (base de concreto)
 // =====================================================================
 import * as THREE from 'three';
@@ -51,7 +52,7 @@ const MODELOS = {
 };
 
 // ---------- Criar um lote ----------
-export function addLote({ nome, x, z, tipo = 'canteiro', aceita = ['muda', 'sementes'] }) {
+export function addLote({ nome, x, z, tipo = 'canteiro', aceita = ['muda', 'sementes'], ativo = () => true }) {
   const y = walkHeight(x, z);
   const marca = new THREE.Group(); marca.position.set(x, y, z); scene.add(marca);
   if (tipo === 'canteiro') {
@@ -64,7 +65,7 @@ export function addLote({ nome, x, z, tipo = 'canteiro', aceita = ['muda', 'seme
     for (const [w, d, px, pz] of [[2.2, 0.08, 0, 1.06], [2.2, 0.08, 0, -1.06], [0.08, 2.2, 1.06, 0], [0.08, 2.2, -1.06, 0]])
       addBox(marca, w, 0.02, d, std('#ffd43b', 0.6, 0, { emissive: '#ffd43b', emissiveIntensity: 0.3 }), px, 0.16, pz);   // faixa amarela
   }
-  const lote = { nome, x, z, y, tipo, aceita, feito: null, marca, modelo: null };
+  const lote = { nome, x, z, y, tipo, aceita, ativo, feito: null, marca, modelo: null };
   lotes.push(lote);
   lotesInteracoes.push({ pos: () => new THREE.Vector2(x, z), r: tipo === 'energia' ? 2.4 : 1.8, label: () => rotulo(lote), act: () => usarLote(lote) });
   return lote;
@@ -76,7 +77,7 @@ const precisaPa = (id) => id === 'muda' || id === 'sementes';
 const verbo = (id) => (precisaPa(id) ? 'Plantar' : 'Instalar');
 
 function rotulo(lote) {
-  if (lote.feito) return null;
+  if (lote.feito || !lote.ativo()) return null;   // já construído, ou ainda não liberado
   const id = itemDisponivel(lote);
   if (!id) return `${lote.nome} (vazio)`;
   return `${verbo(id)} ${ITENS[id].nome.toLowerCase()} (você tem ${qtd(id)})`;

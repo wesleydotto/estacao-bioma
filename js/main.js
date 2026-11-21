@@ -51,7 +51,7 @@ import { ativa, setupInteractions, montarMissoes, updateInteract, updateQuest, u
 import { addNPC, updateNPCs } from './npc.js';
 import { buildPrefeitura } from './prefeitura.js';
 import { buildFazenda } from './fazenda.js';
-import { montarLotes } from './construir.js';
+import { montarLotes, lotes } from './construir.js';
 import { eco, atualizarHudVerba } from './economia.js';
 import { temSave, salvar, carregar, apagarSave, updateSave } from './save.js';
 import './controles.js';   // só de importar, os controles já começam a "ouvir" o teclado e o mouse
@@ -76,7 +76,7 @@ atualizarHudVerba();
 const rig = buildPlayer();
 montarMissoes();
 setupInteractions();
-window.__game = { player, Q, A, stage, openKit, microGame, chemGame, diagnosticoPanel, muralPanel, notebook, addNPC, eco, salvar, carregar, apagarSave, jogo, lakeFx, amostrasBench, winPanel, closePanel, cam: (y, p) => { cam.yaw = y; cam.pitch = p; } };   // atalho para testes no console
+window.__game = { player, Q, A, lotes, stage, openKit, microGame, chemGame, diagnosticoPanel, muralPanel, notebook, addNPC, eco, salvar, carregar, apagarSave, jogo, lakeFx, amostrasBench, winPanel, closePanel, cam: (y, p) => { cam.yaw = y; cam.pitch = p; } };   // atalho para testes no console
 cam.yaw = 0;                          // câmera atrás do jogador, olhando para o laboratório
 player.yaw = Math.PI;
 
