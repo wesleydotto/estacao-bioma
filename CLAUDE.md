@@ -11,8 +11,22 @@ O jogador é um pesquisador de campo. Tem um laboratório (Estação Bioma) no m
 - Respostas diretas e informais, sem textão.
 
 ## Como rodar
-- Tudo está em `index.html` (Three.js 0.170 via CDN, sem build).
-- Rodar com servidor local: `npx serve .` e abrir o endereço que aparecer no navegador.
+- Projeto com **Vite** + Three.js 0.170 (instalado pelo npm).
+- Na primeira vez: `npm install`.
+- Desenvolver: `npm run dev` e abrir o endereço que aparecer (ex.: http://localhost:5173). A página recarrega sozinha ao salvar.
+- Versão final (para publicar): `npm run build`. Ela é gerada na pasta `dist/`.
+
+## Organização dos arquivos
+- `index.html`: a tela (HUD, painéis, tela inicial) e o CSS. Carrega `js/main.js`.
+- `js/main.js`: monta o mundo e roda o laço principal. **A ordem dos `build...()` importa**, porque o gerador aleatório tem semente.
+- `js/utils.js` (matemática), `js/mapa.js` (posições e altura do chão), `js/cena.js` (renderizador, câmera, luz e céu).
+- `js/construcao.js`: ajudantes `addBox`/`addCyl`, texturas, placas e as listas `colliders`, `circles` e `animated`.
+- `js/terreno.js`, `js/lab.js` (prédio e porta), `js/lake.js` (lago e saúde do lago), `js/vegetacao.js`.
+- `js/player.js`: personagem, movimento, colisão e câmera.
+- `js/audio.js`, `js/controles.js` (teclado, mouse e toque), `js/interface.js` (zona, avisos, mini-mapa, diálogos `say()` e painéis `openPanel()`).
+- `js/estado.js`: estado compartilhado (`Q`, `stage()`, `STAGES`, `keys`, `input`, `cam`).
+- `js/minigames.js`: as janelas de cada atividade. `js/quest.js`: as interações com E, o marcador e o rastreador.
+- Regra dos módulos: um arquivo não pode **reatribuir** uma variável importada de outro. Estado compartilhado fica dentro de objetos (ex.: `cam.yaw = 1`).
 
 ## Mapa (coordenadas em metros)
 - Laboratório: centro (0,0), 40 × 22 m, porta virada para +Z (z = 11).
@@ -27,11 +41,11 @@ O jogador é um pesquisador de campo. Tem um laboratório (Estação Bioma) no m
 4. **Restauração**: biofiltro no cano, 6 mudas de mata ciliar e aerador solar no píer. O lago melhora aos poucos (variável `Q.health`, de 0 a 1).
 5. **Medir de novo** com a sonda. Aparece a tela de vitória com o antes e o depois.
 
-O estado da missão fica no objeto `Q`. A etapa atual é calculada por `stage()`.
-As interações com a tecla E ficam em `setupInteractions()`.
+O estado da missão fica no objeto `Q` e a etapa atual é calculada por `stage()`, os dois em `js/estado.js`.
+As interações com a tecla E ficam em `setupInteractions()`, em `js/quest.js`.
 
 ## Ideias para depois
-- Separar o código em arquivos (`world.js`, `lab.js`, `lake.js`, `quest.js`) com Vite.
+- O plano de novas missões está em `PLANO_MISSOES.md`. Começar pela Fase 0 (sistema de missões).
 - Trocar os modelos feitos com formas simples por modelos .glb.
 - NPCs na floresta com novas missões (o mural do laboratório já existe para isso).
 - Novos lagos e rios com outros problemas: metais pesados (espectrofotômetro), condutividade.
