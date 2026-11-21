@@ -6,6 +6,7 @@ import { keys, joy, input, cam } from './estado.js';
 import { initAudio, toggleMute } from './audio.js';
 import { dlgOpen, nextLine, panelOpen, closePanel, showToast } from './interface.js';
 import { notebook, cadernoDisponivel } from './quest.js';
+import { inventarioPanel } from './economia.js';
 
 // =====================================================================
 //  ENTRADA (teclado, mouse, toque)
@@ -14,8 +15,9 @@ addEventListener('keydown', e => {
   // com diálogo aberto, E / Enter / Espaço avançam a conversa
   if (dlgOpen() && ['KeyE', 'Enter', 'Space'].includes(e.code)) { e.preventDefault(); if (!e.repeat) nextLine(); return; }
   // com painel aberto, Esc (ou C) fecha; o resto do teclado fica com o painel
-  if (panelOpen()) { if (e.code === 'Escape' || e.code === 'KeyC') closePanel(); return; }
+  if (panelOpen()) { if (e.code === 'Escape' || e.code === 'KeyC' || e.code === 'KeyI') closePanel(); return; }
   if (e.code === 'KeyC' && cadernoDisponivel()) { notebook(); return; }
+  if (e.code === 'KeyI' && input.started) { inventarioPanel(); return; }
   keys[e.code] = true;
   if (e.code === 'Space') { input.jumpQueued = true; e.preventDefault(); }
   if (e.code === 'KeyE') input.interactQueued = true;
@@ -42,7 +44,7 @@ const joyBase = document.getElementById('joyBase'), joyKnob = document.getElemen
 if (isTouch) {
   const layer = document.getElementById('touch');
   layer.style.display = 'block'; document.getElementById('help').style.display = 'none';
-  ['btnJump', 'btnRun'].forEach(id => document.getElementById(id).style.display = 'block');
+  ['btnJump', 'btnRun', 'btnInv'].forEach(id => document.getElementById(id).style.display = 'block');
   layer.addEventListener('touchstart', e => {
     for (const t of e.changedTouches) {
       if (t.clientX < innerWidth * 0.45 && joy.id === null) { joy.id = t.identifier; joy.ox = t.clientX; joy.oy = t.clientY; joyBase.style.display = 'block'; joyBase.style.left = (t.clientX - 60) + 'px'; joyBase.style.top = (t.clientY - 60) + 'px'; }
@@ -66,5 +68,6 @@ if (isTouch) {
   const tap = (id, fn) => document.getElementById(id).addEventListener('touchstart', e => { e.preventDefault(); e.stopPropagation(); initAudio(); fn(); }, { passive: false });
   tap('btnE', () => { if (dlgOpen()) nextLine(); else input.interactQueued = true; });
   tap('btnJump', () => input.jumpQueued = true);
+  tap('btnInv', () => { if (!panelOpen()) inventarioPanel(); });
   tap('btnRun', () => { input.runToggle = !input.runToggle; document.getElementById('btnRun').classList.toggle('on', input.runToggle); });
 }

@@ -16,6 +16,9 @@
 //    boneco.js      o modelo de pessoa (jogador e NPCs)
 //    npc.js         personagens que conversam com o jogador (addNPC)
 //    save.js        salvar e carregar o progresso (localStorage)
+//    economia.js    verba (R$), inventário, loja e relatórios
+//    prefeitura.js  o prédio da prefeitura e a secretária
+//    construir.js   lugares marcados onde se usa o que foi comprado
 //    audio.js       sons
 //    controles.js   teclado, mouse e toque
 //    interface.js   textos na tela, mini-mapa, diálogos e janelas
@@ -43,6 +46,9 @@ import { buildMapBg, drawMap, setZone, updateHud, panelOpen, dlgOpen, closePanel
 import { openKit, microGame, chemGame, diagnosticoPanel, amostrasBench, winPanel } from './missoes/lago/minigames.js';
 import { ativa, setupInteractions, montarMissoes, updateInteract, updateQuest, updateMissoes, novoJogo, muralPanel, notebook, objTarget } from './quest.js';
 import { addNPC, updateNPCs } from './npc.js';
+import { buildPrefeitura } from './prefeitura.js';
+import { montarLotes } from './construir.js';
+import { eco, atualizarHudVerba } from './economia.js';
 import { temSave, salvar, carregar, apagarSave, updateSave } from './save.js';
 import './controles.js';   // só de importar, os controles já começam a "ouvir" o teclado e o mouse
 
@@ -58,11 +64,14 @@ buildTerrain();
 buildLab();
 buildLake();
 buildVegetation();
+buildPrefeitura();   // não usa o gerador com semente, então pode vir depois
+montarLotes();
 buildMapBg();
+atualizarHudVerba();
 const rig = buildPlayer();
 montarMissoes();
 setupInteractions();
-window.__game = { player, Q, stage, openKit, microGame, chemGame, diagnosticoPanel, muralPanel, notebook, addNPC, salvar, carregar, apagarSave, jogo, lakeFx, amostrasBench, winPanel, closePanel, cam: (y, p) => { cam.yaw = y; cam.pitch = p; } };   // atalho para testes no console
+window.__game = { player, Q, stage, openKit, microGame, chemGame, diagnosticoPanel, muralPanel, notebook, addNPC, eco, salvar, carregar, apagarSave, jogo, lakeFx, amostrasBench, winPanel, closePanel, cam: (y, p) => { cam.yaw = y; cam.pitch = p; } };   // atalho para testes no console
 cam.yaw = 0;                          // câmera atrás do jogador, olhando para o laboratório
 player.yaw = Math.PI;
 

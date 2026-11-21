@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { mergeGeometries, mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
 import { scene } from './cena.js';
 import { std, circles, animated } from './construcao.js';
-import { LAB, LAKE, WORLD_R, lakeR, lakeNorm, distToPath, onPier, groundHeight, P0, PIPE_M, PIPE_DIR } from './mapa.js';
+import { LAB, LAKE, WORLD_R, lakeR, lakeNorm, distToPath, onPier, groundHeight, P0, PIPE_M, PIPE_DIR, distToPref, onPrefWalk } from './mapa.js';
 import { rand, rr, smoothstep, isTouch } from './utils.js';
 
 // =====================================================================
@@ -25,6 +25,7 @@ export function canSpawnTree(x, z) {
   const dx = Math.max(Math.abs(x) - LAB.w / 2, 0), dz = Math.max(Math.abs(z) - LAB.d / 2, 0);
   if (Math.hypot(dx, dz) < 14 || (Math.abs(x) < 24 && z > 0 && z < 30)) return false;
   if (distToPath(x, z) < 4.5 || lakeNorm(x, z) < 1.35) return false;
+  if (distToPref(x, z) < 9) return false;                 // clareira da prefeitura
   if (Math.hypot(x - (PIPE_M.x + PIPE_DIR.x * 8), z - (PIPE_M.y + PIPE_DIR.y * 8)) < 10) return false;
   return true;
 }
@@ -145,6 +146,7 @@ export function buildVegetation() {
     const a = rand() * 6.28, r = Math.sqrt(rand()) * 135, x = -25 + Math.cos(a) * r, z = 40 + Math.sin(a) * r;
     if (x > -21.8 && x < 21.8 && z > -12.8 && z < 21.2) continue;
     const ld = lakeNorm(x, z); if (ld < 1.03 || onPier(x, z)) continue;
+    if (distToPref(x, z) < 0.3 || onPrefWalk(x, z)) continue;     // sem grama dentro da prefeitura e na calçada
     if (distToPath(x, z) < 1.4 && rand() < 0.9) continue;
     const sc = rr(0.7, 1.5);
     q.setFromAxisAngle(up, rr(0, 6.28));
@@ -163,6 +165,7 @@ export function buildVegetation() {
     const a = rand() * 6.28, r = Math.sqrt(rand()) * 130, x = -25 + Math.cos(a) * r, z = 40 + Math.sin(a) * r;
     if (x > -21.8 && x < 21.8 && z > -12.8 && z < 21.2) continue;
     if (lakeNorm(x, z) < 1.25 || distToPath(x, z) < 2) continue;
+    if (distToPref(x, z) < 1 || onPrefWalk(x, z)) continue;
     flowers.setMatrixAt(n, m4.compose(v.set(x, groundHeight(x, z) + rr(0.25, 0.45), z), q.identity(), s.set(1, 1, 1)));
     flowers.setColorAt(n, new THREE.Color(pal[Math.floor(rand() * pal.length)]));
     n++;

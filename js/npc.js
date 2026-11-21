@@ -10,6 +10,7 @@
 //      falas: ['Oi!', 'Tudo bem?'],               // o que ele fala quando o jogador aperta E
 //      // ou, no lugar de falas: aoFalar: () => { ... }  (para conversas que mudam a missão)
 //      temMissao: () => true,                     // mostra um "!" em cima da cabeça
+//      alcance: 2.4,                              // distância (m) para o [E] aparecer
 //    });
 // =====================================================================
 import * as THREE from 'three';
@@ -34,7 +35,7 @@ const exclamTex = (() => {
   return toTex(c);
 })();
 
-export function addNPC({ nome, x, z, olhaPara = 0, cores = {}, falas = ['Olá!'], aoFalar = null, temMissao = () => false }) {
+export function addNPC({ nome, x, z, olhaPara = 0, cores = {}, falas = ['Olá!'], aoFalar = null, temMissao = () => false, alcance = 2.4 }) {
   const rig = criarBoneco({ mochila: null, frasco: false, jaleco: null, ...cores });
   rig.g.position.set(x, walkHeight(x, z), z);
   rig.g.rotation.y = olhaPara;
@@ -46,7 +47,7 @@ export function addNPC({ nome, x, z, olhaPara = 0, cores = {}, falas = ['Olá!']
   const npc = { nome, x, z, olhaPara, rig, exclam, temMissao, fase: Math.random() * 6 };
   npcs.push(npc);
   npcInteracoes.push({
-    pos: () => new THREE.Vector2(x, z), r: 2.4,
+    pos: () => new THREE.Vector2(x, z), r: alcance,   // alcance = distância para aparecer o [E]
     label: () => `Conversar com ${nome}`,
     act: () => (aoFalar ? aoFalar(npc) : say(falas, `💬 ${nome}`)),
   });

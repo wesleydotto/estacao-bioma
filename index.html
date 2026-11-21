@@ -23,6 +23,12 @@
   #mapWrap { top: 14px; right: 14px; background: rgba(16,32,24,.6); border-radius: 16px; padding: 8px; border: 2px solid rgba(255,255,255,.15); }
   #minimap { width: 170px; height: 170px; border-radius: 10px; display: block; }
   #mapInfo { font-size: 12.5px; text-align: center; margin-top: 5px; opacity: .9; }
+  /* ---------- Verba (dinheiro) e inventário ---------- */
+  #verba { top: 238px; right: 14px; background: rgba(16,32,24,.72); padding: 6px 14px; border-radius: 999px; font-weight: 700; font-size: 16px; color: #ffd43b; border: 2px solid rgba(255,255,255,.15); }
+  .inv { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
+  .slot { background: #f1f3f0; border-radius: 14px; padding: 10px 8px; text-align: center; }
+  .slot .ic { font-size: 34px; } .slot .nm { font-size: 13px; font-weight: 600; line-height: 1.25; margin: 4px 0; } .slot .q { font-weight: 700; color: #0f7e6c; }
+  #btnInv { right: 112px; bottom: 120px; font-size: 26px; }
 
   /* ---------- Tela inicial ---------- */
   #start { position: fixed; inset: 0; z-index: 20; display: flex; align-items: center; justify-content: center; background: radial-gradient(ellipse at center, rgba(20,60,40,.55), rgba(5,15,10,.9)); }
@@ -105,11 +111,12 @@
 <div id="prompt" class="hud"><kbd>E</kbd><span id="promptText">Abrir porta</span></div>
 <div id="help" class="hud">
   <b>WASD</b> andar · <b>Shift</b> correr · <b>Espaço</b> pular<br>
-  <b>E</b> interagir · <b>C</b> caderno · <b>Mouse</b> câmera · <b>M</b> som
+  <b>E</b> interagir · <b>C</b> caderno · <b>I</b> inventário · <b>Mouse</b> câmera · <b>M</b> som
 </div>
 <div id="quest" class="hud"></div>
 <div id="dlg"><div class="who"></div><div class="txt"></div><div class="next">clique ou aperte E ▶</div></div>
 <div id="panel"><div class="box"><button id="panelClose">✕</button><h2 id="panelTitle"></h2><div id="panelBody"></div></div></div>
+<div id="verba" class="hud">💰 R$ 0</div>
 <div id="mapWrap" class="hud">
   <canvas id="minimap" width="340" height="340"></canvas>
   <div id="mapInfo"></div>
@@ -120,6 +127,7 @@
 <button id="btnE" class="tbtn">E</button>
 <button id="btnJump" class="tbtn">⤒</button>
 <button id="btnRun" class="tbtn">Correr</button>
+<button id="btnInv" class="tbtn">🎒</button>
 
 <div id="start">
   <div class="card">

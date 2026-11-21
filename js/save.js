@@ -8,6 +8,8 @@
 import { jogo, input } from './estado.js';
 import { MISSOES, missao } from './missoes/index.js';
 import { player } from './player.js';
+import { salvarEco, carregarEco } from './economia.js';
+import { salvarLotes, carregarLotes } from './construir.js';
 
 const CHAVE = 'estacao-bioma-save-v1';   // nome da "gaveta" no navegador (mude o v1 se o formato mudar)
 
@@ -23,6 +25,8 @@ export function salvar() {
     ativa: jogo.ativa,
     player: { x: player.pos.x, y: player.pos.y, z: player.pos.z, yaw: player.yaw },
     missoes: {},
+    eco: salvarEco(),        // verba, inventário e relatórios
+    lotes: salvarLotes(),    // o que foi construído em cada lugar marcado
   };
   for (const m of MISSOES) if (m.salvar) dados.missoes[m.id] = m.salvar();
   try { localStorage.setItem(CHAVE, JSON.stringify(dados)); } catch (e) { /* sem espaço ou bloqueado: segue sem salvar */ }
@@ -37,6 +41,8 @@ export function carregar() {
   player.pos.set(dados.player.x, dados.player.y, dados.player.z);
   player.yaw = dados.player.yaw;
   for (const m of MISSOES) if (m.carregar && dados.missoes[m.id]) m.carregar(dados.missoes[m.id]);
+  carregarEco(dados.eco);
+  carregarLotes(dados.lotes);
   return true;
 }
 

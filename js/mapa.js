@@ -12,6 +12,16 @@ export const FLOOR_Y = 0.16;                            // piso interno do labor
 export const PLAZA_Y = 0.12;                            // calçada de concreto
 export const PIER_Y = 0.12;                             // píer de madeira
 export const WORLD_R = 250;                             // limite do mapa
+// Prefeitura: prédio a leste da praça, porta virada para a praça (-X)
+export const PREF = { x: 33, z: 18, w: 12, d: 9, h: 5 };
+
+// Distância de um ponto até a "caixa" da prefeitura (0 = dentro dela)
+export function distToPref(x, z) {
+  const dx = Math.max(Math.abs(x - PREF.x) - PREF.w / 2, 0), dz = Math.max(Math.abs(z - PREF.z) - PREF.d / 2, 0);
+  return Math.hypot(dx, dz);
+}
+// Calçada entre a praça e a porta da prefeitura
+export const onPrefWalk = (x, z) => x > 21 && x < PREF.x - PREF.w / 2 + 0.5 && Math.abs(z - PREF.z) < 1.6;
 
 // Formato irregular do lago (raio muda com o ângulo)
 export function lakeR(a) { return LAKE.r + 3.5 * Math.sin(3 * a + 0.5) + 2 * Math.sin(5 * a + 2.0); }
@@ -58,6 +68,8 @@ export function groundHeight(x, z) {
   // achata em volta do laboratório
   const dx = Math.max(Math.abs(x) - LAB.w / 2, 0), dz = Math.max(Math.abs(z) - LAB.d / 2, 0);
   h = lerp(0, h, smoothstep(8, 26, Math.hypot(dx, dz)));
+  // achata em volta da prefeitura
+  h = lerp(0, h, smoothstep(4, 16, distToPref(x, z)));
   // suaviza a trilha
   h = lerp(h * 0.35, h, smoothstep(2, 12, distToPath(x, z)));
   // margem plana + bacia do lago
@@ -76,5 +88,7 @@ export function walkHeight(x, z) {
   if (Math.abs(x) < LAB.w / 2 && Math.abs(z) < LAB.d / 2) return FLOOR_Y;
   if (x > -21.6 && x < 21.6 && z > -12.6 && z < 21) return PLAZA_Y;
   if (onPier(x, z)) return PIER_Y;
+  if (distToPref(x, z) === 0) return FLOOR_Y;            // piso da prefeitura
+  if (onPrefWalk(x, z)) return PLAZA_Y;                  // calçada até a prefeitura
   return groundHeight(x, z);
 }

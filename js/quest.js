@@ -18,6 +18,9 @@ import { player } from './player.js';
 import { doorSound, chime } from './audio.js';
 import { isTouch } from './utils.js';
 import { npcInteracoes } from './npc.js';
+import { lotesInteracoes } from './construir.js';
+import { eco } from './economia.js';
+import { BALCAO } from './prefeitura.js';
 
 // Missão que o jogador está seguindo agora
 export const ativa = () => missao(jogo.ativa);
@@ -44,7 +47,7 @@ export function setupInteractions() {
 }
 export function updateInteract() {
   const p = player.pos; currentInteract = null; let best = 1e9;
-  for (const it of [...interactables, ...npcInteracoes]) {   // inclui conversar com NPCs
+  for (const it of [...interactables, ...npcInteracoes, ...lotesInteracoes]) {   // inclui NPCs e lugares de construir
     const q = it.pos(), d = Math.hypot(p.x - q.x, p.z - q.y);
     if (d < it.r && d < best) { const l = it.label(); if (l) { best = d; currentInteract = { it, l }; } }
   }
@@ -93,12 +96,14 @@ export function updateQuest(dt, t) {
   if ((questTick -= dt) <= 0) { questTick = 0.25; atualizarMural3D(); }
   if (questTick === 0.25 && on) {
     const { numero, agora, subs } = m.rastreador(player);
+    if (m.relatorio && m.concluida()) subs.unshift(['Entregar o relatório na Prefeitura', !!eco.relatorios[m.id]]);
     const dist = objTarget ? Math.round(Math.hypot(player.pos.x - objTarget.x, player.pos.z - objTarget.z)) : 0;
     questEl.innerHTML = `<h3>MISSÃO · ${m.titulo.toUpperCase()}</h3><div class="now">${numero !== null ? numero + '. ' : ''}${agora}${objTarget && dist > 3 ? ` <small style="color:#fff;opacity:.7">· ${dist} m</small>` : ''}</div>` +
       subs.map(([txt, ok]) => `<div class="sub ${ok ? 'ok' : ''}">${ok ? '✔' : '•'} ${txt}</div>`).join('');
   }
   // marcador
-  objTarget = on ? m.alvo() : null;
+  // missão concluída com relatório pendente: o marcador leva até o balcão da prefeitura
+  objTarget = !on ? null : (m.relatorio && m.concluida() && !eco.relatorios[m.id]) ? BALCAO : m.alvo();
   marker.visible = !!objTarget;
   if (objTarget) {
     marker.position.copy(objTarget);

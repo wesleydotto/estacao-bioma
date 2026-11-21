@@ -17,6 +17,7 @@
 //    update(dt, t)               → roda todo quadro
 //    montar()                    → (opcional) cria coisas no mundo, como NPCs (veja npc.js)
 //    salvar(), carregar(dados)   → (opcional) o que guardar no save e como refazer (veja save.js)
+//    relatorio: { verba, texto } → (opcional) quanto a prefeitura paga quando a missão termina
 // =====================================================================
 import { lago } from './lago/index.js';
 

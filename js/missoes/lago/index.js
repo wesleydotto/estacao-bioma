@@ -35,6 +35,8 @@ export const lago = {
   titulo: 'Salvar o Lago da Mata',
   icone: '💧',
   resumo: 'O lago ficou verde, com cheiro forte e peixes morrendo. Descubra a causa e recupere a água.',
+  // relatório entregue na prefeitura quando a missão termina (veja economia.js)
+  relatorio: { verba: 1500, texto: 'Diagnóstico e recuperação do Lago da Mata (eutrofização por esgoto e adubo).' },
 
   // ---------- Situação da missão ----------
   iniciada: () => Q.started,
@@ -86,6 +88,7 @@ export const lago = {
     if (s === 4) say(['Todas as análises prontas! 🎉 Vá ao <b>mural</b> no fundo do laboratório e descubra o que está causando o problema.']);
     if (s === 5) say(['Hora de agir! Siga o marcador: <b>biofiltro</b> no cano, <b>6 mudas</b> de mata ciliar e o <b>aerador solar</b> no píer.']);
     if (s === 6) say(['Olha só, a água já está mudando de cor! 💧 Volte ao píer e meça o <b>oxigênio</b> de novo com a sonda.']);
+    if (s === 7) say(['Excelente trabalho! 🎉 Leve o <b>relatório</b> à <b>Prefeitura</b>, ao lado da praça. A secretária vai liberar uma <b>verba</b> para a Estação.', 'Com a verba você compra mudas, ferramentas e equipamentos na loja de lá. Aperte <b>I</b> para ver o seu inventário.']);
   },
 
   // ---------- Coisas que respondem à tecla E ----------
