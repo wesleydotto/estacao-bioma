@@ -38,6 +38,7 @@ import { LAB, lakeNorm, distToFazenda } from './mapa.js';
 import { rr, isTouch } from './utils.js';
 import { input, cam, jogo } from './estado.js';
 import { Q, stage } from './missoes/lago/estado.js';
+import { A } from './missoes/adubo/estado.js';
 import { buildTerrain } from './terreno.js';
 import { buildLab, updateDoor } from './lab.js';
 import { buildLake, waterTime, lakeFx } from './lake.js';
@@ -75,7 +76,7 @@ atualizarHudVerba();
 const rig = buildPlayer();
 montarMissoes();
 setupInteractions();
-window.__game = { player, Q, stage, openKit, microGame, chemGame, diagnosticoPanel, muralPanel, notebook, addNPC, eco, salvar, carregar, apagarSave, jogo, lakeFx, amostrasBench, winPanel, closePanel, cam: (y, p) => { cam.yaw = y; cam.pitch = p; } };   // atalho para testes no console
+window.__game = { player, Q, A, stage, openKit, microGame, chemGame, diagnosticoPanel, muralPanel, notebook, addNPC, eco, salvar, carregar, apagarSave, jogo, lakeFx, amostrasBench, winPanel, closePanel, cam: (y, p) => { cam.yaw = y; cam.pitch = p; } };   // atalho para testes no console
 cam.yaw = 0;                          // câmera atrás do jogador, olhando para o laboratório
 player.yaw = Math.PI;
 

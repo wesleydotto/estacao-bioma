@@ -52,7 +52,7 @@ O estado da missão fica no objeto `Q` e a etapa atual é calculada por `stage()
 As interações com E da missão ficam em `interacoes()`, em `js/missoes/lago/index.js`. O motor (`js/quest.js`) registra todas.
 
 ## Ideias para depois
-- O plano de novas missões está em `PLANO_MISSOES.md`. As Fases 0 (base de missões) e 1 (economia) estão prontas; a Missão 2 (monocultura) está em andamento (fatia A pronta, veja o `HISTORICO.md`). A energia só é liberada na Missão 3.
+- O plano de novas missões está em `PLANO_MISSOES.md`. As Fases 0 (base de missões) e 1 (economia) estão prontas; a Missão 2 (monocultura) está em andamento (fatias A e B prontas, veja o `HISTORICO.md`). A energia só é liberada na Missão 3.
 - Trocar os modelos feitos com formas simples por modelos .glb.
 - NPCs na floresta com novas missões (o mural do laboratório já existe para isso).
 - Novos lagos e rios com outros problemas: metais pesados (espectrofotômetro), condutividade.

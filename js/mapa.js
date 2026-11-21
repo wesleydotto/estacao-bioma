@@ -18,6 +18,9 @@ export const PREF = { x: 33, z: 18, w: 12, d: 9, h: 5 };
 // Fazenda Boa Safra (Missão 2): lavoura de soja ao norte do lago. O portão fica virado para o lago (-Z).
 // y = altura do chão da fazenda (o terreno é aplainado em volta, veja groundHeight)
 export const FAZENDA = { x: -45, z: 160, w: 44, d: 34, y: 0.15 };
+// Pontos de coleta de solo da Missão 2: fragmento de mata (a oeste da fazenda) e lavoura (entre as fileiras de soja)
+export const PONTO_MATA = { x: -92, z: 158 };
+export const PONTO_LAVOURA = { x: -55.7, z: 161.3 };
 // Distância de um ponto até a "caixa" da fazenda (0 = dentro dela)
 export function distToFazenda(x, z) {
   const dx = Math.max(Math.abs(x - FAZENDA.x) - FAZENDA.w / 2, 0), dz = Math.max(Math.abs(z - FAZENDA.z) - FAZENDA.d / 2, 0);

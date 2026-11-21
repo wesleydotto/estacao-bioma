@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { mergeGeometries, mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
 import { scene } from './cena.js';
 import { std, circles, animated } from './construcao.js';
-import { LAB, LAKE, WORLD_R, lakeR, lakeNorm, distToPath, onPier, groundHeight, P0, PIPE_M, PIPE_DIR, distToPref, onPrefWalk, distToFazenda } from './mapa.js';
+import { LAB, LAKE, WORLD_R, lakeR, lakeNorm, distToPath, onPier, groundHeight, P0, PIPE_M, PIPE_DIR, distToPref, onPrefWalk, distToFazenda, PONTO_MATA } from './mapa.js';
 import { rand, rr, smoothstep, isTouch } from './utils.js';
 
 // =====================================================================
@@ -27,6 +27,7 @@ export function canSpawnTree(x, z) {
   if (distToPath(x, z) < 4.5 || lakeNorm(x, z) < 1.35) return false;
   if (distToPref(x, z) < 9) return false;                 // clareira da prefeitura
   if (distToFazenda(x, z) < 5) return false;              // clareira da fazenda
+  if (Math.hypot(x - PONTO_MATA.x, z - PONTO_MATA.z) < 13) return false;   // o fragmento de mata é desenhado em fazenda.js
   if (Math.hypot(x - (PIPE_M.x + PIPE_DIR.x * 8), z - (PIPE_M.y + PIPE_DIR.y * 8)) < 10) return false;
   return true;
 }

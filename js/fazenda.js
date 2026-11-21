@@ -11,7 +11,7 @@
 import * as THREE from 'three';
 import { scene } from './cena.js';
 import { std, addBox, addCyl, addCollider, circles, makeCanvas, toTex, corrugTex, boardTex, makePostBoard } from './construcao.js';
-import { FAZENDA, PIPE_M, PIPE_DIR, walkHeight } from './mapa.js';
+import { FAZENDA, PIPE_M, PIPE_DIR, PONTO_MATA, PONTO_LAVOURA, walkHeight } from './mapa.js';
 import { FONT } from './utils.js';
 
 // ---------- Lugares importantes (a missão usa estes pontos) ----------
@@ -42,6 +42,34 @@ const sacoTex = (() => {
 function saco(grupo, x, y, z, rot = 0) {
   const sb = addBox(grupo, 0.9, 0.36, 0.6, std('#ffffff', 0.9, 0, { map: sacoTex }), x, y, z);
   sb.rotation.y = rot; return sb;
+}
+
+// Bandeirinha de ponto de coleta (estaca + bandeira colorida)
+function marcador(g, x, z, cor) {
+  const y = walkHeight(x, z), m = new THREE.Group(); m.position.set(x, y, z); g.add(m);
+  addCyl(m, 0.03, 0.03, 1.6, std('#c8a46b', 0.9), 0, 0.8, 0, 5);
+  const bandeira = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.3), std(cor, 0.6, 0, { side: THREE.DoubleSide, emissive: cor, emissiveIntensity: 0.4 }));
+  bandeira.position.set(0.27, 1.45, 0); m.add(bandeira);
+  addCyl(m, 0.7, 0.75, 0.06, std('#6b4a2f', 1), 0, 0.03, 0, 16);   // terra remexida
+}
+
+// Fragmento de mata nativa (o "solo de referência" da missão): árvores, folhas no chão e a bandeira do ponto
+function buildMata(g) {
+  const tronco = std('#6b4a2f', 0.95);
+  for (let i = 0; i < 20; i++) {
+    const a = aleat() * Math.PI * 2, r = 3.5 + aleat() * 8, x = PONTO_MATA.x + Math.cos(a) * r, z = PONTO_MATA.z + Math.sin(a) * r;
+    const y = walkHeight(x, z), h = 4 + aleat() * 3, sc = 0.9 + aleat() * 0.5;
+    addCyl(g, 0.18 * sc, 0.3 * sc, h, tronco, x, y + h / 2 - 0.2, z, 7);
+    for (const [dx, dy, dz, rr2] of [[0, h + 0.4, 0, 2.0], [0.9, h - 0.2, 0.4, 1.5], [-0.8, h - 0.1, -0.5, 1.5]]) {
+      const c = new THREE.Mesh(new THREE.IcosahedronGeometry(rr2 * sc, 1), std(new THREE.Color().setHSL(0.24 + aleat() * 0.08, 0.5, 0.28 + aleat() * 0.1), 0.85));
+      c.position.set(x + dx * sc, y + dy * sc, z + dz * sc); c.scale.y = 0.85; c.castShadow = true; g.add(c);
+    }
+    circles.push({ x, z, r: 0.4 * sc });
+  }
+  // serapilheira: camada de folhas caídas no chão da mata
+  const folhas = new THREE.Mesh(new THREE.CircleGeometry(2.2, 20), std('#4a3a1e', 1));
+  folhas.rotation.x = -Math.PI / 2; folhas.position.set(PONTO_MATA.x, walkHeight(PONTO_MATA.x, PONTO_MATA.z) + 0.06, PONTO_MATA.z); g.add(folhas);
+  marcador(g, PONTO_MATA.x, PONTO_MATA.z, '#2b8a3e');
 }
 
 export function buildFazenda() {
@@ -146,4 +174,8 @@ export function buildFazenda() {
     m4.makeTranslation(bx, walkHeight(bx, bz) + 0.05, bz); rastro.setMatrixAt(i, m4);
   }
   g.add(rastro);
+
+  // ---- Pontos de coleta de solo (Missão 2) ----
+  buildMata(g);
+  marcador(g, PONTO_LAVOURA.x, PONTO_LAVOURA.z, '#ffd43b');
 }

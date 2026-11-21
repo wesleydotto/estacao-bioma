@@ -8,7 +8,7 @@ Leia junto com o `CLAUDE.md` (organização dos arquivos) e o `PLANO_MISSOES.md`
 - **Branch de trabalho:** `ccr-637f8c83-h3znzi` (tudo já está no GitHub).
 - **Jogo publicado (privado, só o Wesley abre):** https://claude.ai/artifact/MqLN68X6Vctn3YUaf58ttx
   Para atualizar: `npm run build` e publicar de novo o `dist/index.html` (com a pasta `dist/assets/`) no mesmo endereço.
-- **Missões prontas:** "Salvar o Lago da Mata". A Missão 2 ("De onde veio o adubo?") está **em construção** (fatia A pronta). As próximas estão no `PLANO_MISSOES.md`.
+- **Missões prontas:** "Salvar o Lago da Mata". A Missão 2 ("De onde veio o adubo?") está **em construção** (fatias A e B prontas). As próximas estão no `PLANO_MISSOES.md`.
 
 ## Linha do tempo (o que foi feito)
 1. **Protótipo original:** jogo inteiro em um `index.html` (mundo, laboratório, lago, personagem, controles e a missão do lago).
@@ -25,6 +25,7 @@ Leia junto com o `CLAUDE.md` (organização dos arquivos) e o `PLANO_MISSOES.md`
    - Construir em lugares marcados (`js/construir.js`): 4 canteiros na frente do lab e 2 bases de energia a oeste.
 
 6. **Missão 2, fatia A (pronta):** Fazenda Boa Safra (`js/fazenda.js`: lavoura de soja, cerca, galpão, silo, trator, pilha de sacos e trilha de sacos saindo do lago), Seu Geraldo (primeiro NPC visível, criado em `montar()` da missão), pacote `js/missoes/adubo/` (etapa 1: trilha de pistas + conversa), trava no mural e **equipamentos pagos** na loja.
+7. **Missão 2, fatia B (pronta):** dois pontos de coleta (fragmento de mata a oeste da fazenda e lavoura) com 5 atividades cada (`js/missoes/adubo/minigames.js`): coletar solo (pá), contar minhocas (lupa), infiltração (kit), contar insetos (lupa) e pH/umidade (sonda, opcional). No laboratório, a **bancada SOLO** (`bancada.js`, entre AMOSTRAS e o microscópio): secar, queimar e calcular a matéria orgânica (balança com estufa). Os equipamentos **aparecem na bancada** conforme comprados. O marcador amarelo leva à loja quando falta equipamento. Pagamentos: R$ 300 (campo), R$ 400 (lab), +R$ 100 (cálculo sem erro) e +R$ 100 (sonda nos dois pontos).
 
 ## Decisões tomadas
 - Dinheiro do jogo chama **Verba (R$)**.
@@ -52,6 +53,8 @@ Leia junto com o `CLAUDE.md` (organização dos arquivos) e o `PLANO_MISSOES.md`
 - Abrir a prefeitura mudou o mapa: algumas árvores da floresta ficaram em outros lugares. A fazenda fez o mesmo (clareira nova em `canSpawnTree`).
 - A fazenda **aplaina o terreno** em `groundHeight` (`FAZENDA` em `mapa.js`). Se mudar a posição, confira o relevo (o terreno é bem ondulado ali).
 - O `[E]` do NPC só aparece a até 2,4 m dele (`alcance`); nos testes, fique perto.
+- Nos testes, **feche as falas** (`#dlg`) antes de apertar E: fala aberta bloqueia a interação. O teste de infiltração leva ~4 s (mata) e ~19 s (lavoura) de tempo real.
+- `window.__game.A` é o estado da Missão 2. Atalho para testar o campo: `Object.assign(__game.A,{started:true,falou:true})` e `__game.eco.inv={pa:1,lupaCampo:1,kitInfiltracao:1,balancaSolo:1,sondaSolo:1}`.
 - `economia.js` e `missoes/adubo/index.js` se importam (ciclo). Funciona porque só usam um ao outro dentro de funções, nunca no topo do arquivo. Mantenha assim.
 
 ## Como testar sem gastar muito
@@ -63,7 +66,7 @@ Leia junto com o `CLAUDE.md` (organização dos arquivos) e o `PLANO_MISSOES.md`
 - O objeto `window.__game` expõe `player`, `Q`, `eco`, `lakeFx`, `addNPC`, `salvar`, `carregar` etc. (veja `js/main.js`).
 
 ## Próximos passos (ordem do plano)
-1. **Missão 2: "De onde veio o adubo?"**: faltam as fatias **B** (campo: minhocas, infiltração, insetos, com os equipamentos exigidos; lab: matéria orgânica; equipamento aparece na bancada), **C** (diagnóstico no mural, "conversa com argumentos" com o Seu Geraldo, restauração com lotes novos na fazenda, medir de novo, relatório com estrelas e pagamento por etapa). Hoje a missão para na etapa 2 (aviso "em construção").
+1. **Missão 2: "De onde veio o adubo?"**: falta a fatia **C** (diagnóstico no mural, "conversa com argumentos" com o Seu Geraldo usando a tabela mata × lavoura do caderno, restauração com lotes novos na fazenda, medir de novo, relatório com estrelas e `concluida()`). Hoje a missão para na etapa 4 (aviso "em construção"). Os valores do solo ficam em `SOLO` (`adubo/estado.js`).
 2. **Missão 3: "Energia limpa para o laboratório"** (usa as bases de energia e a loja).
 3. Depois: Clima, Vila, Fauna, Barranco e Rio.
 - **Missão 9 (ideia do Wesley, no plano):** fotografar espécies ameaçadas (lobo-guará) de forma furtiva, enviar pra prefeitura, ganhar verba e montar grades de proteção.
