@@ -336,9 +336,10 @@ export function diagnosticoSoloPanel() {
     $(b, '#desfaz').onclick = () => { escolhidos.pop(); desenha(); };
     $(b, '#ok').onclick = () => {
       const errado = escolhidos.find(e => !e[2]);
-      if (errado) { buzz(); fb.className = 'fb bad'; fb.textContent = errado[3]; return; }
-      if (escolhidos.length < CADEIA.length) { buzz(); fb.className = 'fb bad'; fb.textContent = 'A cadeia está incompleta. Quais são os 4 passos?'; return; }
-      if (escolhidos.some((e, i) => e[0] !== CADEIA[i][0])) { buzz(); fb.className = 'fb bad'; fb.textContent = 'Os cartões certos estão aí, mas a ORDEM não. O que acontece primeiro: o adubo ir pro lago ou a mata ser cortada?'; return; }
+      const dica = (txt) => { buzz(); fb.className = 'fb bad'; fb.textContent = txt; fb.scrollIntoView({ block: 'nearest' }); };   // mostra a dica mesmo se estiver abaixo da tela
+      if (errado) { dica(errado[3]); return; }
+      if (escolhidos.length < CADEIA.length) { dica('A cadeia está incompleta. Quais são os 4 passos?'); return; }
+      if (escolhidos.some((e, i) => e[0] !== CADEIA[i][0])) { dica('Os cartões certos estão aí, mas a ORDEM não. O que acontece primeiro: o adubo ir pro lago ou a mata ser cortada?'); return; }
       A.diag = true; chime();
       b.innerHTML = `<p class="tip">✔ <b>Diagnóstico correto!</b> Veja como tudo se liga:</p><div class="chain">${CADEIA.map(([, t]) => `<span>${t}</span>`).join('<b>→</b>')}</div>
         <p class="tip">Repare: o problema <b>não é só o adubo</b>. É o solo que ficou doente sem a mata. Para resolver, é preciso <b>devolver a cobertura</b> ao solo.<br>Próximo passo: <b>conversar com o Seu Geraldo</b>, usando os seus dados.</p>
@@ -389,7 +390,7 @@ export function convencerPanel() {
         const bt = document.createElement('button'); bt.className = 'btn ghost'; bt.style.textAlign = 'left'; bt.textContent = texto;
         bt.onclick = () => {
           if (certa) { chime(); i++; mostra(); }
-          else { A.conv.erros++; buzz(); const fb = $(b, '#fb'); fb.className = 'fb bad'; fb.textContent = dica; }
+          else { A.conv.erros++; buzz(); const fb = $(b, '#fb'); fb.className = 'fb bad'; fb.textContent = dica; fb.scrollIntoView({ block: 'nearest' }); }
         };
         $(b, '#ops').appendChild(bt);
       });
