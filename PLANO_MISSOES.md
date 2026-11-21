@@ -22,7 +22,55 @@ Hoje o jogo só tem uma missão, e ela está "costurada" no código. Antes de cr
 
 ---
 
-## Missão 1: "Vai chover?" (Estação Meteorológica) · **P/M**
+## Fase 1: Economia e construção · **M**
+
+Base para o jogador **ganhar verba, comprar e construir**. As missões seguintes usam isso.
+
+| # | Tarefa | Como funciona |
+|---|--------|---------------|
+| 1.1 | **Verba (R$)** | Valor sempre visível na tela. Cada missão concluída gera um **relatório para a prefeitura**, que paga a verba. O Lago da Mata vira a primeira verba. |
+| 1.2 | **Prédio da prefeitura** | Prédio novo perto da praça, com um NPC (secretária ou secretário de Meio Ambiente) que recebe os relatórios, paga a verba e vende os itens. |
+| 1.3 | **Lojinha** | Lista de itens com preço: mudas nativas, sementes de adubação verde, placa solar, cata-vento, reagentes e ferramentas (pá, regador). Mostra quanto sobra de verba depois da compra (treina matemática). |
+| 1.4 | **Inventário (tecla I)** | Grade com os itens e as quantidades. Salva junto com o progresso. |
+| 1.5 | **Construir** | Escolher um item do inventário e colocar no mundo, **só em lugares marcados** no começo (ex.: covas de muda, base de painel). Construção livre fica para depois. |
+
+---
+
+## Missão 2: "De onde veio o adubo?" (Monocultura e solo) · **M/G**
+
+- **Conteúdo / BNCC:** impactos nos ecossistemas (EF07CI07, EF07CI08) e ações para recuperar o equilíbrio ambiental (EF08CI16). O tema solo também aparece em Geografia do 6º ano.
+- **Onde:** uma fazenda de monocultura (soja) depois da mata, ao norte do lago. Os sacos de adubo ficam no caminho, e a chuva leva o adubo até o lago.
+- **Gancho:** continua a história do lago. Os sacos tinham a marca de uma fazenda. Quem jogou aquilo ali, e por que precisam de tanto adubo?
+- **Etapas:**
+  1. Seguir a trilha dos sacos até a fazenda e conversar com o fazendeiro (NPC). Ele não é vilão: o solo dele "não dá mais nada sem adubo".
+  2. **Campo:** comparar o solo da mata com o solo da lavoura (contar minhocas, ver a cor e a matéria orgânica, teste de infiltração com uma garrafa de água) e contar insetos nas duas áreas.
+  3. **Lab:** analisar as amostras de solo (matéria orgânica e nutrientes). O solo da lavoura está pobre e compactado.
+  4. **Diagnóstico:** cortaram a mata → o solo ficou sem proteção e sem matéria orgânica → precisa de muito adubo → a chuva leva o adubo pro lago.
+  5. **Convencer o fazendeiro com dados:** mostrar a tabela mata × lavoura.
+  6. **Ação (com a verba e a loja):** faixa de mata entre a lavoura e o lago, adubação verde, curvas de nível e um trecho de agrofloresta.
+  7. **Medir de novo:** a infiltração e as minhocas melhoram, e o fazendeiro gasta menos adubo.
+- **Minigames novos:** contar minhocas num torrão de terra, teste de infiltração (cronômetro), contagem de insetos e uma "conversa com argumentos" (escolher o dado certo pra convencer).
+- **Reaproveita:** kit de campo, mudas da mata ciliar, mural, primeiro NPC visível, loja e construção.
+
+## Missão 3: "Energia limpa para o laboratório" · **M**
+
+- **Conteúdo / BNCC:** fontes renováveis e não renováveis (EF08CI01), circuitos (EF08CI02), consumo dos aparelhos (EF08CI04) e uso consciente (EF08CI05).
+- **Onde:** dentro do lab, no telhado (os painéis já existem) e em volta do prédio.
+- **Gancho:** a energia cai toda tarde, e a estufa desliga no meio do teste de coliformes.
+- **Etapas:**
+  1. Ler o medidor e listar a potência de cada aparelho (geladeira, estufa, microscópio, ar-condicionado).
+  2. Calcular o consumo (potência × horas) e comparar com o que os painéis geram. Não dá!
+  3. Pesquisar as fontes limpas e comparar no mural:
+     - solar (já tem, mas pouca e suja);
+     - eólica (usar os dados do anemômetro);
+     - biodigestor (esterco e restos da fazenda viram biogás, ligando com a Missão 2);
+     - micro-hidrelétrica (precisa de rio).
+  4. **Ação (com a verba):** limpar os painéis, comprar e construir as novas fontes, montar o circuito e instalar um timer no ar-condicionado.
+  5. **Medir de novo:** sobra energia.
+- **Minigames novos:** montar um circuito (série e paralelo), uma calculadora de consumo e uma tabela de prós e contras de cada fonte.
+- **Reaproveita:** loja e construção, telhado, aparelhos do lab, anemômetro.
+
+## Missão 4: "Vai chover?" (Estação Meteorológica) · **P/M**
 
 - **Conteúdo / BNCC:** variáveis do tempo e previsão (EF08CI15), clima e circulação do ar (EF08CI14).
 - **Onde:** no telhado do laboratório. O mastro com anemômetro **já existe**, e dá pra adicionar uma escada.
@@ -37,7 +85,7 @@ Hoje o jogo só tem uma missão, e ela está "costurada" no código. Antes de cr
 - **Reaproveita:** painéis, mural, sonda (parecida com a leitura de instrumentos), telhado do lab.
 - **Bônus:** a chuva vira um sistema do jogo e pode aparecer em outras missões.
 
-## Missão 2: "Surto na Vila" (Água e saúde) · **M**
+## Missão 5: "Surto na Vila" (Água e saúde) · **M**
 
 - **Conteúdo / BNCC:** saneamento básico e doenças de veiculação hídrica (EF07CI09), vacinação e saúde pública (EF07CI10).
 - **Onde:** uma vila pequena ao sul do laboratório (z ≈ -80), com 4 casas, um poço e uma fossa.
@@ -51,9 +99,9 @@ Hoje o jogo só tem uma missão, e ela está "costurada" no código. Antes de cr
   6. Medir de novo: a água fica sem coliformes, e o número de casos cai.
 - **Minigames novos:** mapa de casos (o aluno descobre o padrão), dosar o cloro.
 - **Reaproveita:** coliformes, estufa, frasco de coleta, mural, diálogos.
-- **Bônus:** é a primeira missão com NPCs, então testa a base da Fase 0.
+- **Bônus:** é a primeira missão com NPCs, então usa a vila perto da prefeitura.
 
-## Missão 3: "Quem passa à noite?" (Censo de fauna) · **M/G**
+## Missão 6: "Quem passa à noite?" (Censo de fauna) · **M/G**
 
 - **Conteúdo / BNCC:** ecossistemas brasileiros e as relações entre os seres vivos (EF07CI07), impacto de mudanças no ecossistema (EF07CI08).
 - **Onde:** na floresta a oeste, longe da trilha.
@@ -66,24 +114,26 @@ Hoje o jogo só tem uma missão, e ela está "costurada" no código. Antes de cr
   5. Diagnóstico: com o lago doente, os insetos diminuíram, e os sapos perderam comida.
   6. Ação: corredor de mata ligando os fragmentos de floresta.
 - **Minigames novos:** escolher onde pôr cada armadilha, montar a teia alimentar arrastando cartões.
-- **Reaproveita:** bestiário, mural, ciclo dia/noite (que pode ser criado na missão 1).
+- **Reaproveita:** bestiário, mural, ciclo dia/noite (que pode ser criado na missão 4).
 - **Atenção:** precisa de modelos de animais da fauna brasileira (lobo-guará, tamanduá, capivara, sapo, coruja…). Encaixa com a ideia de trocar por modelos `.glb`.
 
-## Missão 4: "Apagão no laboratório" (Energia) · **M**
+## Missão 7: "O barranco que desabou" (Rochas e fósseis) · **M**
 
-- **Conteúdo / BNCC:** fontes de energia renováveis e não renováveis (EF08CI01), circuitos elétricos (EF08CI02), consumo dos aparelhos (EF08CI04) e uso consciente (EF08CI05).
-- **Onde:** dentro do laboratório e no telhado. Os **painéis solares já existem**.
-- **Gancho:** a energia do lab cai toda tarde, e a estufa desliga no meio do teste.
+- **Conteúdo / BNCC:** tipos de rocha e formação de fósseis (EF06CI12), camadas da Terra (EF06CI11).
+- **Onde:** nos morros da borda do mapa (eles já existem no terreno).
+- **Gancho:** uma chuva forte (ligação com a missão 4) derrubou um barranco e apareceram "pedras com desenhos".
 - **Etapas:**
-  1. Ler o medidor de energia e listar a potência de cada aparelho (geladeira, estufa, microscópio, ar-condicionado).
-  2. Calcular o consumo (potência × horas) e comparar com o que os painéis geram.
-  3. Achar o problema: um painel sujo ou quebrado, e o ar-condicionado ligado o dia todo.
-  4. Ação: limpar e consertar o painel (montar o circuito), instalar um timer e trocar as lâmpadas.
-  5. Medir de novo: a energia sobra.
-- **Minigames novos:** montar um circuito (pilha + fio + lâmpada; série e paralelo), uma calculadora de consumo.
-- **Reaproveita:** painéis, telhado, aparelhos do lab.
+  1. Observar as camadas do barranco e coletar rochas de cada camada.
+  2. No lab, classificar as rochas (ígnea, sedimentar ou metamórfica) pelos testes de dureza, textura e reação com ácido.
+  3. Achar os fósseis e descobrir que eles só aparecem na rocha sedimentar.
+  4. Mural: montar a "linha do tempo" das camadas (as de baixo são mais antigas).
+  5. Ação: proteger o sítio e conter a erosão com plantas.
+- **Minigames novos:** classificar as rochas, escavação cuidadosa (pincel).
+- **Reaproveita:** bancadas do lab, mural, mudas.
 
-## Missão 5: "O rio que mudou de cor" (Contaminação química) · **G**
+---
+
+## Missão 8: "O rio que mudou de cor" (Contaminação química) · **G**
 
 - **Conteúdo / BNCC:** separação de misturas (EF06CI03), impacto humano no ambiente (EF07CI08) e ações para restaurar o equilíbrio (EF08CI16).
 - **Onde:** um rio novo a leste (x ≈ +90), descendo dos morros, com um garimpo ou uma fábrica rio acima.
@@ -99,33 +149,19 @@ Hoje o jogo só tem uma missão, e ela está "costurada" no código. Antes de cr
 - **Reaproveita:** kit de campo, sonda, mural, mata ciliar (mudas), mudanças na cor da água.
 - **Atenção:** precisa de um terreno novo (o leito do rio) e é a maior das missões. Fica por último.
 
-## Missão 6: "O barranco que desabou" (Rochas e fósseis) · **M**
-
-- **Conteúdo / BNCC:** tipos de rocha e formação de fósseis (EF06CI12), camadas da Terra (EF06CI11).
-- **Onde:** nos morros da borda do mapa (eles já existem no terreno).
-- **Gancho:** uma chuva forte (ligação com a missão 1) derrubou um barranco e apareceram "pedras com desenhos".
-- **Etapas:**
-  1. Observar as camadas do barranco e coletar rochas de cada camada.
-  2. No lab, classificar as rochas (ígnea, sedimentar ou metamórfica) pelos testes de dureza, textura e reação com ácido.
-  3. Achar os fósseis e descobrir que eles só aparecem na rocha sedimentar.
-  4. Mural: montar a "linha do tempo" das camadas (as de baixo são mais antigas).
-  5. Ação: proteger o sítio e conter a erosão com plantas.
-- **Minigames novos:** classificar as rochas, escavação cuidadosa (pincel).
-- **Reaproveita:** bancadas do lab, mural, mudas.
-
----
-
 ## Ordem sugerida
 
 ```
-Fase 0 (base) ──► Missão 1 Clima ──► Missão 2 Vila ──► Missão 4 Energia
-                        │
-                        ├──► Missão 3 Fauna (precisa do ciclo dia/noite)
-                        └──► Missão 6 Barranco (precisa da chuva)
-                                          ──► Missão 5 Rio (a maior, por último)
+Fase 0 ✔ ──► Fase 1 Economia ──► Missão 2 Monocultura ──► Missão 3 Energia limpa
+                                                                 │
+                     Missão 4 Clima ◄────────────────────────────┘
+                        │      └──► Missão 5 Vila
+                        ├──► Missão 6 Fauna (precisa do ciclo dia/noite)
+                        └──► Missão 7 Barranco (precisa da chuva)
+                                          ──► Missão 8 Rio (a maior, por último)
 ```
 
-**Por que começar pelo clima?** É pequena, não precisa de área nova no mapa, usa o telhado que já existe e cria a **chuva** e o **tempo passando**, que as outras missões vão usar.
+**Por que nessa ordem?** A economia vem primeiro porque a monocultura e a energia usam a loja e a construção. A monocultura continua a história do lago (o adubo veio de algum lugar). A energia aproveita a fazenda (biodigestor) e o anemômetro.
 
 ## Ideias soltas (para encaixar depois)
 
