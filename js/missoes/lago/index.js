@@ -10,7 +10,7 @@
 import * as THREE from 'three';
 import { Q, stage, STAGES } from './estado.js';
 import {
-  openKit, chemGame, microGame, amostrasBench, benchNeedsSample, diagnosticoPanel, resultsHTML,
+  openKit, chemGame, microGame, amostrasBench, benchNeedsSample, diagnosticoPanel, resultsHTML, placaRecuperada,
 } from './minigames.js';
 import { say, showToast } from '../../interface.js';
 import { labFx } from '../../lab.js';
@@ -120,6 +120,21 @@ export const lago = {
 
   // ---------- Caderno de campo (tecla C) ----------
   caderno: () => `<p class="tip"><b>Objetivo agora:</b> ${STAGES[stage()].now}</p>${resultsHTML()}`,
+
+  // ---------- Salvar e carregar (veja js/save.js) ----------
+  salvar: () => ({ Q: { ...Q }, mudas: lakeFx.spots.map(s => s.done) }),
+  carregar(d) {
+    Object.assign(Q, d.Q);
+    // refaz no mundo o que o jogador já construiu
+    if (Q.filter) { lakeFx.bio.visible = true; lakeFx.flow.visible = false; lakeFx.plume.material.opacity = 0; }
+    if (Q.aerator) lakeFx.aer.visible = true;
+    lakeFx.spots.forEach((s, i) => {
+      if (!d.mudas?.[i]) return;
+      s.done = true; s.grow = 1; s.mark.visible = false; s.sap.visible = true; s.sap.scale.setScalar(1.1);   // muda já crescida
+    });
+    if (Q.plants >= 6) lakeFx.sacks.forEach(m => m.visible = false);
+    if (Q.won) placaRecuperada();
+  },
 
   // ---------- Roda todo quadro (mesmo com a missão parada) ----------
   update(dt, t) {

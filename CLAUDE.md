@@ -22,10 +22,12 @@ O jogador é um pesquisador de campo. Tem um laboratório (Estação Bioma) no m
 - `js/utils.js` (matemática), `js/mapa.js` (posições e altura do chão), `js/cena.js` (renderizador, câmera, luz e céu).
 - `js/construcao.js`: ajudantes `addBox`/`addCyl`, texturas, placas e as listas `colliders`, `circles` e `animated`.
 - `js/terreno.js`, `js/lab.js` (prédio e porta), `js/lake.js` (lago e saúde do lago), `js/vegetacao.js`.
-- `js/player.js`: personagem, movimento, colisão e câmera.
+- `js/player.js`: personagem, movimento, colisão e câmera. `js/boneco.js`: modelo de pessoa (jogador e NPCs).
+- `js/npc.js`: `addNPC({nome, x, z, cores, falas | aoFalar, temMissao})`. `js/save.js`: salva no localStorage a cada 5 s.
 - `js/audio.js`, `js/controles.js` (teclado, mouse e toque), `js/interface.js` (zona, avisos, mini-mapa, diálogos `say()` e painéis `openPanel()`).
-- `js/estado.js`: estado compartilhado (`Q`, `stage()`, `STAGES`, `keys`, `input`, `cam`).
-- `js/minigames.js`: as janelas de cada atividade. `js/quest.js`: as interações com E, o marcador e o rastreador.
+- `js/estado.js`: estado compartilhado (`keys`, `input`, `cam` e `jogo.ativa` = missão seguida agora).
+- `js/quest.js`: **motor de missões** (interações com E, rastreador, marcador, falas por etapa, mural e caderno).
+- `js/missoes/index.js`: lista de missões e o formato que cada uma segue. Cada missão tem a sua pasta (ex.: `js/missoes/lago/`, com `estado.js`, `minigames.js` e `index.js`).
 - Regra dos módulos: um arquivo não pode **reatribuir** uma variável importada de outro. Estado compartilhado fica dentro de objetos (ex.: `cam.yaw = 1`).
 
 ## Mapa (coordenadas em metros)
@@ -41,12 +43,11 @@ O jogador é um pesquisador de campo. Tem um laboratório (Estação Bioma) no m
 4. **Restauração**: biofiltro no cano, 6 mudas de mata ciliar e aerador solar no píer. O lago melhora aos poucos (variável `Q.health`, de 0 a 1).
 5. **Medir de novo** com a sonda. Aparece a tela de vitória com o antes e o depois.
 
-O estado da missão fica no objeto `Q` e a etapa atual é calculada por `stage()`, os dois em `js/estado.js`.
-As interações com a tecla E ficam em `setupInteractions()`, em `js/quest.js`.
+O estado da missão fica no objeto `Q` e a etapa atual é calculada por `stage()`, os dois em `js/missoes/lago/estado.js`.
+As interações com E da missão ficam em `interacoes()`, em `js/missoes/lago/index.js`. O motor (`js/quest.js`) registra todas.
 
 ## Ideias para depois
-- O plano de novas missões está em `PLANO_MISSOES.md`. Começar pela Fase 0 (sistema de missões).
+- O plano de novas missões está em `PLANO_MISSOES.md`. A Fase 0 está pronta; a próxima é a Missão 1 (clima).
 - Trocar os modelos feitos com formas simples por modelos .glb.
 - NPCs na floresta com novas missões (o mural do laboratório já existe para isso).
 - Novos lagos e rios com outros problemas: metais pesados (espectrofotômetro), condutividade.
-- Salvar o progresso (localStorage).

@@ -32,6 +32,7 @@
   #start p { font-size: 15px; line-height: 1.6; color: #e6f5ee; margin: 0 0 22px; }
   #start button { font-family: inherit; font-size: 22px; font-weight: 700; background: #16a08a; color: #fff; border: none; border-radius: 16px; padding: 14px 40px; cursor: pointer; box-shadow: 0 6px 0 #0d6d5d; }
   #start button:active { transform: translateY(3px); box-shadow: 0 3px 0 #0d6d5d; }
+  #start button.sec { background: #dee2e6; color: #24302b; box-shadow: 0 6px 0 #adb5bd; font-size: 17px; padding: 10px 22px; margin: 12px 6px 0; }
   #loading { font-size: 15px; color: #bfeedd; }
 
   /* ---------- Controles de toque (celular/tablet) ---------- */
@@ -126,6 +127,7 @@
     <h2>Protótipo 3D · laboratório na floresta</h2>
     <p>Explore a mata, entre no laboratório pelas portas automáticas<br>e siga a trilha até o lago eutrofizado (~100 m).</p>
     <div id="loading">Gerando o mundo…</div>
+    <button id="continueBtn" style="display:none">▶ Continuar</button>
     <button id="playBtn" style="display:none">▶ Explorar</button>
   </div>
 </div>

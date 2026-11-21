@@ -16,6 +16,7 @@
 //    caderno()                   → HTML da página da missão no caderno (tecla C)
 //    update(dt, t)               → roda todo quadro
 //    montar()                    → (opcional) cria coisas no mundo, como NPCs (veja npc.js)
+//    salvar(), carregar(dados)   → (opcional) o que guardar no save e como refazer (veja save.js)
 // =====================================================================
 import { lago } from './lago/index.js';
 

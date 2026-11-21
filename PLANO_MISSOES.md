@@ -8,7 +8,7 @@ Tamanho: **P** = poucos dias · **M** = uma ou duas semanas · **G** = mais que 
 
 ---
 
-## Fase 0: base para várias missões (fazer primeiro)
+## Fase 0: base para várias missões ✔ PRONTA
 
 Hoje o jogo só tem uma missão, e ela está "costurada" no código. Antes de criar outras:
 

@@ -15,6 +15,7 @@
 //    player.js      personagem, movimento, colisão e câmera
 //    boneco.js      o modelo de pessoa (jogador e NPCs)
 //    npc.js         personagens que conversam com o jogador (addNPC)
+//    save.js        salvar e carregar o progresso (localStorage)
 //    audio.js       sons
 //    controles.js   teclado, mouse e toque
 //    interface.js   textos na tela, mini-mapa, diálogos e janelas
@@ -30,18 +31,19 @@ import { renderer, scene, camera } from './cena.js';
 import { animated } from './construcao.js';
 import { LAB, lakeNorm } from './mapa.js';
 import { rr, isTouch } from './utils.js';
-import { input, cam } from './estado.js';
+import { input, cam, jogo } from './estado.js';
 import { Q, stage } from './missoes/lago/estado.js';
 import { buildTerrain } from './terreno.js';
 import { buildLab, updateDoor } from './lab.js';
-import { buildLake, waterTime } from './lake.js';
+import { buildLake, waterTime, lakeFx } from './lake.js';
 import { buildVegetation, grassTime } from './vegetacao.js';
 import { player, buildPlayer, updatePlayer, updateCamera, tickWaterWarn } from './player.js';
 import { initAudio, audioReady, bird, frog } from './audio.js';
 import { buildMapBg, drawMap, setZone, updateHud, panelOpen, dlgOpen, closePanel, promptEl, btnE } from './interface.js';
 import { openKit, microGame, chemGame, diagnosticoPanel, amostrasBench, winPanel } from './missoes/lago/minigames.js';
-import { setupInteractions, montarMissoes, updateInteract, updateQuest, updateMissoes, novoJogo, muralPanel, notebook, objTarget } from './quest.js';
+import { ativa, setupInteractions, montarMissoes, updateInteract, updateQuest, updateMissoes, novoJogo, muralPanel, notebook, objTarget } from './quest.js';
 import { addNPC, updateNPCs } from './npc.js';
+import { temSave, salvar, carregar, apagarSave, updateSave } from './save.js';
 import './controles.js';   // só de importar, os controles já começam a "ouvir" o teclado e o mouse
 
 // Espera a fonte carregar (para os letreiros desenhados em canvas ficarem bonitos)
@@ -60,20 +62,36 @@ buildMapBg();
 const rig = buildPlayer();
 montarMissoes();
 setupInteractions();
-window.__game = { player, Q, stage, openKit, microGame, chemGame, diagnosticoPanel, muralPanel, notebook, addNPC, amostrasBench, winPanel, closePanel, cam: (y, p) => { cam.yaw = y; cam.pitch = p; } };   // atalho para testes no console
+window.__game = { player, Q, stage, openKit, microGame, chemGame, diagnosticoPanel, muralPanel, notebook, addNPC, salvar, carregar, apagarSave, jogo, lakeFx, amostrasBench, winPanel, closePanel, cam: (y, p) => { cam.yaw = y; cam.pitch = p; } };   // atalho para testes no console
 cam.yaw = 0;                          // câmera atrás do jogador, olhando para o laboratório
 player.yaw = Math.PI;
 
-// ---------- Tela inicial: botão "Explorar" ----------
+// ---------- Tela inicial: "Explorar" (ou "Continuar" e "Novo jogo" se tiver save) ----------
 document.getElementById('loading').style.display = 'none';
-const playBtn = document.getElementById('playBtn'); playBtn.style.display = 'inline-block';
-playBtn.addEventListener('click', () => {
+const playBtn = document.getElementById('playBtn'), continueBtn = document.getElementById('continueBtn');
+playBtn.style.display = 'inline-block';
+if (temSave()) {
+  continueBtn.style.display = 'inline-block';
+  playBtn.textContent = 'Novo jogo'; playBtn.className = 'sec';
+}
+function comecar() {
   initAudio(); input.started = true;
   document.getElementById('start').style.display = 'none';
   const cvs = renderer.domElement;
   if (!isTouch) { try { const p = cvs.requestPointerLock(); if (p && p.catch) p.catch(() => {}); } catch (e) {} }
+}
+playBtn.addEventListener('click', () => {
+  if (temSave() && !confirm('Começar do zero? O progresso salvo será apagado.')) return;
+  apagarSave();
+  comecar();
   setZone('🏢 Praça da Estação');
   novoJogo();
+});
+continueBtn.addEventListener('click', () => {
+  if (!carregar()) { apagarSave(); location.reload(); return; }   // save estragado: começa de novo
+  comecar();
+  // se a missão ativa ainda nem tinha começado (fechou na conversa de abertura), mostra a conversa
+  if (!ativa().iniciada()) novoJogo();
 });
 
 addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
@@ -108,6 +126,7 @@ renderer.setAnimationLoop(() => {
   else { rig.g.position.copy(player.pos); rig.g.rotation.y = player.yaw; cam.yaw = Math.sin(elapsed * 0.1) * 0.5; }
   updateMissoes(dt, elapsed);
   updateNPCs(dt, elapsed);
+  updateSave(dt);
   animated.forEach(f => f(dt, elapsed));
   updateCamera(dt);
   drawMap(player, objTarget);
