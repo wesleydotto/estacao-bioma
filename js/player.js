@@ -1,7 +1,8 @@
 // Arquivo: player.js — o personagem: modelo 3D, movimento, colisões e a câmera que o segue.
 import * as THREE from 'three';
 import { scene, camera, sky, sun, SUN_DIR } from './cena.js';
-import { std, colliders, circles, camBlockers } from './construcao.js';
+import { colliders, circles, camBlockers } from './construcao.js';
+import { criarBoneco } from './boneco.js';
 import { LAB, PLAZA_Y, WATER_Y, WORLD_R, groundHeight, onPier, walkHeight } from './mapa.js';
 import { clamp } from './utils.js';
 import { keys, joy, input, cam } from './estado.js';
@@ -12,25 +13,9 @@ import { showToast } from './interface.js';
 // =====================================================================
 export const player = { pos: new THREE.Vector3(0, PLAZA_Y, 27), vel: new THREE.Vector3(), vy: 0, onGround: true, yaw: Math.PI, phase: 0 };
 export function buildPlayer() {
-  const g = new THREE.Group();
-  const skin = std('#f1c27d', 0.7), shirt = std('#5e8c4a', 0.8), pants = std('#c2a878', 0.85), boots = std('#4a3424', 0.8), hat = std('#d9c08c', 0.85), pack = std('#3f5a33', 0.8), dark = std('#222', 0.5);
-  const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.3, 0.45, 4, 12), shirt); body.position.y = 1.08; g.add(body);
-  const vest = new THREE.Mesh(new THREE.CapsuleGeometry(0.315, 0.3, 4, 12), std('#e9ecef', 0.7)); vest.position.y = 1.15; vest.scale.set(1, 1, 0.92); g.add(vest);  // jaleco
-  const head = new THREE.Mesh(new THREE.SphereGeometry(0.27, 20, 14), skin); head.position.y = 1.68; g.add(head);
-  for (const x of [-0.09, 0.09]) { const e = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 6), dark); e.position.set(x, 1.71, 0.245); g.add(e); }
-  const brim = new THREE.Mesh(new THREE.CylinderGeometry(0.44, 0.44, 0.035, 24), hat); brim.position.y = 1.86; g.add(brim);
-  const crownH = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.27, 0.2, 20), hat); crownH.position.y = 1.97; g.add(crownH);
-  const bandH = new THREE.Mesh(new THREE.CylinderGeometry(0.272, 0.272, 0.05, 20), std('#2f5d50', 0.7)); bandH.position.y = 1.9; g.add(bandH);
-  const bp = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.52, 0.24), pack); bp.position.set(0, 1.15, -0.32); g.add(bp);
-  const roll = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.5, 12), std('#a5672f', 0.8)); roll.rotation.z = Math.PI / 2; roll.position.set(0, 1.47, -0.32); g.add(roll);
-  const vial = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.18, 8), std('#74c0fc', 0.1, 0, { emissive: '#1c7ed6', emissiveIntensity: 0.5 })); vial.position.set(0.25, 0.92, 0.2); g.add(vial);
-  const limb = (r, len, mat, x, y) => { const pv = new THREE.Group(); pv.position.set(x, y, 0); const m = new THREE.Mesh(new THREE.CapsuleGeometry(r, len, 3, 8), mat); m.position.y = -len / 2 - r * 0.5; m.castShadow = true; pv.add(m); g.add(pv); return pv; };
-  const armL = limb(0.08, 0.42, shirt, -0.4, 1.36), armR = limb(0.08, 0.42, shirt, 0.4, 1.36);
-  const legL = limb(0.11, 0.42, pants, -0.15, 0.72), legR = limb(0.11, 0.42, pants, 0.15, 0.72);
-  for (const leg of [legL, legR]) { const b = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.14, 0.3), boots); b.position.set(0, -0.68, 0.05); b.castShadow = true; leg.add(b); }
-  g.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
-  scene.add(g);
-  return { g, armL, armR, legL, legR, body: [body, vest, head, brim, crownH, bandH, bp, roll, vial] };
+  const rig = criarBoneco();   // boneco com as cores do pesquisador (veja boneco.js)
+  scene.add(rig.g);
+  return rig;
 }
 
 // =====================================================================

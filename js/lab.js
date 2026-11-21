@@ -319,7 +319,7 @@ export function buildLab() {
 // ---------- Mural de missões: desenha um "post-it" para cada missão ----------
 // itens = [{ icone, titulo, situacao, cor }] (até 3 cabem no mural)
 export function desenharMural(itens) {
-  const { canvas: c, ctx: g, tex } = labFx.mural;
+  const { ctx: g, tex } = labFx.mural;
   // fundo de cortiça: desenhado uma vez só e guardado (as pintinhas são aleatórias)
   if (!labFx.mural.fundo) {
     const [fc, fg] = makeCanvas(1024, 480);

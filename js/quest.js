@@ -17,6 +17,7 @@ import { LAB } from './mapa.js';
 import { player } from './player.js';
 import { doorSound, chime } from './audio.js';
 import { isTouch } from './utils.js';
+import { npcInteracoes } from './npc.js';
 
 // Missão que o jogador está seguindo agora
 export const ativa = () => missao(jogo.ativa);
@@ -29,6 +30,10 @@ const MURAL_POS = new THREE.Vector2(0, -9.3);
 export const interactables = [];
 export const addInteract = (pos, r, label, act) => interactables.push({ pos, r, label, act });
 let currentInteract = null;
+// Deixa cada missão montar o que precisa no mundo (ex.: criar NPCs). Chamado uma vez, no começo.
+export function montarMissoes() {
+  for (const m of MISSOES) m.montar?.();
+}
 export function setupInteractions() {
   // porta automática do laboratório
   addInteract(() => DOOR_POS, 4.8, () => door.target ? 'Fechar porta' : 'Abrir porta', () => { door.target = door.target ? 0 : 1; doorSound(door.target === 1); door.closeTimer = 0; });
@@ -39,7 +44,7 @@ export function setupInteractions() {
 }
 export function updateInteract() {
   const p = player.pos; currentInteract = null; let best = 1e9;
-  for (const it of interactables) {
+  for (const it of [...interactables, ...npcInteracoes]) {   // inclui conversar com NPCs
     const q = it.pos(), d = Math.hypot(p.x - q.x, p.z - q.y);
     if (d < it.r && d < best) { const l = it.label(); if (l) { best = d; currentInteract = { it, l }; } }
   }
