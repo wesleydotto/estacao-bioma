@@ -19,13 +19,19 @@ export const eco = {
 };
 
 // ---------- Catálogo da loja ----------
-// tipo: 'construir' = vai para um lugar marcado no mundo; 'ferramenta' = fica com você
+// tipo: 'construir' = vai para um lugar marcado no mundo; 'ferramenta' = fica com você;
+//       'equipamento' = compra única que libera um teste no laboratório/campo (precisa para fazer a análise).
+// watts (só equipamentos): consumo de energia. Ainda não aparece no jogo: a Missão 3 (energia) vai usar.
 export const ITENS = {
   muda:      { nome: 'Muda nativa (ipê)', icone: '🌱', preco: 40, tipo: 'construir', desc: 'Árvore nativa do Cerrado. Planta num canteiro marcado. Precisa de pá.' },
   sementes:  { nome: 'Sementes de adubação verde', icone: '🫘', preco: 25, tipo: 'construir', desc: 'Feijão-de-porco: cobre o solo e devolve nitrogênio a ele. Precisa de pá.' },
   placa:     { nome: 'Placa solar', icone: '☀️', preco: 600, tipo: 'construir', desc: 'Transforma a luz do Sol em eletricidade. Vai numa base de energia.' },
   catavento: { nome: 'Cata-vento (turbina eólica)', icone: '🌬️', preco: 450, tipo: 'construir', desc: 'Transforma o vento em eletricidade. Vai numa base de energia.' },
   pa:        { nome: 'Pá', icone: '🪏', preco: 60, tipo: 'ferramenta', desc: 'Ferramenta para cavar e plantar. Compre uma vez e use sempre.' },
+  kitInfiltracao: { nome: 'Kit de infiltração (anel + cronômetro)', icone: '🥤', preco: 180, tipo: 'equipamento', watts: 0, desc: 'Mede quanto tempo a água leva para entrar no solo. Libera o teste de infiltração (Missão 2).' },
+  lupaCampo:      { nome: 'Lupa de campo e peneira', icone: '🔍', preco: 120, tipo: 'equipamento', watts: 0, desc: 'Para contar minhocas e insetos do solo. Libera a contagem de fauna (Missão 2).' },
+  balancaSolo:    { nome: 'Balança de precisão + estufa de solo', icone: '⚖️', preco: 450, tipo: 'equipamento', watts: 300, desc: 'Seca e pesa o solo para achar a matéria orgânica. Libera a análise no laboratório (Missão 2).' },
+  sondaSolo:      { nome: 'Sonda de solo (pH e umidade)', icone: '🌡️', preco: 300, tipo: 'equipamento', watts: 20, desc: 'Opcional: dá dados extras sobre o solo e melhora a nota do relatório (Missão 2).' },
   reagentes: { nome: 'Kit de reagentes', icone: '🧪', preco: 120, tipo: 'ferramenta', desc: 'Reagentes extras para análises. Vai servir nas próximas missões.' },
 };
 
@@ -101,7 +107,7 @@ function mostrarLoja(box) {
   box.innerHTML = `<p class="tip">Escolha o que comprar. Repare quanto de verba <b>sobra</b> depois de cada compra!</p><div class="tools"></div><p class="fb" id="fb"></p>`;
   const lista = box.querySelector('.tools'), fb = box.querySelector('#fb');
   for (const [id, it] of Object.entries(ITENS)) {
-    const jaTem = it.tipo === 'ferramenta' && qtd(id) > 0;   // ferramenta: só precisa de uma
+    const jaTem = (it.tipo === 'ferramenta' || it.tipo === 'equipamento') && qtd(id) > 0;   // ferramenta e equipamento: só precisa de um
     const d = document.createElement('div'); d.className = 'tool';
     d.innerHTML = `<div class="ic">${it.icone}</div><div><div class="nm">${it.nome}</div><div class="ds">${it.desc}</div><div class="ds">Você tem: <b>${qtd(id)}</b></div></div><div class="st">${reais(it.preco)}<br></div>`;
     const bt = document.createElement('button'); bt.className = 'btn'; bt.textContent = jaTem ? 'Já tem' : 'Comprar'; bt.disabled = jaTem;

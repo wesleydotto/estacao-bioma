@@ -18,6 +18,7 @@
 //    save.js        salvar e carregar o progresso (localStorage)
 //    economia.js    verba (R$), inventário, loja e relatórios
 //    prefeitura.js  o prédio da prefeitura e a secretária
+//    fazenda.js     a Fazenda Boa Safra (lavoura, cerca, galpão e sacos de adubo)
 //    construir.js   lugares marcados onde se usa o que foi comprado
 //    audio.js       sons
 //    controles.js   teclado, mouse e toque
@@ -28,11 +29,12 @@
 //    missoes/       uma pasta para cada missão (lista em missoes/index.js)
 //      lago/        "Salvar o Lago da Mata": estado.js (Q e stage),
 //                   minigames.js (atividades) e index.js (o pacote da missão)
+//      adubo/       "De onde veio o adubo?" (monocultura e solo), em construção
 // =====================================================================
 import * as THREE from 'three';
 import { renderer, scene, camera } from './cena.js';
 import { animated } from './construcao.js';
-import { LAB, lakeNorm } from './mapa.js';
+import { LAB, lakeNorm, distToFazenda } from './mapa.js';
 import { rr, isTouch } from './utils.js';
 import { input, cam, jogo } from './estado.js';
 import { Q, stage } from './missoes/lago/estado.js';
@@ -47,6 +49,7 @@ import { openKit, microGame, chemGame, diagnosticoPanel, amostrasBench, winPanel
 import { ativa, setupInteractions, montarMissoes, updateInteract, updateQuest, updateMissoes, novoJogo, muralPanel, notebook, objTarget } from './quest.js';
 import { addNPC, updateNPCs } from './npc.js';
 import { buildPrefeitura } from './prefeitura.js';
+import { buildFazenda } from './fazenda.js';
 import { montarLotes } from './construir.js';
 import { eco, atualizarHudVerba } from './economia.js';
 import { temSave, salvar, carregar, apagarSave, updateSave } from './save.js';
@@ -65,6 +68,7 @@ buildLab();
 buildLake();
 buildVegetation();
 buildPrefeitura();   // não usa o gerador com semente, então pode vir depois
+buildFazenda();      // idem (tem o gerador próprio, só da fazenda)
 montarLotes();
 buildMapBg();
 atualizarHudVerba();
@@ -111,7 +115,8 @@ function updateWorld(dt) {
   const p = player.pos;
   const inLab = Math.abs(p.x) < LAB.w / 2 && Math.abs(p.z) < LAB.d / 2;
   const nearLake = lakeNorm(p.x, p.z) < 1.7;
-  const zone = inLab ? '🔬 Laboratório · Estação Bioma' : nearLake ? (Q.health > 0.9 ? '💧 Lago da Mata (em recuperação)' : '🦠 Lago da Mata (eutrofizado)') : (Math.hypot(p.x, p.z) < 30 ? '🏢 Praça da Estação' : '🌳 Floresta');
+  const naFazenda = distToFazenda(p.x, p.z) < 2;
+  const zone = naFazenda ? '🌾 Fazenda Boa Safra' : inLab ? '🔬 Laboratório · Estação Bioma' : nearLake ? (Q.health > 0.9 ? '💧 Lago da Mata (em recuperação)' : '🦠 Lago da Mata (eutrofizado)') : (Math.hypot(p.x, p.z) < 30 ? '🏢 Praça da Estação' : '🌳 Floresta');
   setZone(zone);
   updateHud(dt);
   tickWaterWarn(dt);

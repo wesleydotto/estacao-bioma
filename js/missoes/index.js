@@ -6,6 +6,7 @@
 //  Cada missão é um objeto com estas partes (veja missoes/lago/index.js):
 //    id, titulo, icone, resumo   → nome e descrição (aparecem no mural)
 //    iniciada(), concluida()     → true/false
+//    bloqueada()                 → (opcional) texto do motivo se a missão ainda não pode começar; null = liberada
 //    etapa()                     → número da etapa atual
 //    iniciar()                   → começa a missão (normalmente com uma fala)
 //    rastreador(player)          → { numero, agora, subs } para o canto da tela
@@ -20,8 +21,9 @@
 //    relatorio: { verba, texto } → (opcional) quanto a prefeitura paga quando a missão termina
 // =====================================================================
 import { lago } from './lago/index.js';
+import { adubo } from './adubo/index.js';
 
-export const MISSOES = [lago];
+export const MISSOES = [lago, adubo];
 
 // Procura uma missão pelo id (ex.: missao('lago'))
 export const missao = (id) => MISSOES.find(m => m.id === id);

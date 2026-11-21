@@ -2,7 +2,7 @@
 // avisos, mini-mapa, diálogos da Dra. Iara e as janelas (painéis) dos minigames.
 import { makeCanvas } from './construcao.js';
 import { rand, rr, clamp, lerp, FONT } from './utils.js';
-import { PATH, LAKE, lakeR, PREF } from './mapa.js';
+import { PATH, LAKE, lakeR, PREF, FAZENDA } from './mapa.js';
 import { keys } from './estado.js';
 import { blip } from './audio.js';
 
@@ -42,6 +42,9 @@ export function buildMapBg() {
   // prefeitura (prédio com telhado de telha)
   const [px0, py0] = toMap(PREF.x - PREF.w / 2, PREF.z - PREF.d / 2); g.fillStyle = '#b5533c'; g.fillRect(px0, py0, PREF.w * MAP_S, PREF.d * MAP_S);
   g.fillStyle = '#fff'; g.font = `700 15px ${FONT}`; g.fillText('PREF.', ...toMap(PREF.x, PREF.z + 12));
+  // fazenda (terra vermelha)
+  const [fx0, fy0] = toMap(FAZENDA.x - FAZENDA.w / 2, FAZENDA.z - FAZENDA.d / 2); g.fillStyle = '#a4533a'; g.fillRect(fx0, fy0, FAZENDA.w * MAP_S, FAZENDA.d * MAP_S);
+  g.fillStyle = '#fff'; g.font = `700 15px ${FONT}`; g.fillText('FAZENDA', ...toMap(FAZENDA.x, FAZENDA.z - 4));
   mapBg = c;
 }
 // Desenha o mini-mapa: jogador (seta amarela) e objetivo atual (bolinha que pisca)

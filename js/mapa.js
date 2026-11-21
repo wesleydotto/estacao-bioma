@@ -15,6 +15,15 @@ export const WORLD_R = 250;                             // limite do mapa
 // Prefeitura: prédio a leste da praça, porta virada para a praça (-X)
 export const PREF = { x: 33, z: 18, w: 12, d: 9, h: 5 };
 
+// Fazenda Boa Safra (Missão 2): lavoura de soja ao norte do lago. O portão fica virado para o lago (-Z).
+// y = altura do chão da fazenda (o terreno é aplainado em volta, veja groundHeight)
+export const FAZENDA = { x: -45, z: 160, w: 44, d: 34, y: 0.15 };
+// Distância de um ponto até a "caixa" da fazenda (0 = dentro dela)
+export function distToFazenda(x, z) {
+  const dx = Math.max(Math.abs(x - FAZENDA.x) - FAZENDA.w / 2, 0), dz = Math.max(Math.abs(z - FAZENDA.z) - FAZENDA.d / 2, 0);
+  return Math.hypot(dx, dz);
+}
+
 // Distância de um ponto até a "caixa" da prefeitura (0 = dentro dela)
 export function distToPref(x, z) {
   const dx = Math.max(Math.abs(x - PREF.x) - PREF.w / 2, 0), dz = Math.max(Math.abs(z - PREF.z) - PREF.d / 2, 0);
@@ -70,6 +79,8 @@ export function groundHeight(x, z) {
   h = lerp(0, h, smoothstep(8, 26, Math.hypot(dx, dz)));
   // achata em volta da prefeitura
   h = lerp(0, h, smoothstep(4, 16, distToPref(x, z)));
+  // achata a fazenda (o chão fica reto para a lavoura e vai subindo/descendo suave em volta)
+  h = lerp(FAZENDA.y, h, smoothstep(0, 14, distToFazenda(x, z)));
   // suaviza a trilha
   h = lerp(h * 0.35, h, smoothstep(2, 12, distToPath(x, z)));
   // margem plana + bacia do lago

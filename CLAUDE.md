@@ -27,11 +27,12 @@ O jogador é um pesquisador de campo. Tem um laboratório (Estação Bioma) no m
 - `js/terreno.js`, `js/lab.js` (prédio e porta), `js/lake.js` (lago e saúde do lago), `js/vegetacao.js`.
 - `js/player.js`: personagem, movimento, colisão e câmera. `js/boneco.js`: modelo de pessoa (jogador e NPCs).
 - `js/npc.js`: `addNPC({nome, x, z, cores, falas | aoFalar, temMissao})`. `js/save.js`: salva no localStorage a cada 5 s.
-- `js/economia.js` (verba, inventário, loja, relatórios), `js/prefeitura.js` (prédio e secretária), `js/construir.js` (lugares marcados para construir).
+- `js/economia.js` (verba, inventário, loja, relatórios; itens do tipo `equipamento` liberam testes), `js/prefeitura.js` (prédio e secretária), `js/construir.js` (lugares marcados para construir).
+- `js/fazenda.js`: cenário da Fazenda Boa Safra (Missão 2), ao norte do lago (centro em (-45, 160), `FAZENDA` em `mapa.js`). O fazendeiro (Seu Geraldo) é criado pela missão.
 - `js/audio.js`, `js/controles.js` (teclado, mouse e toque), `js/interface.js` (zona, avisos, mini-mapa, diálogos `say()` e painéis `openPanel()`).
 - `js/estado.js`: estado compartilhado (`keys`, `input`, `cam` e `jogo.ativa` = missão seguida agora).
 - `js/quest.js`: **motor de missões** (interações com E, rastreador, marcador, falas por etapa, mural e caderno).
-- `js/missoes/index.js`: lista de missões e o formato que cada uma segue. Cada missão tem a sua pasta (ex.: `js/missoes/lago/`, com `estado.js`, `minigames.js` e `index.js`).
+- `js/missoes/index.js`: lista de missões (uma missão pode ter `bloqueada()` para só abrir depois de outra) e o formato que cada uma segue. Cada missão tem a sua pasta (ex.: `js/missoes/lago/`, com `estado.js`, `minigames.js` e `index.js`).
 - Regra dos módulos: um arquivo não pode **reatribuir** uma variável importada de outro. Estado compartilhado fica dentro de objetos (ex.: `cam.yaw = 1`).
 
 ## Mapa (coordenadas em metros)
@@ -51,7 +52,7 @@ O estado da missão fica no objeto `Q` e a etapa atual é calculada por `stage()
 As interações com E da missão ficam em `interacoes()`, em `js/missoes/lago/index.js`. O motor (`js/quest.js`) registra todas.
 
 ## Ideias para depois
-- O plano de novas missões está em `PLANO_MISSOES.md`. As Fases 0 (base de missões) e 1 (economia) estão prontas; a próxima é a Missão 2 (monocultura).
+- O plano de novas missões está em `PLANO_MISSOES.md`. As Fases 0 (base de missões) e 1 (economia) estão prontas; a Missão 2 (monocultura) está em andamento (fatia A pronta, veja o `HISTORICO.md`). A energia só é liberada na Missão 3.
 - Trocar os modelos feitos com formas simples por modelos .glb.
 - NPCs na floresta com novas missões (o mural do laboratório já existe para isso).
 - Novos lagos e rios com outros problemas: metais pesados (espectrofotômetro), condutividade.

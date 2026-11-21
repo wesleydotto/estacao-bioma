@@ -149,6 +149,24 @@ Base para o jogador **ganhar verba, comprar e construir**. As missões seguintes
 - **Reaproveita:** kit de campo, sonda, mural, mata ciliar (mudas), mudanças na cor da água.
 - **Atenção:** precisa de um terreno novo (o leito do rio) e é a maior das missões. Fica por último.
 
+## Missão 9: "Fotos que protegem" (Espécies ameaçadas e reserva ambiental) · **M/G**
+*Ideia do Wesley, anotada para não esquecer.*
+
+- **Conteúdo / BNCC:** biodiversidade e espécies ameaçadas (EF07CI07, EF07CI08), unidades de conservação e ações de proteção (EF08CI16).
+- **Onde:** na floresta, longe da trilha (mesma área da Missão 6).
+- **Ideia central:** para proteger uma espécie, primeiro é preciso **provar que ela existe ali**. O aluno fotografa animais da região (ex.: lobo-guará) **sem ser notado**.
+- **Etapas:**
+  1. Descobrir **onde o animal costuma estar**: pegadas, fezes, marcas, horário (investigação de pistas).
+  2. **Aproximação furtiva:** andar **devagar** (sem correr), de preferência contra o vento e sem barulho. Se correr ou chegar rápido demais, o animal foge.
+  3. **Tirar a foto** com a câmera (qualidade depende da distância, do foco e de o animal não ter percebido o jogador).
+  4. **Enviar as fotos à prefeitura**, que repassa à Secretaria de Meio Ambiente. Quanto melhores e mais variadas as fotos, **mais verba** (pagamento por foto).
+  5. A Secretaria **libera o plano de criar uma reserva de proteção ambiental**.
+  6. **Ação:** montar **grades/cercas de proteção** e outras estruturas no local (usa a loja e os lotes de construir).
+- **Minigames novos:** aproximação furtiva (barra de "visibilidade" que sobe se correr), enquadrar e focar a foto, montar o dossiê de fotos (álbum de espécies).
+- **Itens novos na loja (equipamentos pagos):** câmera fotográfica, binóculo, roupa de camuflagem (opcional) e cercas/grades de proteção (tipo `construir`).
+- **Reaproveita:** economia (pagamento por foto), prefeitura (envio e liberação do plano), construir (lotes de cerca), bestiário e ideia do herbário/álbum.
+- **Atenção:** precisa de modelos de animais (lobo-guará etc.), com comportamento simples de fuga. Combina com a Missão 6 (fauna). Conferir quais espécies são realmente **endêmicas** do Cerrado e usar essas no jogo.
+
 ## Ordem sugerida
 
 ```
@@ -157,6 +175,7 @@ Fase 0 ✔ ──► Fase 1 Economia ──► Missão 2 Monocultura ──► M
                      Missão 4 Clima ◄────────────────────────────┘
                         │      └──► Missão 5 Vila
                         ├──► Missão 6 Fauna (precisa do ciclo dia/noite)
+                        ├──► Missão 9 Fotos que protegem (junto com a Missão 6)
                         └──► Missão 7 Barranco (precisa da chuva)
                                           ──► Missão 8 Rio (a maior, por último)
 ```

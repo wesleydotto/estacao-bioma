@@ -1,7 +1,7 @@
 // Arquivo: terreno.js — o chão do mundo (relevo e cores).
 import * as THREE from 'three';
 import { scene } from './cena.js';
-import { groundHeight, distToPath, lakeNorm } from './mapa.js';
+import { groundHeight, distToPath, lakeNorm, distToFazenda } from './mapa.js';
 import { fbm, noise, smoothstep } from './utils.js';
 
 // =====================================================================
@@ -14,7 +14,7 @@ export function buildTerrain() {
   const pos = geo.attributes.position;
   const col = new Float32Array(pos.count * 3);
   const grassA = new THREE.Color('#86c84f'), grassB = new THREE.Color('#4e9a35'), dry = new THREE.Color('#b4bf56');
-  const dirt = new THREE.Color('#b9915b'), mud = new THREE.Color('#6b5a36'), deep = new THREE.Color('#38461f'), rock = new THREE.Color('#8f9580');
+  const soil = new THREE.Color('#a4533a'), dirt = new THREE.Color('#b9915b'), mud = new THREE.Color('#6b5a36'), deep = new THREE.Color('#38461f'), rock = new THREE.Color('#8f9580');
   const c = new THREE.Color();
   for (let i = 0; i < pos.count; i++) {
     const x = pos.getX(i), z = pos.getZ(i);
@@ -23,6 +23,7 @@ export function buildTerrain() {
     c.lerp(dry, smoothstep(0.35, 0.8, noise(x * 0.012 + 5, z * 0.012)) * 0.6);
     c.lerp(rock, smoothstep(200, 245, Math.hypot(x, z)) * 0.8);
     c.lerp(dirt, 1 - smoothstep(1.6, 3.4, distToPath(x, z)));
+    c.lerp(soil, 1 - smoothstep(0, 3, distToFazenda(x, z)));   // terra vermelha da lavoura
     const ld = lakeNorm(x, z);
     c.lerp(mud, smoothstep(1.3, 1.0, ld));
     c.lerp(deep, smoothstep(0.95, 0.7, ld));

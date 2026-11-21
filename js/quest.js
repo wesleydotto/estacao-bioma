@@ -120,6 +120,7 @@ export function updateQuest(dt, t) {
 export function situacao(m) {
   if (m.concluida()) return { txt: '✔ Concluída', cor: '#2b8a3e' };
   if (m.iniciada()) return { txt: m.id === jogo.ativa ? '▶ Seguindo agora' : '… Em andamento', cor: '#f08c00' };
+  const trava = m.bloqueada?.(); if (trava) return { txt: '🔒 Bloqueada', cor: '#868e96', trava };   // trava = motivo (aparece no painel do mural)
   return { txt: '★ Disponível', cor: '#1c7ed6' };
 }
 // Redesenha o mural da parede só quando a situação de alguma missão muda
@@ -137,12 +138,12 @@ export function muralPanel() {
     for (const m of MISSOES) {
       const sit = situacao(m);
       const d = document.createElement('div'); d.className = 'tool';
-      d.innerHTML = `<div class="ic">${m.icone}</div><div><div class="nm">${m.titulo}</div><div class="ds">${m.resumo}</div><div class="ds" style="color:${sit.cor};font-weight:700;margin-top:4px">${sit.txt}</div></div><div class="st"></div>`;
+      d.innerHTML = `<div class="ic">${m.icone}</div><div><div class="nm">${m.titulo}</div><div class="ds">${m.resumo}</div><div class="ds" style="color:${sit.cor};font-weight:700;margin-top:4px">${sit.txt}</div>${sit.trava ? `<div class="ds">${sit.trava}</div>` : ''}</div><div class="st"></div>`;
       const st = d.querySelector('.st');
       const botao = (texto, acao, ghost = false) => { const bt = document.createElement('button'); bt.className = ghost ? 'btn ghost' : 'btn'; bt.textContent = texto; bt.onclick = acao; bt.style.margin = '3px 0'; st.appendChild(bt); st.appendChild(document.createElement('br')); };
       // botões extras da própria missão (ex.: diagnóstico do lago)
       for (const a of (m.acoesMural?.() || [])) botao(a.texto, a.acao, !a.destaque);
-      if (!m.iniciada()) botao('Começar', () => { jogo.ativa = m.id; closePanel(); m.iniciar(); });
+      if (!m.iniciada() && !sit.trava) botao('Começar', () => { jogo.ativa = m.id; closePanel(); m.iniciar(); });
       else if (!m.concluida() && m.id !== jogo.ativa) botao('Seguir esta', () => { jogo.ativa = m.id; chime(); muralPanel(); });
       box.appendChild(d);
     }
