@@ -139,8 +139,9 @@ function infiltracaoGame(site, depois = false) {
       // atualiza o relógio na hora do clique (em computador lento o último quadro pode estar atrasado)
       { const agora = performance.now(); t += (agora - last) / 1000 * ESCALA_TEMPO; last = agora; rel.textContent = mmss(t); }
       if (t < S.infilt * 0.85) { buzz(); fb.className = 'fb bad'; fb.textContent = `Cedo demais! Ainda tinha água no anel (${mmss(t)}). Tente de novo.`; $(b, '#go').disabled = false; agua.style.height = '0%'; return; }
-      if (t > S.infilt * 1.4) { buzz(); fb.className = 'fb bad'; fb.textContent = `Você demorou para parar (${mmss(t)}): a água já tinha sumido faz tempo. Tente de novo.`; $(b, '#go').disabled = false; agua.style.height = '0%'; return; }
-      const medido = Math.round(t / 5) * 5;
+      if (t > S.infilt * 1.4 + 40) {   // tolerância folgada (+40 s do relógio do jogo) para dar tempo de reagir, mesmo em computador lento
+         buzz(); fb.className = 'fb bad'; fb.textContent = `Você demorou para parar (${mmss(t)}): a água já tinha sumido faz tempo. Tente de novo.`; $(b, '#go').disabled = false; agua.style.height = '0%'; return; }
+      const medido = S.infilt;   // o aluno parou perto do ponto certo: registra o tempo verdadeiro da água sumir
       if (depois) A.depois.infilt = medido; else A.solo[site].infilt = medido;
       chime(); checarPagamentos();
       fb.className = 'fb good';
