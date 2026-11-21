@@ -1,5 +1,8 @@
 # Estação Bioma — jogo 3D educativo (Three.js)
 
+## Comece por aqui
+No começo de cada sessão, leia o `HISTORICO.md` (o que já foi feito, decisões e armadilhas) e o `PLANO_MISSOES.md` (o que vem pela frente).
+
 ## Sobre o projeto
 Jogo 3D de mundo aberto, estilo "cozy" com visual inspirado em Palworld, para alunos do Fundamental II (6º a 8º ano).
 O jogador é um pesquisador de campo. Tem um laboratório (Estação Bioma) no meio da floresta e um lago eutrofizado a ~100 m.
@@ -24,6 +27,7 @@ O jogador é um pesquisador de campo. Tem um laboratório (Estação Bioma) no m
 - `js/terreno.js`, `js/lab.js` (prédio e porta), `js/lake.js` (lago e saúde do lago), `js/vegetacao.js`.
 - `js/player.js`: personagem, movimento, colisão e câmera. `js/boneco.js`: modelo de pessoa (jogador e NPCs).
 - `js/npc.js`: `addNPC({nome, x, z, cores, falas | aoFalar, temMissao})`. `js/save.js`: salva no localStorage a cada 5 s.
+- `js/economia.js` (verba, inventário, loja, relatórios), `js/prefeitura.js` (prédio e secretária), `js/construir.js` (lugares marcados para construir).
 - `js/audio.js`, `js/controles.js` (teclado, mouse e toque), `js/interface.js` (zona, avisos, mini-mapa, diálogos `say()` e painéis `openPanel()`).
 - `js/estado.js`: estado compartilhado (`keys`, `input`, `cam` e `jogo.ativa` = missão seguida agora).
 - `js/quest.js`: **motor de missões** (interações com E, rastreador, marcador, falas por etapa, mural e caderno).
@@ -47,7 +51,7 @@ O estado da missão fica no objeto `Q` e a etapa atual é calculada por `stage()
 As interações com E da missão ficam em `interacoes()`, em `js/missoes/lago/index.js`. O motor (`js/quest.js`) registra todas.
 
 ## Ideias para depois
-- O plano de novas missões está em `PLANO_MISSOES.md`. A Fase 0 está pronta; a próxima é a Fase 1 (economia: verba, prefeitura, loja, inventário e construção).
+- O plano de novas missões está em `PLANO_MISSOES.md`. As Fases 0 (base de missões) e 1 (economia) estão prontas; a próxima é a Missão 2 (monocultura).
 - Trocar os modelos feitos com formas simples por modelos .glb.
 - NPCs na floresta com novas missões (o mural do laboratório já existe para isso).
 - Novos lagos e rios com outros problemas: metais pesados (espectrofotômetro), condutividade.
