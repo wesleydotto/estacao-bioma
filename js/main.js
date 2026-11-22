@@ -32,7 +32,7 @@
 //      adubo/       "De onde veio o adubo?" (monocultura e solo), em construção
 // =====================================================================
 import * as THREE from 'three';
-import { renderer, scene, camera } from './cena.js';
+import { renderer, scene, camera, ceuTempo } from './cena.js';
 import { renderizar, redimensionar } from './graficos.js';
 import { NIVEIS, nivelAtual, trocarNivel } from './qualidade.js';
 import { animated } from './construcao.js';
@@ -144,7 +144,7 @@ const clock = new THREE.Clock();
 let elapsed = 0;   // segundos desde que o jogo abriu
 renderer.setAnimationLoop(() => {
   const dt = Math.min(clock.getDelta(), 0.05); elapsed += dt;   // dt = tempo desde o último quadro
-  waterTime.value = elapsed; grassTime.value = elapsed;
+  waterTime.value = elapsed; grassTime.value = elapsed; ceuTempo.value = elapsed;
   if (input.started) {
     const busy = panelOpen() || dlgOpen() || acaoAtiva() || binoculoLigado();   // com janela aberta, animação ou binóculo o personagem fica parado
     if (!busy) { updatePlayer(dt, rig); updateInteract(); }

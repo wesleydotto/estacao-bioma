@@ -31,8 +31,8 @@ if (usarFiltros) {
   if (qualidade.ao) {
     const ao = new GTAOPass(scene, camera, innerWidth, innerHeight);
     // raio em metros: até onde um objeto "escurece" o vizinho
-    ao.updateGtaoMaterial({ radius: 0.9, distanceExponent: 1.5, thickness: 1.2, scale: 1.1, samples: 12 });
-    ao.blendIntensity = 0.85;
+    ao.updateGtaoMaterial({ radius: 1.6, distanceExponent: 1.4, thickness: 2.0, scale: 1.4, samples: 12 });
+    ao.blendIntensity = 1.0;
     composer.addPass(ao);
   }
   if (qualidade.bloom) {
@@ -43,7 +43,7 @@ if (usarFiltros) {
 
   // Acabamento: saturação (cores mais vivas) e vinheta (cantos um pouco mais escuros)
   composer.addPass(new ShaderPass({
-    uniforms: { tDiffuse: { value: null }, saturacao: { value: 1.12 }, vinheta: { value: 0.28 } },
+    uniforms: { tDiffuse: { value: null }, saturacao: { value: 1.06 }, vinheta: { value: 0.28 } },
     vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
     fragmentShader: `uniform sampler2D tDiffuse; uniform float saturacao, vinheta; varying vec2 vUv;
       void main(){

@@ -185,7 +185,8 @@ export function buildVegetation() {
   for (let i = 0; i < 22; i++) {
     const c = new THREE.Group();
     for (let j = 0; j < 5; j++) { const b = new THREE.Mesh(new THREE.IcosahedronGeometry(rr(6, 11), 1), cloudMat); b.position.set(rr(-14, 14), rr(-2, 3), rr(-6, 6)); b.scale.y = 0.6; c.add(b); }
-    c.position.set(rr(-500, 500), rr(110, 150), rr(-500, 500)); scene.add(c); clouds.push(c);
+    c.position.set(rr(-500, 500), rr(110, 150), rr(-500, 500)); clouds.push(c);
+    // As nuvens agora são desenhadas no céu (cena.js). Estas continuam sendo criadas só para
+    // não mudar a sequência do gerador aleatório, mas não entram na cena.
   }
-  animated.push(dt => clouds.forEach(c => { c.position.x += dt * 2.5; if (c.position.x > 520) c.position.x = -520; }));
 }
