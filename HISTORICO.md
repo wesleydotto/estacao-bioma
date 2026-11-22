@@ -4,20 +4,33 @@ Resumo de tudo que já foi feito, pra retomar o trabalho sem precisar da convers
 Leia junto com o `CLAUDE.md` (organização dos arquivos) e o `PLANO_MISSOES.md` (o que vem pela frente).
 
 ## Se você está começando uma conversa nova (leia primeiro)
-- Tudo está no GitHub, branch `ccr-637f8c83-h3znzi` (último commit: "Atalho de testes: expõe a câmera..."). Não há nada solto no computador.
-- **Pendências de verificação** (o código das animações foi escrito e **compila**, mas faltou conferir):
-  1. Ver as animações **de lado** (plantar, regar com garrafa e gotas, coletar com frasco, binóculo com zoom). Os 3 primeiros prints (de costas) mostraram só o agachar; a rega e o binóculo **ainda não foram vistos**.
-  2. Testar o **fluxo real**: plantar apertando E num canteiro (praça e fazenda) e nas mudas do lago (agacha → planta aparece → rega), e **coletar** a água do lago e a terra da mata/lavoura. Esses dois últimos mudaram (agora fecham a janela, rodam a animação e só depois guardam a amostra e mostram a fala). O teste completo da Missão 2 (que passou) foi feito **antes** dessa mudança: rodar de novo.
-  3. Rodar `npm run unico` de novo: o arquivo em `dist-unico/` **não** tem as animações (foi gerado antes delas).
-- **Remodelagem visual em andamento** (pedido do Wesley: deixar o jogo mais bonito, estilo Palworld). Feito: gráficos (item 11) e Biólogo 3D (item 12). Falta: terreno com textura, grama menos amarela, água com reflexo, NPCs no modelo novo. O Wesley ainda não conferiu o nível Alto no computador dele.
-- Depois disso, o próximo grande passo é a **Missão 3 (energia)**.
+- Tudo está no GitHub, branch `ccr-637f8c83-h3znzi`. Não há nada solto no computador.
+- **Estamos no meio da remodelagem visual** (pedido do Wesley: jogo mais bonito, estilo Palworld). Já feito e aprovado por ele ("ficou ótimo"):
+  gráficos com seletor Alta/Média/Baixa e pós-processamento (item 11), céu com nuvens (item 11) e o **Biólogo 3D** com o corpo da Quaternius (itens 12 e 13).
+  O jogo publicado e o arquivo único (`dist-unico/`) já estão atualizados com isso.
+- **PRÓXIMA TAREFA (o Wesley já aprovou): grama, terreno e água.** Plano combinado:
+  1. **Terreno** (`js/terreno.js`): hoje é cor por vértice, lisa. Usar textura desenhada no código (canvas, como em `js/construcao.js`:
+     `makeCanvas`, `toTex`, `speckle`) para grama e terra, repetida no chão e misturada com as cores de vértice que já existem (trilha,
+     lavoura, lama, pedra). Detalhe que muda com a distância, para não ficar repetitivo. Grama um pouco menos amarela/saturada.
+  2. **Grama** (`js/vegetacao.js`, `grassMat`): degradê da raiz (escura) para a ponta (clara), tom puxado para o chão, vento em "ondas"
+     (já existe `grassTime`), mais densa no nível Alto (`qualidade.grama` em `js/qualidade.js`).
+  3. **Água** (`js/lake.js`, shader em `onBeforeCompile` com `waterTime`/`waterHealth`): o lago continua **verde e sujo enquanto doente**
+     (é a aula de eutrofização), mas ganha reflexo do céu (Fresnel), brilho do sol e margem suave; com `Q.health` → 1 vira água azul e espelhada.
+  4. **Não mexer na ordem do gerador com semente** (só materiais e shaders). Conferir que o nível Baixo continua leve.
+  5. Verificar com prints (praça, lago doente, lago limpo com o atalho do `Q`), `npx vite build`, `npm run unico`, commit/push e
+     **republicar o jogo** no mesmo endereço (veja "Estado atual").
+- Depois da remodelagem: NPCs com modelo novo (ainda usam o boneco antigo de `boneco.js`) e então a **Missão 3 (energia)**.
+- **Pendências de verificação:** regar e coletar ainda não foram vistos dentro do jogo com o Biólogo novo; nenhuma missão foi rodada inteira
+  depois da troca do personagem. O Wesley jogou e aprovou, mas não detalhou o nível de gráficos que usou.
 
 ## Estado atual
 - **Tecnologia:** Vite + Three.js 0.170 (instalado pelo npm). Rodar: `npm install` (1ª vez) e `npm run dev`.
 - **Branch de trabalho:** `ccr-637f8c83-h3znzi` (tudo já está no GitHub).
 - **Jogo publicado (privado, só o Wesley abre):** https://claude.ai/artifact/MqLN68X6Vctn3YUaf58ttx
   Para atualizar: `npm run build` e publicar de novo o `dist/index.html` (com a pasta `dist/assets/`) no mesmo endereço.
-- **Jogador:** o **Biólogo** (versão 3D da ficha de personagem em pixel art do Wesley) com animações de plantar, regar, coletar e binóculo (tecla **B** segurando, com zoom).
+- **Jogador:** o **Biólogo** em 3D com esqueleto (`js/personagem.js`: corpo da Quaternius, CC0, com a roupa e a barba pintadas na textura), animações parado/andar/correr e as ações de plantar, regar, coletar e binóculo (tecla **B** segurando, com zoom).
+- **Gráficos:** tela inicial tem **Gráficos: Alta / Média / Baixa** (`js/qualidade.js`, salvo no navegador). O Alto não foi testado aqui (o navegador de teste não tem placa de vídeo).
+- **Publicar:** o `dist/assets/index-XXXX.js` muda de nome a cada build. Ao republicar, mande o arquivo novo em `files` e apague o antigo com `null`.
 - **Missões prontas:** "Salvar o Lago da Mata" e "De onde veio o adubo?" (Missão 2, fatias A, B e C). A próxima é a Missão 3 (energia). Veja o `PLANO_MISSOES.md`.
 - **Arquivo único para jogar/testar sem instalar nada:** `npm run unico` cria, na pasta `dist-unico/`, o `estacao-bioma.html` (jogo normal) e o `estacao-bioma-teste.html` (já com save **depois do lago**: lago concluído, relatório entregue, R$ 1.500). Abre com duplo clique. O de teste tem um botão "🧪 Reiniciar o teste" na tela inicial e usa um save próprio (não mexe no jogo normal).
 
@@ -108,11 +121,12 @@ Leia junto com o `CLAUDE.md` (organização dos arquivos) e o `PLANO_MISSOES.md`
 - **Atalho pra testar a Missão 2 sem repetir o lago:** abra o `estacao-bioma-teste.html` (veja acima) e clique em Continuar.
 
 ## Próximos passos (ordem do plano)
+0. **Terminar a remodelagem visual:** grama, terreno e água (plano no topo) e depois os NPCs no modelo novo.
 1. **Missão 3: "Energia limpa para o laboratório"**: começa pelo gancho do fim da Missão 2 (equipamentos novos puxam mais energia do que o lab tem). Aí **destrava** a energia: placa solar e cata-vento saem do bloqueio em `ITENS` (`bloqueado`), as 2 bases de energia (`js/construir.js`) passam a ser usadas e o campo `watts` dos equipamentos ganha tela (consumo × geração). Veja o `PLANO_MISSOES.md`.
 2. Conferir as animações e os fluxos de plantar/coletar (veja "Se você está começando uma conversa nova" no topo).
 3. Ajustar o equilíbrio da verba da Missão 2 (ver Decisões) e, se precisar, **serviços extras** no mural.
 4. Depois: Clima, Vila, Fauna, Barranco e Rio.
 - **Missão 9 (ideia do Wesley, no plano):** fotografar espécies ameaçadas (lobo-guará) de forma furtiva, enviar pra prefeitura, ganhar verba e montar grades de proteção.
 - **Ideias da ficha do Biólogo ainda não feitas:** equipamentos na mão (lupa, câmera, rede, luvas); a câmera fotográfica combina com a Missão 9 (e com o binóculo).
-- **Qualidade gráfica (ideia, não feita):** seletor Alta/Média/Baixa (pixelRatio, sombras, antialias, quantidade de grama em `js/cena.js` e `js/vegetacao.js`). Rodar no PowerShell não melhora os gráficos; o que ajuda é o navegador usar a placa de vídeo certa (`chrome://gpu`).
+- **Qualidade gráfica:** seletor Alta/Média/Baixa **feito** (item 11). Rodar no PowerShell não melhora os gráficos; o que ajuda é o navegador usar a placa de vídeo certa (`chrome://gpu`).
 - Ideias soltas: relógio de sol, herbário, conquistas, modo professor, modelos `.glb`.
