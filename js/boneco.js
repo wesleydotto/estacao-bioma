@@ -21,6 +21,7 @@ export const CORES_PESQUISADOR = {
   brinco: false,        // argola na orelha e piercing no nariz
   nariz: false,         // nariz (necessário para o piercing)
   bolsosCargo: false,   // bolsos laterais nas coxas (calça cargo)
+  mangaCurta: false,    // camiseta de manga curta: o antebraço aparece com a cor da pele
   mochilaGrande: false, // mochila maior, com alças no peito e garrafa de água
   binoculo: false,      // binóculo pendurado no peito
 };
@@ -33,7 +34,7 @@ export const CORES_BIOLOGO = {
   chapeu: null, jaleco: null, frasco: false, cabelo: null,
   mochila: '#4f5d34',
   bone: '#16181a', oculos: true, barba: '#2e2118', coque: '#2e2118',
-  orelhas: true, brinco: true, nariz: true, bolsosCargo: true, mochilaGrande: true, binoculo: true,
+  orelhas: true, brinco: true, nariz: true, bolsosCargo: true, mangaCurta: true, mochilaGrande: true, binoculo: true,
 };
 
 // Cria o boneco. Devolve o grupo (g) e as "juntas" dos braços e pernas para animar.
@@ -123,7 +124,14 @@ export function criarBoneco(cores = {}) {
   if (c.frasco) { const vial = add(new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.18, 8), std('#74c0fc', 0.1, 0, { emissive: '#1c7ed6', emissiveIntensity: 0.5 }))); vial.position.set(0.25, 0.92, 0.2); }
   // braços e pernas: um "pivô" no ombro/quadril para girar
   const limb = (r, len, mat, x, y) => { const pv = new THREE.Group(); pv.position.set(x, y, 0); const m = new THREE.Mesh(new THREE.CapsuleGeometry(r, len, 3, 8), mat); m.position.y = -len / 2 - r * 0.5; m.castShadow = true; pv.add(m); g.add(pv); return pv; };
-  const armL = limb(0.08, 0.42, shirt, -0.4, 1.36), armR = limb(0.08, 0.42, shirt, 0.4, 1.36);
+  // braços: com manga curta, só a parte de cima é da camiseta e o antebraço (com a mão) é da cor da pele
+  const braco = (x) => {
+    if (!c.mangaCurta) return limb(0.08, 0.42, shirt, x, 1.36);
+    const pv = limb(0.08, 0.16, shirt, x, 1.36);
+    const antebraco = new THREE.Mesh(new THREE.CapsuleGeometry(0.07, 0.22, 3, 8), skin); antebraco.position.y = -0.38; antebraco.castShadow = true; pv.add(antebraco);
+    return pv;
+  };
+  const armL = braco(-0.4), armR = braco(0.4);
   const legL = limb(0.11, 0.42, pants, -0.15, 0.72), legR = limb(0.11, 0.42, pants, 0.15, 0.72);
   for (const leg of [legL, legR]) { const b = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.14, 0.3), boots); b.position.set(0, -0.68, 0.05); b.castShadow = true; leg.add(b); }
   // bolsos da calça cargo: ficam presos à perna, então balançam junto ao andar
