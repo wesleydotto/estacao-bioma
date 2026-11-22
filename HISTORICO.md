@@ -71,6 +71,13 @@ Leia junto com o `CLAUDE.md` (organização dos arquivos) e o `PLANO_MISSOES.md`
     os mesmos números do gerador com semente; não entram na cena nem têm colisão. **Menu inicial legível:** a caixa usava a classe
     `card` (mesmo nome das caixinhas claras dos painéis) e ficava branca com texto branco; virou `.inicio`, com fundo verde-escuro.
 
+17. **Fazenda com modelos da Quaternius** (*Farm Buildings*, CC0; o Wesley mandou os zips FBX/OBJ): `scripts/montar-fazenda.py`
+    converte os `.obj` em `js/modelos/fazenda.glb` (0,65 MB). `carregarModelosFazenda()` (`js/fazenda.js`, chamada no `main.js`)
+    troca o galpão por um **celeiro** vermelho, o silo por um **silo** de tijolo, a cerca por pedaços de **cerca de madeira**, e
+    acrescenta **garagem aberta com o trator dentro**, **galinheiro** com cerquinha de ripas, **caixa d'água** e **poço**. As
+    versões simples ficam no grupo `simples` e somem quando os modelos carregam (colisão do galpão antigo só vale sem modelo).
+    Não usados (combinariam menos): moinho holandês e cata-vento de torre (o cata-vento de energia é da Missão 3).
+
 ## Decisões tomadas
 - Dinheiro do jogo chama **Verba (R$)**.
 - A loja fica no **prédio da prefeitura** (não no lab).
@@ -124,6 +131,8 @@ Leia junto com o `CLAUDE.md` (organização dos arquivos) e o `PLANO_MISSOES.md`
 - **Testes do nível Alto** no navegador de teste (sem placa de vídeo) travam: teste no Médio ou Baixo (`localStorage['estacao-bioma-qualidade']`).
 - Nos testes, **esconda o `#dlg` antes de teleportar** o jogador: com a fala aberta o `updatePlayer` não roda e ele fica flutuando (o `onGround` nunca fica `true`).
 
+- **Modelos .obj da Quaternius:** a cor do `.mtl` (`Kd`) é "linear" (Blender). Converta para `.glb` com `baseColorFactor` = `Kd`
+  (como faz o `montar-fazenda.py`); o `MTLLoader` do Three.js trataria como sRGB e escureceria tudo.
 - **Modelos da natureza:** o pacote original da Quaternius (118 MB) fica fora do GitHub (`.gitignore`). Para mudar quais modelos
   entram ou a cor das folhas, edite `scripts/montar-natureza.py` e rode de novo. O `COLOR_0` do pacote **não é cor** (é máscara de
   vento do Unity/Unreal): se entrar, deixa samambaias quase pretas.

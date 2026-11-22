@@ -32,7 +32,7 @@ O jogador é um pesquisador de campo. Tem um laboratório (Estação Bioma) no m
 - `js/qualidade.js` (níveis de gráficos Alta/Média/Baixa) e `js/graficos.js` (pós-processamento: oclusão, bloom, acabamento).
 - `js/npc.js`: `addNPC({nome, x, z, cores, falas | aoFalar, temMissao})`. `js/save.js`: salva no localStorage a cada 5 s.
 - `js/economia.js` (verba, inventário, loja, relatórios; itens do tipo `equipamento` liberam testes), `js/prefeitura.js` (prédio e secretária), `js/construir.js` (lugares marcados para construir).
-- `js/fazenda.js`: cenário da Fazenda Boa Safra (Missão 2), ao norte do lago (centro em (-45, 160), `FAZENDA` em `mapa.js`), com o fragmento de mata e os pontos de coleta. O fazendeiro (Seu Geraldo) e a bancada SOLO do laboratório são criados pela missão (`js/missoes/adubo/`).
+- `js/fazenda.js`: cenário da Fazenda Boa Safra (Missão 2), ao norte do lago (centro em (-45, 160), `FAZENDA` em `mapa.js`), com o fragmento de mata e os pontos de coleta. Celeiro, silo, cerca, garagem, galinheiro, caixa d'água e poço são modelos da Quaternius (`js/modelos/fazenda.glb`, feito por `scripts/montar-fazenda.py`). O fazendeiro (Seu Geraldo) e a bancada SOLO do laboratório são criados pela missão (`js/missoes/adubo/`).
 - `js/audio.js`, `js/controles.js` (teclado, mouse e toque), `js/interface.js` (zona, avisos, mini-mapa, diálogos `say()` e painéis `openPanel()`).
 - `js/estado.js`: estado compartilhado (`keys`, `input`, `cam` e `jogo.ativa` = missão seguida agora).
 - `js/quest.js`: **motor de missões** (interações com E, rastreador, marcador, falas por etapa, mural e caderno).

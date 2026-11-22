@@ -3,3 +3,6 @@ dist/
 dist-unico/
 # pacote original da Quaternius (118 MB): o jogo usa só o js/modelos/natureza.glb, feito pelo scripts/montar-natureza.py
 Stylized Nature MegaKit*/
+# pacote original da fazenda (Quaternius): o jogo usa só o js/modelos/fazenda.glb, feito pelo scripts/montar-fazenda.py
+Farm Buildings (Quaternius)/
+*-20261122T*.zip

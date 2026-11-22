@@ -55,7 +55,7 @@ import { ativa, setupInteractions, montarMissoes, updateInteract, updateQuest, u
 import { addNPC, updateNPCs } from './npc.js';
 import { updateAcoes, acaoAtiva, binoculoLigado, fazerAcao, estadoAcao } from './acoes.js';
 import { buildPrefeitura } from './prefeitura.js';
-import { buildFazenda } from './fazenda.js';
+import { buildFazenda, carregarModelosFazenda } from './fazenda.js';
 import { montarLotes, lotes } from './construir.js';
 import { eco, atualizarHudVerba } from './economia.js';
 import { temSave, salvar, carregar, apagarSave, updateSave } from './save.js';
@@ -84,6 +84,8 @@ try { rig3d = await carregarBiologo(); } catch (e) { console.error('Não deu par
 const rig = buildPlayer(rig3d);
 // Árvores, arbustos, pedras e plantinhas com os modelos da Quaternius. Se der erro, ficam as versões simples.
 try { await carregarNatureza(); } catch (e) { console.error('Não deu para carregar a natureza 3D:', e); }
+// Celeiro, silo, cerca etc. da fazenda (modelos da Quaternius). Se der erro, ficam as versões simples.
+try { await carregarModelosFazenda(); } catch (e) { console.error('Não deu para carregar os modelos da fazenda:', e); }
 montarMissoes();
 setupInteractions();
 window.__game = { player, Q, A, lotes, fazerAcao, estadoAcao, camera, stage, openKit, microGame, chemGame, diagnosticoPanel, muralPanel, notebook, addNPC, eco, salvar, carregar, apagarSave, jogo, lakeFx, amostrasBench, winPanel, closePanel, cam: (y, p) => { cam.yaw = y; cam.pitch = p; } };   // atalho para testes no console

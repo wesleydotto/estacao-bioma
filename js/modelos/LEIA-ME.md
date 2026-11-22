@@ -20,3 +20,8 @@
     tira o `COLOR_0` (no original é máscara de vento, não cor) e **repinta** folhas: a árvore torta vira
     **ipê-amarelo**, o arbusto fica verde e as folhas roxas/azuis do atlas viram verdes.
   - Usado em `js/natureza.js` (modelos perto do jogador; longe ficam as versões simples do `vegetacao.js`).
+- `fazenda.glb`: celeiro (`BigBarn`), garagem aberta (`OpenBarn`), silo, cerca (`Fence` e a de ripas `Fence2`), galinheiro,
+  caixa d'água e poço do pacote **"Farm Buildings"** da **Quaternius** (**CC0**). Os arquivos originais ficam na pasta
+  `Farm Buildings (Quaternius)/` (fora do GitHub). Feito pelo `python scripts/montar-fazenda.py`, que lê os `.obj`/`.mtl`
+  e grava as cores certas no `.glb` (carregando o `.obj` direto, as cores ficariam mais escuras). Usado em
+  `carregarModelosFazenda()` (`js/fazenda.js`).
