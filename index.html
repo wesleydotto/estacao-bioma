@@ -32,7 +32,9 @@
 
   /* ---------- Tela inicial ---------- */
   #start { position: fixed; inset: 0; z-index: 20; display: flex; align-items: center; justify-content: center; background: radial-gradient(ellipse at center, rgba(20,60,40,.55), rgba(5,15,10,.9)); }
-  #start .card { text-align: center; padding: 30px 34px; max-width: 460px; }
+  /* A caixa do menu tem nome próprio ("inicio"). Antes ela se chamava "card", o mesmo nome das caixinhas
+     cinza-claras dos painéis, e pegava aquele fundo claro: o texto branco ficava ilegível. */
+  #start .inicio { text-align: center; padding: 30px 34px; max-width: 460px; background: rgba(8, 28, 20, .88); border: 2px solid rgba(155, 231, 201, .25); border-radius: 22px; box-shadow: 0 14px 40px rgba(0,0,0,.45); }
   #start h1 { margin: 0; font-size: 46px; letter-spacing: 1px; color: #fff; text-shadow: 0 4px 0 #0f6e5e; }
   #start h2 { margin: 6px 0 18px; font-weight: 400; font-size: 18px; color: #bfeedd; }
   #start p { font-size: 15px; line-height: 1.6; color: #e6f5ee; margin: 0 0 22px; }
@@ -135,7 +137,7 @@
 <button id="btnB" class="tbtn">🔭</button>
 
 <div id="start">
-  <div class="card">
+  <div class="inicio">
     <h1>ESTAÇÃO BIOMA</h1>
     <h2>Protótipo 3D · laboratório na floresta</h2>
     <p>Explore a mata, entre no laboratório pelas portas automáticas<br>e siga a trilha até o lago eutrofizado (~100 m).</p>

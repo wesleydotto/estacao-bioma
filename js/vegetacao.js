@@ -1,4 +1,4 @@
-// Arquivo: vegetacao.js — árvores, buritis, arbustos, pedras, grama, flores e nuvens.
+// Arquivo: vegetacao.js — árvores, arbustos, pedras, grama, flores e nuvens.
 import * as THREE from 'three';
 import { qualidade } from './qualidade.js';
 import { mergeGeometries, mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
@@ -8,7 +8,7 @@ import { LAB, LAKE, WORLD_R, lakeR, lakeNorm, distToPath, onPier, groundHeight, 
 import { rand, rr, smoothstep, isTouch, mulberry32 } from './utils.js';
 
 // =====================================================================
-//  VEGETAÇÃO (árvores, palmeiras buriti, arbustos, grama, flores, pedras)
+//  VEGETAÇÃO (árvores, arbustos, grama, flores, pedras)
 // =====================================================================
 export const grassTime = { value: 0 };
 
@@ -72,7 +72,10 @@ export function buildVegetation() {
   scene.add(trunks, crowns);
   vegetacao.malhas.troncos = trunks; vegetacao.malhas.copas = crowns;
 
-  // ---- Buritis (palmeiras das veredas) perto do lago ----
+  // ---- Palmeiras (REMOVIDAS a pedido do Wesley: não combinam com a mata do jogo) ----
+  // O código continua aqui só para gastar os MESMOS números do gerador com semente
+  // (senão todas as árvores, arbustos e a grama mudariam de lugar). Elas não entram
+  // na cena e não têm colisão.
   const palmTrunk = new THREE.CylinderGeometry(0.22, 0.3, 1, 8); palmTrunk.translate(0, 0.5, 0);
   const leaves = [];
   for (let i = 0; i < 12; i++) {
@@ -94,11 +97,9 @@ export function buildVegetation() {
     q.setFromAxisAngle(up, rr(0, 6.28));
     pT.setMatrixAt(n, m4.compose(v.set(x, y - 0.2, z), q, s.set(1, hgt, 1)));
     pL.setMatrixAt(n, m4.compose(v.set(x, y + hgt - 0.3, z), q, s.set(1, 1, 1)));
-    circles.push({ x, z, r: 0.35 });
     n++;
   }
-  pT.count = pL.count = n; pT.castShadow = pL.castShadow = true;
-  scene.add(pT, pL);
+  pT.count = pL.count = n;
 
   // ---- Arbustos ----
   const BN = 500;

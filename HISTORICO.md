@@ -67,6 +67,10 @@ Leia junto com o `CLAUDE.md` (organização dos arquivos) e o `PLANO_MISSOES.md`
     árvores, cogumelos na base dos troncos, folhagens baixas no campo, pedrinhas na beira da trilha, capim alto na margem do lago e
     2 árvores mortas com orelha-de-pau perto do cano de esgoto. Folhas, flores e capim balançam com o vento (`comVento`).
 
+16. **Palmeiras removidas** (pedido do Wesley: não fazem parte da mata do jogo). O código delas segue em `vegetacao.js` só para gastar
+    os mesmos números do gerador com semente; não entram na cena nem têm colisão. **Menu inicial legível:** a caixa usava a classe
+    `card` (mesmo nome das caixinhas claras dos painéis) e ficava branca com texto branco; virou `.inicio`, com fundo verde-escuro.
+
 ## Decisões tomadas
 - Dinheiro do jogo chama **Verba (R$)**.
 - A loja fica no **prédio da prefeitura** (não no lab).
@@ -127,6 +131,9 @@ Leia junto com o `CLAUDE.md` (organização dos arquivos) e o `PLANO_MISSOES.md`
   A versão simples é escondida zerando a matriz da cópia (`mostrarSimples` em `natureza.js`).
 - **Testes com Playwright nesta máquina:** o navegador de teste já está em `~/AppData/Local/ms-playwright`; basta `npm i playwright`
   numa pasta temporária, `npx vite preview` e teleportar com `__game.player.pos.set(x, 30, z)` + esperar `onGround`.
+
+- **CSS:** não reaproveite nomes de classe genéricos (`card`, `row`, `tip`...) em telas novas: as regras dos painéis valem para o
+  jogo inteiro e mudam o fundo e o tamanho sem avisar (foi o que deixou o menu inicial ilegível).
 
 ## Como testar sem gastar muito
 1. `npx vite build` (se der erro de "not exported", falta um `export` ou `import`).
