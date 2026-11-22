@@ -1,5 +1,6 @@
 // Arquivo: vegetacao.js — árvores, buritis, arbustos, pedras, grama, flores e nuvens.
 import * as THREE from 'three';
+import { qualidade } from './qualidade.js';
 import { mergeGeometries, mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
 import { scene } from './cena.js';
 import { std, circles, animated } from './construcao.js';
@@ -157,6 +158,9 @@ export function buildVegetation() {
     grass.setColorAt(n, new THREE.Color().setHSL(rr(0.2, 0.28), 0.5, rr(0.75, 1.0)));
     n++;
   }
+  // No nível de gráficos mais leve, mostra só uma parte da grama (a ordem é aleatória,
+  // então cortar o fim da lista tira tufos espalhados). Não mexe no gerador com semente.
+  grass.count = Math.floor(GN * qualidade.grama);
   grass.receiveShadow = true; scene.add(grass);
 
   // ---- Flores ----

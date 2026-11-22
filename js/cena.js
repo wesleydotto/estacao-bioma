@@ -1,17 +1,18 @@
 // Arquivo: cena.js — o "palco" 3D: renderizador, cena, câmera, sol e céu.
 import * as THREE from 'three';
-import { isTouch } from './utils.js';
+import { qualidade } from './qualidade.js';
 
 // =====================================================================
 //  RENDERIZADOR, CENA, CÂMERA, LUZES
 // =====================================================================
-export const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
-renderer.setPixelRatio(Math.min(devicePixelRatio, isTouch ? 1.5 : 1.75));
+// Com pós-processamento (níveis Alta e Média), a suavização das bordas é feita no graficos.js.
+export const renderer = new THREE.WebGLRenderer({ antialias: qualidade.msaa === 0, powerPreference: 'high-performance' });
+renderer.setPixelRatio(Math.min(devicePixelRatio, qualidade.pixelRatio));
 renderer.setSize(innerWidth, innerHeight);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.0;
+renderer.toneMappingExposure = 1.05;
 document.getElementById('game').appendChild(renderer.domElement);
 
 export const scene = new THREE.Scene();
@@ -20,15 +21,34 @@ scene.fog = new THREE.Fog(HORIZON, 70, 430);
 export const camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 1600);
 
 export const SUN_DIR = new THREE.Vector3(0.55, 0.72, 0.42).normalize();
-export const hemi = new THREE.HemisphereLight('#d6ecff', '#5f7d3c', 0.55);
+// Luz do céu: azulada de cima e esverdeada de baixo (reflexo da grama)
+export const hemi = new THREE.HemisphereLight('#cfe6ff', '#56733a', 0.6);
 scene.add(hemi);
-export const sun = new THREE.DirectionalLight('#fff0d4', 2.8);
+// Sol: luz amarelada e forte, que faz as sombras
+export const sun = new THREE.DirectionalLight('#fff0d4', 2.9);
 sun.castShadow = true;
-sun.shadow.mapSize.set(2048, 2048);
-Object.assign(sun.shadow.camera, { left: -70, right: 70, top: 70, bottom: -70, near: 1, far: 320 });
-sun.shadow.bias = -0.0004;
-sun.shadow.normalBias = 0.05;
+const ALC = qualidade.sombraAlc;   // metros de sombra para cada lado do jogador
+sun.shadow.mapSize.set(qualidade.sombraMapa, qualidade.sombraMapa);
+Object.assign(sun.shadow.camera, { left: -ALC, right: ALC, top: ALC, bottom: -ALC, near: 1, far: 320 });
+sun.shadow.bias = -0.0003;
+sun.shadow.normalBias = 0.04;
 scene.add(sun, sun.target);
+
+// O sol "segue" o jogador para as sombras estarem sempre por perto.
+// Ele anda em passos do tamanho de 1 pixel da sombra: assim as bordas das sombras
+// não ficam "tremendo" quando o jogador se mexe.
+const _luzZ = SUN_DIR.clone().negate();                                   // para onde o sol aponta
+const _luzX = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), _luzZ).normalize();
+const _luzY = new THREE.Vector3().crossVectors(_luzZ, _luzX);
+const _centro = new THREE.Vector3();
+export function seguirSol(pos) {
+  const pixel = (2 * ALC) / qualidade.sombraMapa;                         // tamanho de 1 pixel da sombra, em metros
+  const a = Math.round(pos.dot(_luzX) / pixel) * pixel;
+  const b = Math.round(pos.dot(_luzY) / pixel) * pixel;
+  _centro.copy(_luzX).multiplyScalar(a).addScaledVector(_luzY, b).addScaledVector(_luzZ, pos.dot(_luzZ));
+  sun.target.position.copy(_centro);
+  sun.position.copy(_centro).addScaledVector(SUN_DIR, 140);
+}
 
 // ---------- Céu (degradê feito em shader) ----------
 export function makeSky() {

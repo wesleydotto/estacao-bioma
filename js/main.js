@@ -33,6 +33,8 @@
 // =====================================================================
 import * as THREE from 'three';
 import { renderer, scene, camera } from './cena.js';
+import { renderizar, redimensionar } from './graficos.js';
+import { NIVEIS, nivelAtual, trocarNivel } from './qualidade.js';
 import { animated } from './construcao.js';
 import { LAB, lakeNorm, distToFazenda } from './mapa.js';
 import { rr, isTouch } from './utils.js';
@@ -89,6 +91,16 @@ if (temSave()) {
   continueBtn.style.display = 'inline-block';
   playBtn.textContent = 'Novo jogo'; playBtn.className = 'sec';
 }
+// ---------- Seletor de gráficos (Alta, Média, Baixa) na tela inicial ----------
+{
+  const box = document.getElementById('graficosBtns');
+  for (const [id, n] of Object.entries(NIVEIS)) {
+    const b = document.createElement('button');
+    b.textContent = n.nome; b.className = 'gq' + (id === nivelAtual ? ' on' : '');
+    b.addEventListener('click', () => { if (id !== nivelAtual) trocarNivel(id); });   // troca e recarrega a página
+    box.appendChild(b);
+  }
+}
 function comecar() {
   initAudio(); input.started = true;
   document.getElementById('start').style.display = 'none';
@@ -109,7 +121,7 @@ continueBtn.addEventListener('click', () => {
   if (!ativa().iniciada()) novoJogo();
 });
 
-addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
+addEventListener('resize', redimensionar);
 
 // ---------- Ambiente: nome da zona e sons de bichos ----------
 let birdT = 2;   // segundos até o próximo canto de pássaro/sapo
@@ -147,5 +159,5 @@ renderer.setAnimationLoop(() => {
   animated.forEach(f => f(dt, elapsed));
   updateCamera(dt);
   drawMap(player, objTarget);
-  renderer.render(scene, camera);
+  renderizar();   // desenha a cena (com o acabamento do graficos.js)
 });

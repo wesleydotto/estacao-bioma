@@ -1,6 +1,6 @@
 // Arquivo: player.js — o personagem: modelo 3D, movimento, colisões e a câmera que o segue.
 import * as THREE from 'three';
-import { scene, camera, sky, sun, SUN_DIR } from './cena.js';
+import { scene, camera, sky, seguirSol } from './cena.js';
 import { colliders, circles, camBlockers } from './construcao.js';
 import { criarBoneco, CORES_BIOLOGO } from './boneco.js';
 import { LAB, PLAZA_Y, WATER_Y, WORLD_R, groundHeight, onPier, walkHeight } from './mapa.js';
@@ -111,5 +111,5 @@ export function updateCamera(dt) {
   camera.lookAt(camTarget);
   sky.position.copy(camera.position);
   // o sol acompanha o jogador (sombras sempre por perto)
-  sun.position.copy(player.pos).addScaledVector(SUN_DIR, 140); sun.target.position.copy(player.pos);
+  seguirSol(player.pos);
 }
