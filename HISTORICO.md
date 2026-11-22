@@ -11,6 +11,8 @@ Leia junto com o `CLAUDE.md` (organização dos arquivos) e o `PLANO_MISSOES.md`
 - **Grama, terreno e água: feitos** (item 14). O jogo publicado e o arquivo único já estão com isso. O Wesley testou: **Baixo roda liso, Médio ficou lento
   no Chrome** → o Médio foi deixado mais leve (nitidez 1,5 → 1,25, msaa 4 → 2, grama 0,7 → 0,55). **Falta o Wesley retestar o Médio e aprovar o visual.**
   Se o Médio continuar lento: tirar a 2ª escala da textura do terreno no Médio (`DUAS_ESCALAS` em `js/terreno.js`) ou desligar o bloom.
+- **Natureza com modelos da Quaternius: feita** (item 15) e já publicada. **Falta o Wesley ver e aprovar**, e conferir se o Médio
+  continua leve (agora há mais triângulos perto do jogador). Se pesar: diminuir `natureza` e `enfeites` em `js/qualidade.js`.
 - Depois da remodelagem: NPCs com modelo novo (ainda usam o boneco antigo de `boneco.js`) e então a **Missão 3 (energia)**.
 - **Pendências de verificação:** regar e coletar ainda não foram vistos dentro do jogo com o Biólogo novo; nenhuma missão foi rodada inteira
   depois da troca do personagem. O Wesley jogou e aprovou, mas não detalhou o nível de gráficos que usou.
@@ -56,6 +58,14 @@ Leia junto com o `CLAUDE.md` (organização dos arquivos) e o `PLANO_MISSOES.md`
     "ondas" de vento que atravessam o campo (ponta clareia quando a rajada passa), e no Alto 40% de tufos extras (`gramaExtra`, com gerador
     próprio `mulberry32(7)` para não mexer no gerador com semente). **Água** (`js/lake.js`): reflexo do céu (Fresnel), brilho do sol e margem
     suave; continua verde e suja com o lago doente e fica azul e espelhada com `Q.health` → 1.
+
+15. **Natureza com modelos da Quaternius** (*Stylized Nature MegaKit*, CC0; o Wesley deixou o pacote na pasta do projeto):
+    `scripts/montar-natureza.py` junta 28 modelos num `js/modelos/natureza.glb` (3,9 MB, texturas reduzidas, folhas repintadas:
+    árvore torta = **ipê-amarelo**, arbusto verde, sem folhas roxas/azuis). `js/natureza.js` põe os modelos **perto do jogador**
+    (raio `natureza` em `qualidade.js`: 90/60/40 m) nos mesmos lugares das árvores, arbustos, pedras e flores do `vegetacao.js`
+    (lista `vegetacao`); longe ficam as versões simples. Novos enfeites com gerador próprio: samambaias e folhagens em volta das
+    árvores, cogumelos na base dos troncos, folhagens baixas no campo, pedrinhas na beira da trilha, capim alto na margem do lago e
+    2 árvores mortas com orelha-de-pau perto do cano de esgoto. Folhas, flores e capim balançam com o vento (`comVento`).
 
 ## Decisões tomadas
 - Dinheiro do jogo chama **Verba (R$)**.
@@ -109,6 +119,14 @@ Leia junto com o `CLAUDE.md` (organização dos arquivos) e o `PLANO_MISSOES.md`
 - **Animações de outro modelo:** não dá para só trocar o nome dos ossos; esqueletos com "pose de descanso" diferente ficam tortos (pernas para cima). Foi preciso reorientar cada osso comparando o giro no espaço do mundo. O `SkeletonUtils.retargetClip` do Three.js **não** funcionou para este par de modelos.
 - **Testes do nível Alto** no navegador de teste (sem placa de vídeo) travam: teste no Médio ou Baixo (`localStorage['estacao-bioma-qualidade']`).
 - Nos testes, **esconda o `#dlg` antes de teleportar** o jogador: com a fala aberta o `updatePlayer` não roda e ele fica flutuando (o `onGround` nunca fica `true`).
+
+- **Modelos da natureza:** o pacote original da Quaternius (118 MB) fica fora do GitHub (`.gitignore`). Para mudar quais modelos
+  entram ou a cor das folhas, edite `scripts/montar-natureza.py` e rode de novo. O `COLOR_0` do pacote **não é cor** (é máscara de
+  vento do Unity/Unreal): se entrar, deixa samambaias quase pretas.
+- **Pedras simples** do `vegetacao.js` são todas trocadas pelo modelo novo (raio infinito); árvores, arbustos e flores só perto.
+  A versão simples é escondida zerando a matriz da cópia (`mostrarSimples` em `natureza.js`).
+- **Testes com Playwright nesta máquina:** o navegador de teste já está em `~/AppData/Local/ms-playwright`; basta `npm i playwright`
+  numa pasta temporária, `npx vite preview` e teleportar com `__game.player.pos.set(x, 30, z)` + esperar `onGround`.
 
 ## Como testar sem gastar muito
 1. `npx vite build` (se der erro de "not exported", falta um `export` ou `import`).

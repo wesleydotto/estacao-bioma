@@ -1,3 +1,5 @@
 node_modules/
 dist/
 dist-unico/
+# pacote original da Quaternius (118 MB): o jogo usa só o js/modelos/natureza.glb, feito pelo scripts/montar-natureza.py
+Stylized Nature MegaKit*/

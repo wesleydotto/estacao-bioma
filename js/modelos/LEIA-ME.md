@@ -13,3 +13,10 @@
   `pelvis`, `spine_03`, `upperarm_l`): cada osso foi reorientado comparando o giro no espaço do mundo.
 - Ainda dá para trocar pelas animações da própria Quaternius (*Universal Animation Library*, também CC0) e usar o
   cabelo `Hair_Buns` e a barba `Hair_Beard` do pacote (faltam os arquivos `.bin` deles).
+- `natureza.glb`: árvores, arbustos, pedras, flores, samambaias, cogumelos, pedrinhas e capim do
+  **"Stylized Nature MegaKit"** da **Quaternius** (versão grátis, **CC0**). O pacote original (118 MB) fica na pasta
+  `Stylized Nature MegaKit[Standard]/` do projeto, que **não vai para o GitHub** (está no `.gitignore`).
+  - Feito pelo `python scripts/montar-natureza.py`: escolhe os modelos (lista `MODELOS`), diminui as texturas,
+    tira o `COLOR_0` (no original é máscara de vento, não cor) e **repinta** folhas: a árvore torta vira
+    **ipê-amarelo**, o arbusto fica verde e as folhas roxas/azuis do atlas viram verdes.
+  - Usado em `js/natureza.js` (modelos perto do jogador; longe ficam as versões simples do `vegetacao.js`).

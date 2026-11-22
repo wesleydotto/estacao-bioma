@@ -46,6 +46,7 @@ import { buildLab, updateDoor } from './lab.js';
 import { buildLake, waterTime, lakeFx } from './lake.js';
 import { buildVegetation, grassTime } from './vegetacao.js';
 import { carregarBiologo } from './personagem.js';
+import { carregarNatureza } from './natureza.js';
 import { player, buildPlayer, updatePlayer, updateCamera, tickWaterWarn } from './player.js';
 import { initAudio, audioReady, bird, frog } from './audio.js';
 import { buildMapBg, drawMap, setZone, updateHud, panelOpen, dlgOpen, closePanel, promptEl, btnE } from './interface.js';
@@ -81,6 +82,8 @@ atualizarHudVerba();
 let rig3d = null;
 try { rig3d = await carregarBiologo(); } catch (e) { console.error('Não deu para carregar o Biólogo 3D:', e); }
 const rig = buildPlayer(rig3d);
+// Árvores, arbustos, pedras e plantinhas com os modelos da Quaternius. Se der erro, ficam as versões simples.
+try { await carregarNatureza(); } catch (e) { console.error('Não deu para carregar a natureza 3D:', e); }
 montarMissoes();
 setupInteractions();
 window.__game = { player, Q, A, lotes, fazerAcao, estadoAcao, camera, stage, openKit, microGame, chemGame, diagnosticoPanel, muralPanel, notebook, addNPC, eco, salvar, carregar, apagarSave, jogo, lakeFx, amostrasBench, winPanel, closePanel, cam: (y, p) => { cam.yaw = y; cam.pitch = p; } };   // atalho para testes no console

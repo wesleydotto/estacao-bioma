@@ -11,6 +11,11 @@ import { rand, rr, smoothstep, isTouch, mulberry32 } from './utils.js';
 //  VEGETAÇÃO (árvores, palmeiras buriti, arbustos, grama, flores, pedras)
 // =====================================================================
 export const grassTime = { value: 0 };
+
+// Onde ficou cada planta e pedra. O natureza.js usa esta lista para pôr os
+// modelos 3D novos (Quaternius) nos MESMOS lugares, sem sortear nada de novo.
+// "malhas" guarda as versões simples (bolinhas), que continuam sendo usadas de longe.
+export const vegetacao = { arvores: [], arbustos: [], pedras: [], flores: [], malhas: {} };
 export function blobGeo(r, seed, amp = 0.2) {
   let g = new THREE.IcosahedronGeometry(r, 2); g.deleteAttribute('normal'); g.deleteAttribute('uv'); g = mergeVertices(g);
   const p = g.attributes.position;
@@ -50,16 +55,22 @@ export function buildVegetation() {
     const dx = Math.max(Math.abs(x) - LAB.w / 2, 0), dz = Math.max(Math.abs(z) - LAB.d / 2, 0);
     if (rand() > smoothstep(12, 50, Math.hypot(dx, dz)) * 0.9 + 0.1) continue;   // clareira perto do lab
     const y = groundHeight(x, z), sc = rr(0.8, 1.5), tall = rr(2.6, 4.2), tilt = rr(0.85, 1.3);
-    q.setFromAxisAngle(up, rr(0, 6.28));
+    const giro = rr(0, 6.28);   // (sorteado na mesma ordem de antes)
+    q.setFromAxisAngle(up, giro);
+    // altura total da árvore simples (tronco + copa), para o modelo novo ficar do mesmo tamanho
+    vegetacao.arvores.push({ x, y, z, giro, altura: (tall + 2.2) * sc, i: n });
     trunks.setMatrixAt(n, m4.compose(v.set(x, y - 0.2, z), q, s.set(sc, tall * sc, sc)));
     crowns.setMatrixAt(n, m4.compose(v.set(x, y + tall * sc + 0.6 * sc, z), q, s.set(sc, sc * tilt, sc)));
-    crowns.setColorAt(n, new THREE.Color().setHSL(rr(0.22, 0.32), rr(0.45, 0.65), rr(0.28, 0.42)));
+    // cor da copa simples (vista de longe): verde-oliva mais escuro, parecido com as folhas dos modelos novos
+    // (mudar só os números não muda o sorteio: cada rr() continua gastando um número do gerador)
+    crowns.setColorAt(n, new THREE.Color().setHSL(rr(0.21, 0.28), rr(0.5, 0.65), rr(0.22, 0.32)));
     circles.push({ x, z, r: 0.35 * sc });
     n++;
   }
   trunks.count = crowns.count = n;
   trunks.castShadow = crowns.castShadow = true; crowns.receiveShadow = true;
   scene.add(trunks, crowns);
+  vegetacao.malhas.troncos = trunks; vegetacao.malhas.copas = crowns;
 
   // ---- Buritis (palmeiras das veredas) perto do lago ----
   const palmTrunk = new THREE.CylinderGeometry(0.22, 0.3, 1, 8); palmTrunk.translate(0, 0.5, 0);
@@ -97,12 +108,15 @@ export function buildVegetation() {
     const a = rand() * 6.28, r = Math.sqrt(rand()) * WORLD_R, x = Math.cos(a) * r, z = Math.sin(a) * r;
     if (!canSpawnTree(x, z) && !(lakeNorm(x, z) > 1.15 && lakeNorm(x, z) < 1.5 && !onPier(x, z) && distToPath(x, z) > 3)) continue;
     const sc = rr(0.6, 1.4);
-    q.setFromAxisAngle(up, rr(0, 6.28));
+    const giro = rr(0, 6.28);
+    q.setFromAxisAngle(up, giro);
+    vegetacao.arbustos.push({ x, y: groundHeight(x, z), z, giro, sc, i: n });
     bushes.setMatrixAt(n, m4.compose(v.set(x, groundHeight(x, z) + 0.2 * sc, z), q, s.set(sc, sc * 0.8, sc)));
-    bushes.setColorAt(n, new THREE.Color().setHSL(rr(0.24, 0.33), 0.55, rr(0.25, 0.36)));
+    bushes.setColorAt(n, new THREE.Color().setHSL(rr(0.22, 0.28), 0.55, rr(0.22, 0.3)));
     n++;
   }
   bushes.castShadow = bushes.receiveShadow = true; scene.add(bushes);
+  vegetacao.malhas.arbustos = bushes;
 
   // ---- Pedras ----
   const RN = 170;
@@ -112,12 +126,15 @@ export function buildVegetation() {
     const a = rand() * 6.28, r = Math.sqrt(rand()) * WORLD_R, x = Math.cos(a) * r, z = Math.sin(a) * r;
     if (!canSpawnTree(x, z)) continue;
     const sc = rr(0.4, 1.8);
-    q.setFromEuler(new THREE.Euler(rr(0, 3), rr(0, 3), rr(0, 3)));
+    const e = new THREE.Euler(rr(0, 3), rr(0, 3), rr(0, 3));
+    q.setFromEuler(e);
+    vegetacao.pedras.push({ x, y: groundHeight(x, z), z, giro: e.y * 2, sc, i: n });
     rocks.setMatrixAt(n, m4.compose(v.set(x, groundHeight(x, z) + 0.1, z), q, s.set(sc, sc * rr(0.5, 0.9), sc)));
     if (sc > 1) circles.push({ x, z, r: 0.5 * sc });
     n++;
   }
   rocks.castShadow = rocks.receiveShadow = true; scene.add(rocks);
+  vegetacao.malhas.pedras = rocks;
 
   // ---- Grama que balança com o vento ----
   const tuft = (() => {
@@ -204,9 +221,11 @@ export function buildVegetation() {
     if (distToPref(x, z) < 1 || onPrefWalk(x, z) || distToFazenda(x, z) < 1) continue;
     flowers.setMatrixAt(n, m4.compose(v.set(x, groundHeight(x, z) + rr(0.25, 0.45), z), q.identity(), s.set(1, 1, 1)));
     flowers.setColorAt(n, new THREE.Color(pal[Math.floor(rand() * pal.length)]));
+    vegetacao.flores.push({ x, y: groundHeight(x, z), z, i: n });
     n++;
   }
   scene.add(flowers);
+  vegetacao.malhas.flores = flowers;
 
   // ---- Nuvens ----
   const cloudMat = std('#ffffff', 1, 0, { emissive: '#ffffff', emissiveIntensity: 0.35 });

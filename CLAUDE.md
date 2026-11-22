@@ -28,6 +28,7 @@ O jogador é um pesquisador de campo. Tem um laboratório (Estação Bioma) no m
 - `js/terreno.js`, `js/lab.js` (prédio e porta), `js/lake.js` (lago e saúde do lago), `js/vegetacao.js`.
 - `js/acoes.js`: animações do Biólogo (`fazerAcao('plantar' | 'regar' | 'coletar', aoFim)`) e o binóculo (tecla B segurando, com zoom).
 - `js/player.js`: personagem (o **Biólogo**), movimento, colisão e câmera. `js/personagem.js`: o Biólogo em 3D com esqueleto (modelo `.glb` e animações em `js/modelos/`). `js/boneco.js`: boneco antigo de formas simples (NPCs, e reserva do jogador se o `.glb` falhar).
+- `js/natureza.js`: modelos 3D da Quaternius (árvores, arbustos, pedras, flores, plantinhas) que aparecem perto do jogador, nos lugares sorteados pelo `vegetacao.js`. O pacote `js/modelos/natureza.glb` é feito por `scripts/montar-natureza.py`.
 - `js/qualidade.js` (níveis de gráficos Alta/Média/Baixa) e `js/graficos.js` (pós-processamento: oclusão, bloom, acabamento).
 - `js/npc.js`: `addNPC({nome, x, z, cores, falas | aoFalar, temMissao})`. `js/save.js`: salva no localStorage a cada 5 s.
 - `js/economia.js` (verba, inventário, loja, relatórios; itens do tipo `equipamento` liberam testes), `js/prefeitura.js` (prédio e secretária), `js/construir.js` (lugares marcados para construir).
