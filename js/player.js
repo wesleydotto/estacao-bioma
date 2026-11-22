@@ -2,18 +2,18 @@
 import * as THREE from 'three';
 import { scene, camera, sky, sun, SUN_DIR } from './cena.js';
 import { colliders, circles, camBlockers } from './construcao.js';
-import { criarBoneco } from './boneco.js';
+import { criarBoneco, CORES_BIOLOGO } from './boneco.js';
 import { LAB, PLAZA_Y, WATER_Y, WORLD_R, groundHeight, onPier, walkHeight } from './mapa.js';
 import { clamp } from './utils.js';
 import { keys, joy, input, cam } from './estado.js';
 import { showToast } from './interface.js';
 
 // =====================================================================
-//  PERSONAGEM (pesquisador de campo)
+//  PERSONAGEM (o Biólogo, pesquisador de campo)
 // =====================================================================
 export const player = { pos: new THREE.Vector3(0, PLAZA_Y, 27), vel: new THREE.Vector3(), vy: 0, onGround: true, yaw: Math.PI, phase: 0 };
 export function buildPlayer() {
-  const rig = criarBoneco();   // boneco com as cores do pesquisador (veja boneco.js)
+  const rig = criarBoneco(CORES_BIOLOGO);   // o Biólogo: boné, óculos, barba, coque, mochila verde... (veja boneco.js)
   scene.add(rig.g);
   return rig;
 }
