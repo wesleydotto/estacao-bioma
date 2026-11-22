@@ -45,6 +45,7 @@ import { buildTerrain } from './terreno.js';
 import { buildLab, updateDoor } from './lab.js';
 import { buildLake, waterTime, lakeFx } from './lake.js';
 import { buildVegetation, grassTime } from './vegetacao.js';
+import { carregarBiologo } from './personagem.js';
 import { player, buildPlayer, updatePlayer, updateCamera, tickWaterWarn } from './player.js';
 import { initAudio, audioReady, bird, frog } from './audio.js';
 import { buildMapBg, drawMap, setZone, updateHud, panelOpen, dlgOpen, closePanel, promptEl, btnE } from './interface.js';
@@ -76,7 +77,10 @@ buildFazenda();      // idem (tem o gerador próprio, só da fazenda)
 montarLotes();
 buildMapBg();
 atualizarHudVerba();
-const rig = buildPlayer();
+// O Biólogo em 3D (modelo .glb). Se der algum erro, o jogo segue com o boneco antigo.
+let rig3d = null;
+try { rig3d = await carregarBiologo(); } catch (e) { console.error('Não deu para carregar o Biólogo 3D:', e); }
+const rig = buildPlayer(rig3d);
 montarMissoes();
 setupInteractions();
 window.__game = { player, Q, A, lotes, fazerAcao, estadoAcao, camera, stage, openKit, microGame, chemGame, diagnosticoPanel, muralPanel, notebook, addNPC, eco, salvar, carregar, apagarSave, jogo, lakeFx, amostrasBench, winPanel, closePanel, cam: (y, p) => { cam.yaw = y; cam.pitch = p; } };   // atalho para testes no console
@@ -149,10 +153,12 @@ renderer.setAnimationLoop(() => {
     const busy = panelOpen() || dlgOpen() || acaoAtiva() || binoculoLigado();   // com janela aberta, animação ou binóculo o personagem fica parado
     if (!busy) { updatePlayer(dt, rig); updateInteract(); }
     else { input.interactQueued = false; input.jumpQueued = false; promptEl.style.display = 'none'; btnE.style.display = 'none'; }
+    if (busy && rig.esqueleto) rig.velocidade = 0;   // parado durante ações e janelas
     updateAcoes(dt, elapsed, rig);   // animações: plantar, regar, coletar e binóculo (tecla B)
     updateDoor(dt, elapsed); updateWorld(dt); updateQuest(dt, elapsed);
   }
   else { rig.g.position.copy(player.pos); rig.g.rotation.y = player.yaw; cam.yaw = Math.sin(elapsed * 0.1) * 0.5; }
+  if (rig.atualizar) rig.atualizar(dt);   // boneco 3D: roda as animações e aplica as poses das ações
   updateMissoes(dt, elapsed);
   updateNPCs(dt, elapsed);
   updateSave(dt);

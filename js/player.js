@@ -12,8 +12,10 @@ import { showToast } from './interface.js';
 //  PERSONAGEM (o Biólogo, pesquisador de campo)
 // =====================================================================
 export const player = { pos: new THREE.Vector3(0, PLAZA_Y, 27), vel: new THREE.Vector3(), vy: 0, onGround: true, yaw: Math.PI, phase: 0 };
-export function buildPlayer() {
-  const rig = criarBoneco(CORES_BIOLOGO);   // o Biólogo: boné, óculos, barba, coque, mochila verde... (veja boneco.js)
+// rig3d = o Biólogo em 3D com esqueleto (personagem.js). Se não vier (ou der erro ao carregar),
+// usa o boneco antigo feito de formas simples (boneco.js).
+export function buildPlayer(rig3d = null) {
+  const rig = rig3d || criarBoneco(CORES_BIOLOGO);
   scene.add(rig.g);
   return rig;
 }
@@ -84,6 +86,9 @@ export function updatePlayer(dt, rig) {
   const sp = Math.hypot(player.vel.x, player.vel.z);
   if (sp > 0.3) player.yaw = angleLerp(player.yaw, Math.atan2(player.vel.x, player.vel.z), 1 - Math.exp(-12 * dt));
   rig.g.position.copy(p); rig.g.rotation.y = player.yaw;
+  // Boneco 3D com esqueleto: as animações de andar/correr vêm do arquivo (personagem.js).
+  // Aqui só avisamos a velocidade e se está no chão.
+  if (rig.esqueleto) { rig.velocidade = player.onGround ? sp : 0; rig.noChao = player.onGround; return; }
   player.phase += dt * sp * 2.1;
   const sw = Math.min(1, sp / 4.6) * 0.75;
   if (player.onGround) {

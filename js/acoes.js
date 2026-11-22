@@ -72,10 +72,44 @@ function limparItens(rig) {
   if (rig.binOlhos) { rig.binOlhos.visible = false; rig.binPeito.visible = true; }
 }
 
+// Poses das ações para o Biólogo 3D (personagem.js). Os giros são em radianos, nos eixos do personagem:
+//  .rotation.x negativo = levanta para a FRENTE (braço/coxa); positivo = para TRÁS.
+//  No joelho e no cotovelo o giro é somado ao da coxa/braço.
+function poseEsqueleto(rig, tipo, tt, dur, ease) {
+  if (tipo === 'plantar' || tipo === 'coletar') {
+    // ajoelha numa perna só (a direita fica na frente), inclina o tronco e cava com as mãos
+    const fimAgacha = tipo === 'coletar' ? dur * 0.8 : dur;
+    const ag = ease(Math.min(tt / 0.25, (fimAgacha - tt) / 0.25));
+    baixar(rig, -0.42 * ag);
+    rig.legR.rotation.x = -1.3 * ag; rig.joelhoR.rotation.x = 1.4 * ag;    // perna da frente: coxa para frente, canela em pé
+    rig.legL.rotation.x = 0.15 * ag; rig.joelhoL.rotation.x = 1.45 * ag;   // perna de trás: joelho no chão
+    rig.tronco.rotation.x = 0.45 * ag;                                      // inclina para frente
+    const cava = Math.sin(tt * (tipo === 'plantar' ? 14 : 8)) * 0.18;
+    rig.armL.rotation.x = (-0.55 - cava) * ag; rig.armR.rotation.x = (-0.55 + cava) * ag;
+    if (tipo === 'coletar' && tt > dur * 0.6) {   // levanta a amostra (frasco) na mão direita
+      rig.itemMao.frasco.visible = true;
+      const sobe = ease((tt - dur * 0.6) / 0.3);
+      rig.armR.rotation.x = lerp(rig.armR.rotation.x, -1.0, sobe); rig.cotoveloR.rotation.x = -0.9 * sobe;
+    }
+  } else if (tipo === 'regar') {
+    // em pé: braço direito estendido inclinando a garrafa; mão esquerda na cintura
+    const e = ease(Math.min(tt / 0.25, (dur - tt) / 0.25));
+    baixar(rig, 0);
+    rig.armR.rotation.x = -1.35 * e; rig.tronco.rotation.x = 0.12 * e;
+    rig.armL.rotation.z = 0.35 * e; rig.cotoveloL.rotation.set(-0.6 * e, 0, -1.4 * e);
+    rig.itemMao.garrafa.visible = true; rig.itemMao.garrafa.rotation.z = -2.1 * e;   // vira a garrafa para a água sair
+    if (tt > 0.3 && (proxGota -= dt0) <= 0) { proxGota = 0.06; soltarGota(rig); }
+  }
+}
+// direções dos braços (eixos do personagem) segurando o binóculo nos olhos
+const MIRA_BIN = { LeftArm: new THREE.Vector3(0.4, -0.25, 0.85), RightArm: new THREE.Vector3(-0.4, -0.25, 0.85), LeftForeArm: new THREE.Vector3(-0.4, 0.95, 0.1), RightForeArm: new THREE.Vector3(0.4, 0.95, 0.1) };
+let dt0 = 0;   // dt do quadro atual (usado pelas gotas na pose do Biólogo 3D)
+
 // =====================================================================
 //  Roda todo quadro (depois do updatePlayer). rig = o boneco do jogador.
 // =====================================================================
 export function updateAcoes(dt, t, rig) {
+  dt0 = dt;
   // ---- binóculo: tecla B segurada (só sem painel, diálogo ou outra ação) ----
   binoculo = !!keys.KeyB && !atual && !panelOpen() && !dlgOpen() && !!rig.binOlhos;
   moldura.style.display = binoculo ? 'block' : 'none';
@@ -87,7 +121,8 @@ export function updateAcoes(dt, t, rig) {
     atual.t += dt;
     const { tipo, dur } = atual, tt = atual.t;
     const ease = (x) => { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); };
-    if (tipo === 'plantar' || tipo === 'coletar') {
+    if (rig.esqueleto) poseEsqueleto(rig, tipo, tt, dur, ease);   // Biólogo 3D (com joelhos e coluna)
+    else if (tipo === 'plantar' || tipo === 'coletar') {
       // agacha (meio ajoelhado: uma perna à frente, outra para trás), estica os braços até o chão e cava
       const fimAgacha = tipo === 'coletar' ? dur * 0.8 : dur;
       const ag = ease(Math.min(tt / 0.25, (fimAgacha - tt) / 0.25));
@@ -107,6 +142,11 @@ export function updateAcoes(dt, t, rig) {
       if (tt > 0.3 && (proxGota -= dt) <= 0) { proxGota = 0.06; soltarGota(rig); }
     }
     if (tt >= dur) { const f = atual.aoFim; atual = null; baixar(rig, 0); limparItens(rig); if (f) f(); }
+  } else if (binoculo && rig.esqueleto) {
+    // Biólogo 3D: braços levantados e cotovelos dobrados, segurando o binóculo nos olhos
+    Object.assign(rig.mira, MIRA_BIN);
+    
+    rig.binPeito.visible = false; rig.binOlhos.visible = true;
   } else if (binoculo) {
     // braços dobrados à frente, segurando o binóculo diante dos olhos
     baixar(rig, 0);
