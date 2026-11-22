@@ -8,17 +8,9 @@ Leia junto com o `CLAUDE.md` (organização dos arquivos) e o `PLANO_MISSOES.md`
 - **Estamos no meio da remodelagem visual** (pedido do Wesley: jogo mais bonito, estilo Palworld). Já feito e aprovado por ele ("ficou ótimo"):
   gráficos com seletor Alta/Média/Baixa e pós-processamento (item 11), céu com nuvens (item 11) e o **Biólogo 3D** com o corpo da Quaternius (itens 12 e 13).
   O jogo publicado e o arquivo único (`dist-unico/`) já estão atualizados com isso.
-- **PRÓXIMA TAREFA (o Wesley já aprovou): grama, terreno e água.** Plano combinado:
-  1. **Terreno** (`js/terreno.js`): hoje é cor por vértice, lisa. Usar textura desenhada no código (canvas, como em `js/construcao.js`:
-     `makeCanvas`, `toTex`, `speckle`) para grama e terra, repetida no chão e misturada com as cores de vértice que já existem (trilha,
-     lavoura, lama, pedra). Detalhe que muda com a distância, para não ficar repetitivo. Grama um pouco menos amarela/saturada.
-  2. **Grama** (`js/vegetacao.js`, `grassMat`): degradê da raiz (escura) para a ponta (clara), tom puxado para o chão, vento em "ondas"
-     (já existe `grassTime`), mais densa no nível Alto (`qualidade.grama` em `js/qualidade.js`).
-  3. **Água** (`js/lake.js`, shader em `onBeforeCompile` com `waterTime`/`waterHealth`): o lago continua **verde e sujo enquanto doente**
-     (é a aula de eutrofização), mas ganha reflexo do céu (Fresnel), brilho do sol e margem suave; com `Q.health` → 1 vira água azul e espelhada.
-  4. **Não mexer na ordem do gerador com semente** (só materiais e shaders). Conferir que o nível Baixo continua leve.
-  5. Verificar com prints (praça, lago doente, lago limpo com o atalho do `Q`), `npx vite build`, `npm run unico`, commit/push e
-     **republicar o jogo** no mesmo endereço (veja "Estado atual").
+- **Grama, terreno e água: feitos** (item 14). O jogo publicado e o arquivo único já estão com isso. O Wesley testou: **Baixo roda liso, Médio ficou lento
+  no Chrome** → o Médio foi deixado mais leve (nitidez 1,5 → 1,25, msaa 4 → 2, grama 0,7 → 0,55). **Falta o Wesley retestar o Médio e aprovar o visual.**
+  Se o Médio continuar lento: tirar a 2ª escala da textura do terreno no Médio (`DUAS_ESCALAS` em `js/terreno.js`) ou desligar o bloom.
 - Depois da remodelagem: NPCs com modelo novo (ainda usam o boneco antigo de `boneco.js`) e então a **Missão 3 (energia)**.
 - **Pendências de verificação:** regar e coletar ainda não foram vistos dentro do jogo com o Biólogo novo; nenhuma missão foi rodada inteira
   depois da troca do personagem. O Wesley jogou e aprovou, mas não detalhou o nível de gráficos que usou.
@@ -57,6 +49,13 @@ Leia junto com o `CLAUDE.md` (organização dos arquivos) e o `PLANO_MISSOES.md`
 11. **Gráficos novos:** `js/qualidade.js` (níveis Alta/Média/Baixa, escolhidos na tela inicial e salvos no localStorage; trocar recarrega a página) e `js/graficos.js` (pós-processamento: oclusão de ambiente GTAO só na Alta, bloom na Alta e Média, saturação e vinheta). Sombra do sol mais nítida, cobrindo ~50 m em volta do jogador e andando "de pixel em pixel" (`seguirSol` em `cena.js`), para não tremer. Céu em shader com nuvens que andam (`ceuTempo`), sol mais baixo. As nuvens antigas (bolas brancas) ainda são **criadas** em `vegetacao.js`, só não entram na cena, para não mudar o gerador com semente.
 12. **Biólogo em 3D com esqueleto** (`js/personagem.js`, modelos em `js/modelos/`, veja o LEIA-ME de lá): modelo `.glb` com roupas recoloridas (paletó cortado na cintura, calça verde-oliva, bota) e acessórios presos nos ossos (boné, óculos, barba, coque, mochila, garrafa, binóculo). Animações parado/andar/correr misturadas pela velocidade. As ações (`acoes.js`) usam `poseEsqueleto()`: pivôs `armL/armR/legL/legR/joelhoL/joelhoR/tronco/cotoveloL/cotoveloR` (giro nos eixos do personagem, somado à animação) e `rig.mira` (aponta um osso numa direção; usado no binóculo). Se o modelo não carregar, o jogo usa o boneco antigo (`boneco.js`), que os NPCs continuam usando.
 13. **Biólogo trocado pelo corpo da Quaternius (CC0)**: o Wesley baixou o pacote *Universal Base Characters* e mandou o `Superhero_Male` pelo chat (o `.zip` passa de 30 MB; o jeito foi mandar só os arquivos glTF/bin e as imagens). Como o corpo vem só de cueca, a **roupa e a barba foram pintadas na textura** (`scripts/pintar-roupa-biologo.py`). Ossos com outros nomes: mapa `OSSO` em `personagem.js` (Hips→pelvis, Spine2→spine_03, LeftArm→upperarm_l...). Animações do Xbot convertidas de novo para esse esqueleto. Faltam os `.bin` do coque (`Hair_Buns`) e da barba (`Hair_Beard`) do pacote, que ainda podem ser usados no lugar do coque feito no código.
+
+14. **Terreno, grama e água** (remodelagem visual): o chão ganhou **textura desenhada no código** (`texGrama`/`texTerra` em `js/terreno.js`),
+    misturada pelo atributo `mistura` (grama ↔ terra na trilha, lavoura, lama e pedra), em duas escalas (3 m e 17 m, girada) que somem com a
+    distância; só uma escala no nível Baixo. Cores da grama menos amarelas. **Grama** (`js/vegetacao.js`): degradê raiz escura → ponta clara,
+    "ondas" de vento que atravessam o campo (ponta clareia quando a rajada passa), e no Alto 40% de tufos extras (`gramaExtra`, com gerador
+    próprio `mulberry32(7)` para não mexer no gerador com semente). **Água** (`js/lake.js`): reflexo do céu (Fresnel), brilho do sol e margem
+    suave; continua verde e suja com o lago doente e fica azul e espelhada com `Q.health` → 1.
 
 ## Decisões tomadas
 - Dinheiro do jogo chama **Verba (R$)**.
@@ -121,7 +120,7 @@ Leia junto com o `CLAUDE.md` (organização dos arquivos) e o `PLANO_MISSOES.md`
 - **Atalho pra testar a Missão 2 sem repetir o lago:** abra o `estacao-bioma-teste.html` (veja acima) e clique em Continuar.
 
 ## Próximos passos (ordem do plano)
-0. **Terminar a remodelagem visual:** grama, terreno e água (plano no topo) e depois os NPCs no modelo novo.
+0. **Terminar a remodelagem visual:** Wesley retestar o Médio e aprovar o visual; depois os NPCs no modelo novo.
 1. **Missão 3: "Energia limpa para o laboratório"**: começa pelo gancho do fim da Missão 2 (equipamentos novos puxam mais energia do que o lab tem). Aí **destrava** a energia: placa solar e cata-vento saem do bloqueio em `ITENS` (`bloqueado`), as 2 bases de energia (`js/construir.js`) passam a ser usadas e o campo `watts` dos equipamentos ganha tela (consumo × geração). Veja o `PLANO_MISSOES.md`.
 2. Conferir as animações e os fluxos de plantar/coletar (veja "Se você está começando uma conversa nova" no topo).
 3. Ajustar o equilíbrio da verba da Missão 2 (ver Decisões) e, se precisar, **serviços extras** no mural.

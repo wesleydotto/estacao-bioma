@@ -14,7 +14,8 @@ import { isTouch } from './utils.js';
 //  gramaExtra  = grama a mais (1.4 = 40% a mais de tufos, só no Alto; 1 = nenhuma extra)
 export const NIVEIS = {
   alta:  { nome: 'Alta',  pixelRatio: 2,    sombraMapa: 4096, sombraAlc: 50, ao: true,  bloom: true,  msaa: 4, grama: 1, gramaExtra: 1.4 },
-  media: { nome: 'Média', pixelRatio: 1.5,  sombraMapa: 2048, sombraAlc: 45, ao: false, bloom: true,  msaa: 4, grama: 0.7, gramaExtra: 1 },
+  // Média: deixada mais leve (era 1.5 de nitidez, msaa 4 e grama 0.7) porque ficou lenta no Chrome
+  media: { nome: 'Média', pixelRatio: 1.25, sombraMapa: 2048, sombraAlc: 45, ao: false, bloom: true,  msaa: 2, grama: 0.55, gramaExtra: 1 },
   baixa: { nome: 'Baixa', pixelRatio: 1,    sombraMapa: 1024, sombraAlc: 40, ao: false, bloom: false, msaa: 0, grama: 0.4, gramaExtra: 1 },
 };
 
