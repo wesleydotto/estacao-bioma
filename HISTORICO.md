@@ -13,6 +13,7 @@ Leia junto com o `CLAUDE.md` (organização dos arquivos) e o `PLANO_MISSOES.md`
   Se o Médio continuar lento: tirar a 2ª escala da textura do terreno no Médio (`DUAS_ESCALAS` em `js/terreno.js`) ou desligar o bloom.
 - **Natureza com modelos da Quaternius: feita** (item 15) e já publicada. **Falta o Wesley ver e aprovar**, e conferir se o Médio
   continua leve (agora há mais triângulos perto do jogador). Se pesar: diminuir `natureza` e `enfeites` em `js/qualidade.js`.
+- NPCs no modelo novo: **feito** (item 18). Falta o Wesley aprovar.
 - Depois da remodelagem: NPCs com modelo novo (ainda usam o boneco antigo de `boneco.js`) e então a **Missão 3 (energia)**.
 - **Pendências de verificação:** regar e coletar ainda não foram vistos dentro do jogo com o Biólogo novo; nenhuma missão foi rodada inteira
   depois da troca do personagem. O Wesley jogou e aprovou, mas não detalhou o nível de gráficos que usou.
@@ -78,6 +79,16 @@ Leia junto com o `CLAUDE.md` (organização dos arquivos) e o `PLANO_MISSOES.md`
     versões simples ficam no grupo `simples` e somem quando os modelos carregam (colisão do galpão antigo só vale sem modelo).
     Não usados (combinariam menos): moinho holandês e cata-vento de torre (o cata-vento de energia é da Missão 3).
 
+18. **NPCs em 3D** (`js/pessoas.js`): corpos da Quaternius (*Universal Base Characters*, CC0) com o mesmo esqueleto do Biólogo.
+    Homem = corpo do `biologo.glb`; mulher = `mulher.glb`. A **roupa é pintada quando o jogo abre** com as cores do
+    `addNPC({ cores })`, usando os mapas de regiões (`regioes_homem.png`/`regioes_mulher.png`: tronco, manga curta, manga
+    longa, mão, cinto, calça, sapato); onde tem roupa o relevo (normal map) fica quase liso. Cabelo (`curto`, `raspado`,
+    `comprido`) e barba vêm do `cabelos.glb`, chapéu de palha é feito no código. Animação "parado" do Biólogo; no corpo
+    feminino ela é corrigida pela diferença da pose de descanso (`clipeParado`). Tudo gerado por `scripts/montar-pessoas.py`.
+    **Lúcia**: `corpo: 'mulher'`, blusa azul, cabelo comprido. **Seu Geraldo**: camisa vermelha de manga longa, calça jeans,
+    chapéu de palha, cabelo e barba grisalhos. NPCs criados antes de carregar (Lúcia) são trocados por `trocarNPCsPor3D()`.
+    Se os modelos falharem, os NPCs usam o boneco antigo (`boneco.js`).
+
 ## Decisões tomadas
 - Dinheiro do jogo chama **Verba (R$)**.
 - A loja fica no **prédio da prefeitura** (não no lab).
@@ -131,6 +142,9 @@ Leia junto com o `CLAUDE.md` (organização dos arquivos) e o `PLANO_MISSOES.md`
 - **Testes do nível Alto** no navegador de teste (sem placa de vídeo) travam: teste no Médio ou Baixo (`localStorage['estacao-bioma-qualidade']`).
 - Nos testes, **esconda o `#dlg` antes de teleportar** o jogador: com a fala aberta o `updatePlayer` não roda e ele fica flutuando (o `onGround` nunca fica `true`).
 
+- **Novo NPC:** é só `addNPC({ cores: {...} })` com as opções listadas no topo de `js/pessoas.js` (corpo, pele, camisa,
+  mangaLonga, calca, cinto, sapato, cabelo, cabeloTipo, barba, chapeu, faixa). No `biologo.glb` a malha do corpo NÃO se
+  chama "Corpo" (o material sim): procure pelo `material.name === 'Corpo'`.
 - **Modelos .obj da Quaternius:** a cor do `.mtl` (`Kd`) é "linear" (Blender). Converta para `.glb` com `baseColorFactor` = `Kd`
   (como faz o `montar-fazenda.py`); o `MTLLoader` do Three.js trataria como sRGB e escureceria tudo.
 - **Modelos da natureza:** o pacote original da Quaternius (118 MB) fica fora do GitHub (`.gitignore`). Para mudar quais modelos

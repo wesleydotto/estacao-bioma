@@ -97,7 +97,7 @@ export function buildPrefeitura() {
   // ---- A secretária (NPC) atrás do balcão ----
   addNPC({
     nome: 'Secretária Lúcia', x: BALCAO.x + 1.9, z: cz, olhaPara: -Math.PI / 2, alcance: 3,
-    cores: { camisa: '#1971c2', calca: '#343a40', chapeu: null, cabelo: '#4a2c1a', pele: '#c68e5f' },
+    cores: { corpo: 'mulher', camisa: '#1971c2', calca: '#343a40', sapato: '#1f1f24', chapeu: null, cabelo: '#4a2c1a', cabeloTipo: 'comprido', pele: '#c68e5f' },
     aoFalar: () => prefeituraPanel(),
     temMissao: () => relatoriosPendentes().length > 0,
   });

@@ -198,7 +198,7 @@ export const adubo = {
     for (const x of [-63, -60, -57, -54, -51, -48]) lotesVerde.push(addLote({ nome: 'Adubação verde', x, z: 146.2, tipo: 'canteiro', aceita: ['sementes'], ativo: () => A.conv.feito }));
     addNPC({
       nome: 'Seu Geraldo', x: GERALDO_POS.x, z: GERALDO_POS.y, olhaPara: Math.PI,
-      cores: { camisa: '#c92a2a', calca: '#3b5b8c', chapeu: '#e0c27a', faixa: '#7a4b1f', cabelo: '#4a4a4a', pele: '#b07a4f' },
+      cores: { camisa: '#c92a2a', mangaLonga: true, calca: '#3b5b8c', sapato: '#5a3b22', chapeu: '#e0c27a', faixa: '#7a4b1f', cabelo: '#8a8a8a', cabeloTipo: 'curto', barba: '#9a9a9a', pele: '#b07a4f' },
       temMissao: () => A.started && (!A.falou || stage() === 5 || (stage() === 7 && !A.dias)),
       aoFalar: () => {
         if (!A.started) {

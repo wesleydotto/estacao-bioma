@@ -47,12 +47,13 @@ import { buildLake, waterTime, lakeFx } from './lake.js';
 import { buildVegetation, grassTime } from './vegetacao.js';
 import { carregarBiologo } from './personagem.js';
 import { carregarNatureza } from './natureza.js';
+import { carregarPessoas } from './pessoas.js';
 import { player, buildPlayer, updatePlayer, updateCamera, tickWaterWarn } from './player.js';
 import { initAudio, audioReady, bird, frog } from './audio.js';
 import { buildMapBg, drawMap, setZone, updateHud, panelOpen, dlgOpen, closePanel, promptEl, btnE } from './interface.js';
 import { openKit, microGame, chemGame, diagnosticoPanel, amostrasBench, winPanel } from './missoes/lago/minigames.js';
 import { ativa, setupInteractions, montarMissoes, updateInteract, updateQuest, updateMissoes, novoJogo, muralPanel, notebook, objTarget } from './quest.js';
-import { addNPC, updateNPCs } from './npc.js';
+import { addNPC, updateNPCs, trocarNPCsPor3D } from './npc.js';
 import { updateAcoes, acaoAtiva, binoculoLigado, fazerAcao, estadoAcao } from './acoes.js';
 import { buildPrefeitura } from './prefeitura.js';
 import { buildFazenda, carregarModelosFazenda } from './fazenda.js';
@@ -86,6 +87,8 @@ const rig = buildPlayer(rig3d);
 try { await carregarNatureza(); } catch (e) { console.error('Não deu para carregar a natureza 3D:', e); }
 // Celeiro, silo, cerca etc. da fazenda (modelos da Quaternius). Se der erro, ficam as versões simples.
 try { await carregarModelosFazenda(); } catch (e) { console.error('Não deu para carregar os modelos da fazenda:', e); }
+// NPCs em 3D (corpos da Quaternius com a roupa pintada). Se der erro, ficam os bonecos antigos.
+try { await carregarPessoas(); trocarNPCsPor3D(); } catch (e) { console.error('Não deu para carregar os NPCs 3D:', e); }
 montarMissoes();
 setupInteractions();
 window.__game = { player, Q, A, lotes, fazerAcao, estadoAcao, camera, stage, openKit, microGame, chemGame, diagnosticoPanel, muralPanel, notebook, addNPC, eco, salvar, carregar, apagarSave, jogo, lakeFx, amostrasBench, winPanel, closePanel, cam: (y, p) => { cam.yaw = y; cam.pitch = p; } };   // atalho para testes no console
