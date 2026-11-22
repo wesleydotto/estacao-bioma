@@ -44,7 +44,7 @@ const joyBase = document.getElementById('joyBase'), joyKnob = document.getElemen
 if (isTouch) {
   const layer = document.getElementById('touch');
   layer.style.display = 'block'; document.getElementById('help').style.display = 'none';
-  ['btnJump', 'btnRun', 'btnInv'].forEach(id => document.getElementById(id).style.display = 'block');
+  ['btnJump', 'btnRun', 'btnInv', 'btnB'].forEach(id => document.getElementById(id).style.display = 'block');
   layer.addEventListener('touchstart', e => {
     for (const t of e.changedTouches) {
       if (t.clientX < innerWidth * 0.45 && joy.id === null) { joy.id = t.identifier; joy.ox = t.clientX; joy.oy = t.clientY; joyBase.style.display = 'block'; joyBase.style.left = (t.clientX - 60) + 'px'; joyBase.style.top = (t.clientY - 60) + 'px'; }
@@ -69,5 +69,9 @@ if (isTouch) {
   tap('btnE', () => { if (dlgOpen()) nextLine(); else input.interactQueued = true; });
   tap('btnJump', () => input.jumpQueued = true);
   tap('btnInv', () => { if (!panelOpen()) inventarioPanel(); });
+  // binóculo no celular: segurar o botão 🔭 (o mesmo que segurar a tecla B)
+  const btnB = document.getElementById('btnB');
+  btnB.addEventListener('touchstart', e => { e.preventDefault(); e.stopPropagation(); keys.KeyB = true; }, { passive: false });
+  for (const ev of ['touchend', 'touchcancel']) btnB.addEventListener(ev, e => { e.preventDefault(); keys.KeyB = false; }, { passive: false });
   tap('btnRun', () => { input.runToggle = !input.runToggle; document.getElementById('btnRun').classList.toggle('on', input.runToggle); });
 }

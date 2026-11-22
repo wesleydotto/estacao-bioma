@@ -8,6 +8,7 @@ import { chime, blip, buzz, tone } from '../../audio.js';
 import { mulberry32 } from '../../utils.js';
 import { ITENS, qtd, ganhar } from '../../economia.js';
 import { bancadaFx } from './bancada.js';
+import { fazerAcao } from '../../acoes.js';
 
 export const fmt = (v, d = 1) => v.toFixed(d).replace('.', ',');
 // segundos → "m:ss" (ex.: 75 → "1:15")
@@ -65,8 +66,11 @@ export function pontoPanel(site) {
 }
 
 function coletarSolo(site) {
+  closePanel();   // o personagem se abaixa e cava (animação) antes de guardar a amostra
+  fazerAcao('coletar', () => {
   A.solo[site].amostra = true; chime(); checarPagamentos();
   say(['🪏 Você cavou até <b>20 cm</b> de fundo e guardou a terra num saquinho etiquetado: <b>' + SOLO[site].nome.toUpperCase() + '</b>. Ela vai para a bancada <b>SOLO</b> do laboratório.'], '✔ Amostra de solo', () => pontoPanel(site));
+  });
 }
 
 // =====================================================================

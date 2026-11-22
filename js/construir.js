@@ -15,6 +15,7 @@ import { walkHeight } from './mapa.js';
 import { say } from './interface.js';
 import { chime, buzz } from './audio.js';
 import { ITENS, qtd, usarItem } from './economia.js';
+import { fazerAcao, acaoAtiva } from './acoes.js';
 
 export const lotes = [];
 export const lotesInteracoes = [];   // o motor de missões (quest.js) lê esta lista
@@ -90,8 +91,11 @@ function usarLote(lote) {
     say([`Este lugar aceita: <b>${nomes}</b>. Compre na <b>loja da prefeitura</b>, ao lado da praça.`], '🏗️ ' + lote.nome); return;
   }
   if (precisaPa(id) && !qtd('pa')) { buzz(); say(['Para plantar você precisa de uma <b>🪏 pá</b>. Tem na loja da prefeitura!'], '🏗️ ' + lote.nome); return; }
-  usarItem(id); chime();
-  construirNoLote(lote, id, true);
+  if (acaoAtiva()) return;
+  if (precisaPa(id)) {
+    // plantar: o personagem agacha e cava, a planta aparece, e depois ele rega
+    fazerAcao('plantar', () => { usarItem(id); chime(); construirNoLote(lote, id, true); fazerAcao('regar'); });
+  } else { usarItem(id); chime(); construirNoLote(lote, id, true); }
 }
 
 // Coloca o modelo do item no lote (animar = cresce aos poucos; ao carregar o save, aparece pronto)

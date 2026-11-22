@@ -23,7 +23,8 @@ export const CORES_PESQUISADOR = {
   bolsosCargo: false,   // bolsos laterais nas coxas (calça cargo)
   mangaCurta: false,    // camiseta de manga curta: o antebraço aparece com a cor da pele
   mochilaGrande: false, // mochila maior, com alças no peito e garrafa de água
-  binoculo: false,      // binóculo pendurado no peito
+  binoculo: false,      // binóculo pendurado no peito (e que sobe até os olhos ao segurar B)
+  itensDeMao: false,    // garrafa de água (regar) e frasco (coletar) que aparecem na mão direita nas animações
 };
 
 // O Biólogo: o personagem principal (inspirado na ficha de personagem do Wesley).
@@ -34,7 +35,7 @@ export const CORES_BIOLOGO = {
   chapeu: null, jaleco: null, frasco: false, cabelo: null,
   mochila: '#4f5d34',
   bone: '#16181a', oculos: true, barba: '#2e2118', coque: '#2e2118',
-  orelhas: true, brinco: true, nariz: true, bolsosCargo: true, mangaCurta: true, mochilaGrande: true, binoculo: true,
+  orelhas: true, brinco: true, nariz: true, bolsosCargo: true, mangaCurta: true, mochilaGrande: true, binoculo: true, itensDeMao: true,
 };
 
 // Cria o boneco. Devolve o grupo (g) e as "juntas" dos braços e pernas para animar.
@@ -115,11 +116,19 @@ export function criarBoneco(cores = {}) {
       const roll = add(new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.5, 12), std('#a5672f', 0.8))); roll.rotation.z = Math.PI / 2; roll.position.set(0, 1.47, -0.32);
     }
   }
-  // Binóculo pendurado no peito
+  // Binóculo: um pendurado no peito (binPeito) e outro, escondido, na frente dos olhos (binOlhos), usado na animação
+  let binPeito = null, binOlhos = null;
   if (c.binoculo) {
-    const bin = std('#2a2d30', 0.5, 0.2);
-    for (const s of [-1, 1]) { const tubo = peca(new THREE.CylinderGeometry(0.05, 0.055, 0.13, 10), bin, s * 0.058, 1.02, 0.33); tubo.rotation.x = Math.PI / 2; }
-    peca(new THREE.BoxGeometry(0.07, 0.03, 0.05), bin, 0, 1.03, 0.31);
+    const bin = std('#2a2d30', 0.5, 0.2), vidro = std('#74c0fc', 0.1, 0.3, { emissive: '#1c7ed6', emissiveIntensity: 0.4 });
+    binPeito = new THREE.Group(); binPeito.position.set(0, 1.02, 0.33); g.add(binPeito); partes.push(binPeito);
+    binOlhos = new THREE.Group(); binOlhos.position.set(0, 1.67, 0.43); binOlhos.visible = false; g.add(binOlhos);
+    for (const s of [-1, 1]) {
+      const tubo = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.055, 0.13, 10), bin); tubo.rotation.x = Math.PI / 2; tubo.position.x = s * 0.058; binPeito.add(tubo);
+      const tubo2 = new THREE.Mesh(new THREE.CylinderGeometry(0.065, 0.07, 0.2, 10), bin); tubo2.rotation.x = Math.PI / 2; tubo2.position.x = s * 0.075; binOlhos.add(tubo2);
+      const lente = new THREE.Mesh(new THREE.CircleGeometry(0.055, 10), vidro); lente.position.set(s * 0.075, 0, 0.101); binOlhos.add(lente);
+    }
+    binPeito.add(new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.03, 0.05), bin));
+    binOlhos.add(new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.04, 0.12), bin));
   }
   if (c.frasco) { const vial = add(new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.18, 8), std('#74c0fc', 0.1, 0, { emissive: '#1c7ed6', emissiveIntensity: 0.5 }))); vial.position.set(0.25, 0.92, 0.2); }
   // braços e pernas: um "pivô" no ombro/quadril para girar
@@ -132,6 +141,15 @@ export function criarBoneco(cores = {}) {
     return pv;
   };
   const armL = braco(-0.4), armR = braco(0.4);
+  // objetos que aparecem na mão direita nas animações (acoes.js): garrafa de água e frasco de amostra
+  let itemMao = null;
+  if (c.itensDeMao) {
+    const grupo = new THREE.Group(); grupo.position.set(0, -0.6, 0); armR.add(grupo);
+    const garrafa = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.22, 10), std('#d9e3d0', 0.5)); garrafa.visible = false;
+    const tampa = new THREE.Mesh(new THREE.CylinderGeometry(0.052, 0.052, 0.04, 10), std('#2b8a3e', 0.6)); tampa.position.y = 0.13; garrafa.add(tampa);   // a boca fica do lado de baixo (-y)
+    const frasco = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.16, 8), std('#74c0fc', 0.1, 0, { emissive: '#1c7ed6', emissiveIntensity: 0.5 })); frasco.visible = false;
+    grupo.add(garrafa, frasco); itemMao = { grupo, garrafa, frasco };
+  }
   const legL = limb(0.11, 0.42, pants, -0.15, 0.72), legR = limb(0.11, 0.42, pants, 0.15, 0.72);
   for (const leg of [legL, legR]) { const b = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.14, 0.3), boots); b.position.set(0, -0.68, 0.05); b.castShadow = true; leg.add(b); }
   // bolsos da calça cargo: ficam presos à perna, então balançam junto ao andar
@@ -139,5 +157,5 @@ export function criarBoneco(cores = {}) {
     const bolso = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.15, 0.12), std('#5f5c33', 0.9)); bolso.position.set(s * 0.115, -0.3, 0.02); bolso.castShadow = true; leg.add(bolso);
   }
   g.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
-  return { g, armL, armR, legL, legR, body: partes };
+  return { g, armL, armR, legL, legR, body: partes, itemMao, binPeito, binOlhos };
 }

@@ -18,6 +18,7 @@ import { lakeFx, updateLakeVisual } from '../../lake.js';
 import { FLOOR_Y, PIER_Y, PIPE_M, PIPE_DIR, groundHeight } from '../../mapa.js';
 import { chime, buzz } from '../../audio.js';
 import { clamp } from '../../utils.js';
+import { fazerAcao, acaoAtiva } from '../../acoes.js';
 
 // Posição de cada bancada do laboratório (onde o jogador aperta E)
 export const BENCH = { chem: new THREE.Vector3(-12.5, FLOOR_Y, -2.4), amostras: new THREE.Vector3(0, FLOOR_Y, -2.4), micro: new THREE.Vector3(12.5, FLOOR_Y, -2.4), mural: new THREE.Vector3(0, FLOOR_Y, -9.3) };
@@ -110,8 +111,13 @@ export const lago = {
     ];
     // as 6 covas da mata ciliar
     lakeFx.spots.forEach(sp => lista.push({ pos: () => new THREE.Vector2(sp.x, sp.z), r: 1.8, label: () => stage() === 5 && !sp.done ? `Plantar muda (${Q.plants + 1}/6)` : null, act: () => {
+      if (acaoAtiva()) return;
+      // o personagem agacha e cava; a muda aparece no fim da animação e depois ele rega
+      fazerAcao('plantar', () => {
       sp.done = true; sp.mark.visible = false; sp.sap.visible = true; Q.plants++; chime();
       if (Q.plants === 6) { lakeFx.sacks.forEach(m => m.visible = false); say(['🌳 Mata ciliar plantada! As raízes seguram o solo e <b>barram o adubo</b> que escorre com a chuva. (E os sacos de adubo foram recolhidos!)'], '✔ Restauração'); }
+      fazerAcao('regar');
+      });
     } }));
     return lista;
   },

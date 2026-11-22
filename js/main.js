@@ -49,6 +49,7 @@ import { buildMapBg, drawMap, setZone, updateHud, panelOpen, dlgOpen, closePanel
 import { openKit, microGame, chemGame, diagnosticoPanel, amostrasBench, winPanel } from './missoes/lago/minigames.js';
 import { ativa, setupInteractions, montarMissoes, updateInteract, updateQuest, updateMissoes, novoJogo, muralPanel, notebook, objTarget } from './quest.js';
 import { addNPC, updateNPCs } from './npc.js';
+import { updateAcoes, acaoAtiva, binoculoLigado, fazerAcao, estadoAcao } from './acoes.js';
 import { buildPrefeitura } from './prefeitura.js';
 import { buildFazenda } from './fazenda.js';
 import { montarLotes, lotes } from './construir.js';
@@ -76,7 +77,7 @@ atualizarHudVerba();
 const rig = buildPlayer();
 montarMissoes();
 setupInteractions();
-window.__game = { player, Q, A, lotes, stage, openKit, microGame, chemGame, diagnosticoPanel, muralPanel, notebook, addNPC, eco, salvar, carregar, apagarSave, jogo, lakeFx, amostrasBench, winPanel, closePanel, cam: (y, p) => { cam.yaw = y; cam.pitch = p; } };   // atalho para testes no console
+window.__game = { player, Q, A, lotes, fazerAcao, estadoAcao, stage, openKit, microGame, chemGame, diagnosticoPanel, muralPanel, notebook, addNPC, eco, salvar, carregar, apagarSave, jogo, lakeFx, amostrasBench, winPanel, closePanel, cam: (y, p) => { cam.yaw = y; cam.pitch = p; } };   // atalho para testes no console
 cam.yaw = 0;                          // câmera atrás do jogador, olhando para o laboratório
 player.yaw = Math.PI;
 
@@ -133,9 +134,10 @@ renderer.setAnimationLoop(() => {
   const dt = Math.min(clock.getDelta(), 0.05); elapsed += dt;   // dt = tempo desde o último quadro
   waterTime.value = elapsed; grassTime.value = elapsed;
   if (input.started) {
-    const busy = panelOpen() || dlgOpen();      // com janela aberta o personagem fica parado
+    const busy = panelOpen() || dlgOpen() || acaoAtiva() || binoculoLigado();   // com janela aberta, animação ou binóculo o personagem fica parado
     if (!busy) { updatePlayer(dt, rig); updateInteract(); }
     else { input.interactQueued = false; input.jumpQueued = false; promptEl.style.display = 'none'; btnE.style.display = 'none'; }
+    updateAcoes(dt, elapsed, rig);   // animações: plantar, regar, coletar e binóculo (tecla B)
     updateDoor(dt, elapsed); updateWorld(dt); updateQuest(dt, elapsed);
   }
   else { rig.g.position.copy(player.pos); rig.g.rotation.y = player.yaw; cam.yaw = Math.sin(elapsed * 0.1) * 0.5; }

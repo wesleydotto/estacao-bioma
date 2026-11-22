@@ -8,6 +8,7 @@ import { chime, blip, buzz, tone } from '../../audio.js';
 import { clamp, lerp, rr, rand, mulberry32, FONT } from '../../utils.js';
 import { lakeFx } from '../../lake.js';
 import { boardTex } from '../../construcao.js';
+import { fazerAcao } from '../../acoes.js';
 
 // Leituras da sonda (pioram/melhoram com a saúde do lago)
 export const probeValues = (h) => ({ od: lerp(2.1, 7.6, h), ph: lerp(8.9, 7.3, h), temp: lerp(27, 25, h) });
@@ -147,14 +148,12 @@ export function collectGame() {
       <div class="row"><div class="tube" style="width:70px;height:170px"><div class="liq" style="height:0%;background:#7aa83a"></div></div></div>
       <div class="row"><button class="btn" id="go">Encher frasco</button></div><p class="fb" id="fb"></p>`;
     $(b, '#go').onclick = () => {
-      $(b, '#go').disabled = true; $(b, '.liq').style.transition = 'height 1.4s'; $(b, '.liq').style.height = '80%';
-      setTimeout(() => {
-        if (tok !== panelToken) return;
+      // fecha a janela: o personagem se abaixa e enche o frasco na água (animação), e depois a amostra é guardada
+      closePanel();
+      fazerAcao('coletar', () => {
         Q.sample = true; Q.sampleT = SAMPLE_TIME; chime();
-        $(b, '#fb').className = 'fb good';
-        $(b, '#fb').innerHTML = 'Amostra coletada! ⏱ Ela dura <b>3 minutos</b> fora da geladeira — depois as bactérias mudam o resultado.';
-        const bt = document.createElement('button'); bt.className = 'btn'; bt.textContent = 'Voltar ao kit'; bt.onclick = openKit; $(b, '#fb').after(bt); bt.style.margin = '8px auto 0'; bt.style.display = 'block';
-      }, 1500);
+        say(['Amostra coletada! ⏱ Ela dura <b>3 minutos</b> fora da geladeira — depois as bactérias mudam o resultado.'], '✔ Amostra de água', openKit);
+      });
     };
   });
 }
