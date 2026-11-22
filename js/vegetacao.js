@@ -5,7 +5,7 @@ import { mergeGeometries, mergeVertices } from 'three/addons/utils/BufferGeometr
 import { scene } from './cena.js';
 import { std, circles, animated } from './construcao.js';
 import { LAB, LAKE, WORLD_R, lakeR, lakeNorm, distToPath, onPier, groundHeight, P0, PIPE_M, PIPE_DIR, distToPref, onPrefWalk, distToFazenda, PONTO_MATA } from './mapa.js';
-import { rand, rr, smoothstep, isTouch } from './utils.js';
+import { rand, rr, smoothstep, isTouch, mulberry32 } from './utils.js';
 
 // =====================================================================
 //  VEGETAÇÃO (árvores, palmeiras buriti, arbustos, grama, flores, pedras)
@@ -127,7 +127,9 @@ export function buildVegetation() {
       const g = new THREE.BufferGeometry();
       const lean = rr(0.05, 0.16), hgt = rr(0.32, 0.5);
       g.setAttribute('position', new THREE.Float32BufferAttribute([-0.045, 0, 0, 0.045, 0, 0, 0, hgt, lean, 0.045, 0, 0, -0.045, 0, 0, 0, hgt, lean], 3));
-      g.setAttribute('color', new THREE.Float32BufferAttribute([0.2, 0.4, 0.1, 0.2, 0.4, 0.1, 0.62, 0.85, 0.3, 0.2, 0.4, 0.1, 0.2, 0.4, 0.1, 0.62, 0.85, 0.3], 3));
+      // cor da raiz (escura, quase a cor do chão) e da ponta (clara): o degradê vai de uma para a outra
+      const R = [0.11, 0.24, 0.06], P = [0.58, 0.82, 0.32];
+      g.setAttribute('color', new THREE.Float32BufferAttribute([...R, ...R, ...P, ...R, ...R, ...P], 3));
       g.setAttribute('normal', new THREE.Float32BufferAttribute([0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0], 3));
       g.translate(rr(-0.12, 0.12), 0, rr(-0.12, 0.12));
       g.rotateY(i * Math.PI / 3 + rr(0, 0.5)); parts.push(g);
@@ -137,31 +139,58 @@ export function buildVegetation() {
   const grassMat = new THREE.MeshLambertMaterial({ vertexColors: true });
   grassMat.onBeforeCompile = (sh) => {
     sh.uniforms.uTime = grassTime;
-    sh.vertexShader = 'uniform float uTime;\n' + sh.vertexShader.replace('#include <begin_vertex>', `#include <begin_vertex>
+    // VÉRTICE: balanço de cada tufo + "ondas" de vento que atravessam o campo
+    sh.vertexShader = 'uniform float uTime;\nvarying float vRajada; varying float vAltura;\n' + sh.vertexShader.replace('#include <begin_vertex>', `#include <begin_vertex>
       vec4 ip = instanceMatrix * vec4(0.0, 0.0, 0.0, 1.0);
-      float sway = sin(uTime*1.8 + ip.x*0.35 + ip.z*0.27)*0.13 + sin(uTime*3.3 + ip.x*0.9)*0.04;
-      transformed.x += sway * position.y; transformed.z += sway * 0.6 * position.y;`);
+      // onda grande: anda na direção do vento (de sudoeste para nordeste), como rajadas num campo
+      float onda = sin(dot(ip.xz, vec2(0.07, 0.05)) - uTime * 1.6);
+      float rajada = smoothstep(0.2, 1.0, onda);
+      // balanço pequeno de cada tufo (o que já existia), mais forte quando a rajada passa
+      float sway = sin(uTime*1.8 + ip.x*0.35 + ip.z*0.27)*0.10 + sin(uTime*3.3 + ip.x*0.9)*0.035 + rajada * 0.16;
+      transformed.x += sway * position.y; transformed.z += sway * 0.7 * position.y;
+      vRajada = rajada; vAltura = clamp(position.y / 0.5, 0.0, 1.0);`);
+    // FRAGMENTO: a ponta fica um pouco mais clara quando a rajada passa (brilho do vento na grama)
+    sh.fragmentShader = 'varying float vRajada; varying float vAltura;\n' + sh.fragmentShader.replace('#include <color_fragment>', `#include <color_fragment>
+      diffuseColor.rgb *= 1.0 + vRajada * vAltura * 0.22;`);
   };
+
+  // Sorteia um lugar para um tufo de grama usando o gerador "rnd".
+  // Devolve true se o tufo foi posto. A ORDEM dos sorteios é a mesma de antes,
+  // porque com o gerador do jogo (rand) isso decide onde fica tudo o que vem depois.
+  function porTufo(malha, i, rnd) {
+    const a = rnd() * 6.28, r = Math.sqrt(rnd()) * 135, x = -25 + Math.cos(a) * r, z = 40 + Math.sin(a) * r;
+    if (x > -21.8 && x < 21.8 && z > -12.8 && z < 21.2) return false;
+    const ld = lakeNorm(x, z); if (ld < 1.03 || onPier(x, z)) return false;
+    if (distToPref(x, z) < 0.3 || onPrefWalk(x, z)) return false;     // sem grama dentro da prefeitura e na calçada
+    if (distToFazenda(x, z) < 1) return false;                        // sem grama dentro da fazenda (é terra de lavoura)
+    if (distToPath(x, z) < 1.4 && rnd() < 0.9) return false;
+    const entre = (lo, hi) => lo + (hi - lo) * rnd();
+    const sc = entre(0.7, 1.5);
+    q.setFromAxisAngle(up, entre(0, 6.28));
+    malha.setMatrixAt(i, m4.compose(v.set(x, groundHeight(x, z) - 0.03, z), q, s.set(sc, sc * entre(0.8, 1.4), sc)));
+    // cor de cada tufo: verde menos amarelo e menos saturado que antes
+    malha.setColorAt(i, new THREE.Color().setHSL(entre(0.24, 0.30), 0.42, entre(0.75, 1.0)));
+    return true;
+  }
+
   const GN = isTouch ? 18000 : 34000;
   const grass = new THREE.InstancedMesh(tuft, grassMat, GN);
   n = 0;
-  while (n < GN) {
-    const a = rand() * 6.28, r = Math.sqrt(rand()) * 135, x = -25 + Math.cos(a) * r, z = 40 + Math.sin(a) * r;
-    if (x > -21.8 && x < 21.8 && z > -12.8 && z < 21.2) continue;
-    const ld = lakeNorm(x, z); if (ld < 1.03 || onPier(x, z)) continue;
-    if (distToPref(x, z) < 0.3 || onPrefWalk(x, z)) continue;     // sem grama dentro da prefeitura e na calçada
-    if (distToFazenda(x, z) < 1) continue;                        // sem grama dentro da fazenda (é terra de lavoura)
-    if (distToPath(x, z) < 1.4 && rand() < 0.9) continue;
-    const sc = rr(0.7, 1.5);
-    q.setFromAxisAngle(up, rr(0, 6.28));
-    grass.setMatrixAt(n, m4.compose(v.set(x, groundHeight(x, z) - 0.03, z), q, s.set(sc, sc * rr(0.8, 1.4), sc)));
-    grass.setColorAt(n, new THREE.Color().setHSL(rr(0.2, 0.28), 0.5, rr(0.75, 1.0)));
-    n++;
-  }
+  while (n < GN) { if (porTufo(grass, n, rand)) n++; }
   // No nível de gráficos mais leve, mostra só uma parte da grama (a ordem é aleatória,
   // então cortar o fim da lista tira tufos espalhados). Não mexe no gerador com semente.
   grass.count = Math.floor(GN * qualidade.grama);
   grass.receiveShadow = true; scene.add(grass);
+
+  // Grama EXTRA (só no nível Alto): usa um gerador PRÓPRIO (semente 7),
+  // então não muda a posição de nada do resto do mapa.
+  const extra = Math.floor(GN * (qualidade.gramaExtra - 1));
+  if (extra > 0) {
+    const rnd2 = mulberry32(7);
+    const grass2 = new THREE.InstancedMesh(tuft, grassMat, extra);
+    for (let i = 0; i < extra;) { if (porTufo(grass2, i, rnd2)) i++; }
+    grass2.receiveShadow = true; scene.add(grass2);
+  }
 
   // ---- Flores ----
   const FN = 900;

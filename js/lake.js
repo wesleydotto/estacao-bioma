@@ -2,7 +2,7 @@
 // da restauração e a "saúde" do lago (que muda o visual aos poucos).
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { scene } from './cena.js';
+import { scene, SUN_DIR, HORIZON } from './cena.js';
 import { animated, circles, std, addBox, addCyl, makeCanvas, toTex, woodTex, solarTex, boardTex, makePostBoard } from './construcao.js';
 import { LAKE, WATER_Y, PIER_Y, lakeR, U, P0, PIER_DIR, PIER_PERP, PATH, PIPE_A, PIPE_DIR, PIPE_M, groundHeight, onPier } from './mapa.js';
 import { rr, lerp, FONT } from './utils.js';
@@ -16,12 +16,31 @@ export function buildLake() {
   // ---- Água com algas (shader modificado) ----
   const geo = new THREE.CircleGeometry(LAKE.r * 1.35, 96); geo.rotateX(-Math.PI / 2);
   const mat = new THREE.MeshStandardMaterial({ color: '#4a6a2a', roughness: 0.3, metalness: 0.05, transparent: true, opacity: 0.97, envMapIntensity: 0.1 });
+
+  // Mapa de PROFUNDIDADE do lago (128 × 128 pontos), feito com a altura do chão.
+  // O shader usa para deixar a água transparente onde é rasa (margem suave)
+  // e desenhar a espuma na beirada. Não usa sorteio (não mexe no gerador com semente).
+  const RAIO = LAKE.r * 1.35, NP = 128;
+  const prof = new Uint8Array(NP * NP * 4);
+  for (let j = 0; j < NP; j++) for (let i = 0; i < NP; i++) {
+    const x = LAKE.x - RAIO + (i + 0.5) / NP * RAIO * 2, z = LAKE.z - RAIO + (j + 0.5) / NP * RAIO * 2;
+    const d = WATER_Y - groundHeight(x, z);                       // metros de água naquele ponto
+    prof[(j * NP + i) * 4] = Math.round(Math.min(Math.max(d / 2, 0), 1) * 255);   // 0 a 2 m vira 0 a 255
+  }
+  const texProf = new THREE.DataTexture(prof, NP, NP);
+  texProf.magFilter = texProf.minFilter = THREE.LinearFilter; texProf.needsUpdate = true;
+
   mat.onBeforeCompile = (sh) => {
     sh.uniforms.uTime = waterTime; sh.uniforms.uHealth = waterHealth;
+    sh.uniforms.tProf = { value: texProf };
+    sh.uniforms.uSol = { value: SUN_DIR };
+    sh.uniforms.uCeuH = { value: HORIZON };                       // cor do céu no horizonte
+    sh.uniforms.uCeuT = { value: new THREE.Color('#2f7fd6') };    // cor do céu lá no alto (a mesma do céu em cena.js)
     sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vWPos;')
       .replace('#include <begin_vertex>', '#include <begin_vertex>\nvWPos = (modelMatrix * vec4(transformed, 1.0)).xyz;');
     sh.fragmentShader = sh.fragmentShader.replace('#include <common>', `#include <common>
       uniform float uTime; uniform float uHealth; varying vec3 vWPos;
+      uniform sampler2D tProf; uniform vec3 uSol; uniform vec3 uCeuH; uniform vec3 uCeuT;
       float h2(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7))) * 43758.5453); }
       float n2(vec2 p){ vec2 i = floor(p), f = fract(p); vec2 u = f*f*(3.0-2.0*f);
         return mix(mix(h2(i), h2(i+vec2(1,0)), u.x), mix(h2(i+vec2(0,1)), h2(i+vec2(1,1)), u.x), u.y); }
@@ -41,11 +60,42 @@ export function buildLake() {
       // lago recuperado: água azul-esverdeada e limpa
       vec3 well = mix(vec3(0.02, 0.09, 0.11), vec3(0.05, 0.19, 0.19), fine);
       diffuseColor.rgb = mix(diffuseColor.rgb, well, uHealth);
-      scum *= (1.0 - uHealth);`)
+      scum *= (1.0 - uHealth);
+      // MARGEM SUAVE: lê a profundidade daquele ponto (0 = beirada, 1 = 2 m ou mais)
+      vec2 uvP = (q - vec2(${(LAKE.x - RAIO).toFixed(2)}, ${(LAKE.z - RAIO).toFixed(2)})) / ${(RAIO * 2).toFixed(2)};
+      float prof = texture2D(tProf, uvP).r * 2.0;                  // em metros
+      // espuma: uma faixa clara bem na beirada, que "respira" devagar (amarelada quando o lago está doente)
+      float esp = smoothstep(0.02, 0.07, prof) * (1.0 - smoothstep(0.10, 0.22 + 0.05*sin(uTime*0.8 + q.x*0.3), prof));
+      vec3 corEsp = mix(vec3(0.55, 0.60, 0.35), vec3(0.85, 0.92, 0.92), uHealth);
+      diffuseColor.rgb = mix(diffuseColor.rgb, corEsp, esp * 0.55 * (0.6 + 0.4*fine));
+      // água rasa fica transparente e deixa ver a lama do fundo
+      diffuseColor.a *= mix(0.25, 1.0, smoothstep(0.0, 0.6, prof));
+      float transp = smoothstep(0.0, 0.03, prof);
+      diffuseColor.a *= transp;`)
       .replace('#include <roughnessmap_fragment>', `#include <roughnessmap_fragment>
-      roughnessFactor = mix(mix(0.55, 0.12, uHealth), 0.95, scum);`)
+      roughnessFactor = mix(mix(0.55, 0.06, uHealth), 0.95, scum);`)
       .replace('#include <normal_fragment_maps>', `#include <normal_fragment_maps>
-      normal = normalize(normal + (1.0 - scum) * 0.06 * vec3(sin(q.x*1.7 + uTime*1.3) + sin(q.y*2.3 - uTime), 0.0, cos(q.y*1.9 + uTime*1.1)));`);
+      normal = normalize(normal + (1.0 - scum) * 0.06 * vec3(sin(q.x*1.7 + uTime*1.3) + sin(q.y*2.3 - uTime), 0.0, cos(q.y*1.9 + uTime*1.1)));`)
+      .replace('#include <opaque_fragment>', `
+      {
+        // normal da água no MUNDO (para cima, com ondinhas que andam)
+        vec3 Nw = normalize(vec3(0.08 * (sin(q.x*1.7 + uTime*1.3) + sin(q.y*2.3 - uTime) + 0.5*sin(q.x*4.1 - uTime*2.0)), 1.0,
+                                 0.08 * (cos(q.y*1.9 + uTime*1.1) + 0.5*cos(q.x*3.7 + uTime*1.7))));
+        Nw = normalize(mix(Nw, vec3(0.0, 1.0, 0.0), scum));       // a nata de algas é lisa e fosca
+        vec3 V = normalize(cameraPosition - vWPos);               // direção de quem olha
+        // FRESNEL: olhando de lado, a água vira espelho do céu; olhando de cima, mostra a cor da água
+        float fres = pow(1.0 - max(dot(Nw, V), 0.0), 3.0);
+        vec3 R = reflect(-V, Nw);
+        vec3 ceu = mix(uCeuH, uCeuT, smoothstep(0.0, 0.6, R.y));  // cor do céu na direção refletida
+        float forca = mix(0.25, 0.9, uHealth) * (1.0 - scum);    // lago doente reflete pouco; algas não refletem
+        outgoingLight = mix(outgoingLight, ceu, clamp(fres * forca, 0.0, 1.0));
+        // BRILHO DO SOL nas ondinhas (fraco no lago doente, forte no lago limpo)
+        float brilho = pow(max(dot(R, uSol), 0.0), mix(60.0, 300.0, uHealth));
+        outgoingLight += vec3(1.0, 0.93, 0.78) * brilho * mix(0.5, 3.0, uHealth) * (1.0 - scum);
+        // a parte que reflete fica menos transparente (reflexo "tampa" o fundo)
+        diffuseColor.a = max(diffuseColor.a, fres * forca * transp);
+      }
+      #include <opaque_fragment>`);
   };
   const water = new THREE.Mesh(geo, mat);
   water.position.set(LAKE.x, WATER_Y, LAKE.z); water.receiveShadow = true;
