@@ -28,6 +28,7 @@ Leia junto com o `CLAUDE.md` (organização dos arquivos) e o `PLANO_MISSOES.md`
 6. **Missão 2, fatia A (pronta):** Fazenda Boa Safra (`js/fazenda.js`: lavoura de soja, cerca, galpão, silo, trator, pilha de sacos e trilha de sacos saindo do lago), Seu Geraldo (primeiro NPC visível, criado em `montar()` da missão), pacote `js/missoes/adubo/` (etapa 1: trilha de pistas + conversa), trava no mural e **equipamentos pagos** na loja.
 7. **Missão 2, fatia B (pronta):** dois pontos de coleta (fragmento de mata a oeste da fazenda e lavoura) com 5 atividades cada (`js/missoes/adubo/minigames.js`): coletar solo (pá), contar minhocas (lupa), infiltração (kit), contar insetos (lupa) e pH/umidade (sonda, opcional). No laboratório, a **bancada SOLO** (`bancada.js`, entre AMOSTRAS e o microscópio): secar, queimar e calcular a matéria orgânica (balança com estufa). Os equipamentos **aparecem na bancada** conforme comprados. O marcador amarelo leva à loja quando falta equipamento. Pagamentos: R$ 300 (campo), R$ 400 (lab), +R$ 100 (cálculo sem erro) e +R$ 100 (sonda nos dois pontos).
 8. **Missão 2, fatia C (pronta):** a missão agora conclui. Etapas: 4 **diagnóstico** no mural (montar a cadeia de causas, com 2 cartões sem prova), 5 **convencer o Seu Geraldo** (3 objeções, escolher o dado certo da tabela mata × lavoura), 6 **restauração** (8 mudas na faixa de mata + 6 sementes de adubação verde em lotes novos, que só aparecem depois do acordo), 7 **esperar 30 dias** (tela escura) e **medir de novo** a lavoura (minhocas 1→5, infiltração 6:00→2:30, mesmos equipamentos), 8 **concluída** com tela antes × depois. O **relatório** paga de R$ 1.200 a R$ 2.000 conforme as **estrelas** (★ concluir; ★★ + cálculo sem erro e sonda nos 2 pontos; ★★★ + argumentos certos de primeira). Ajustes: placa solar e cata-vento **travados na loja** até a Missão 3, soja desenhada como plantinha, tolerância maior no cronômetro da infiltração, `scripts/gerar-arquivo-unico.mjs`.
+9. **Personagem principal virou o "Biólogo"** (versão 3D da ficha de personagem em pixel art que o Wesley mandou): boné preto com logo, óculos escuros retangulares, barba e bigode, coque, brinco de argola e piercing no nariz, camiseta preta de manga curta (antebraço com a cor da pele), calça cargo verde-oliva com bolsos, bota, mochila verde com alças e garrafa de água, binóculo no peito. Feito em `js/boneco.js` (preset `CORES_BIOLOGO`, usado em `js/player.js`).
 
 ## Decisões tomadas
 - Dinheiro do jogo chama **Verba (R$)**.
@@ -43,6 +44,7 @@ Leia junto com o `CLAUDE.md` (organização dos arquivos) e o `PLANO_MISSOES.md`
 - **Verba da Missão 2 (valores atuais, a ajustar jogando):** gasta ~R$ 1.140 (pá 60, lupa 120, kit 180, sonda 300, balança 450) + R$ 470 na restauração (8 × 40 + 6 × 25). Ganha R$ 300 (campo) + R$ 400 (lab) + bônus (R$ 100 cálculo sem erro, R$ 100 sonda) + relatório (R$ 1.200 a 2.000). **Sobra dinheiro com facilidade**; ideia em aberto: subir a balança para R$ 600 ou criar serviços extras no mural.
 - O relatório usa `get verba()`/`get texto()` no objeto `relatorio` da missão (assim o valor muda conforme as estrelas sem mexer no `economia.js`).
 - O `ativo` de `addLote` esconde um lote até a missão liberar (a missão do adubo usa `() => A.conv.feito`).
+- O **jogador** usa `CORES_BIOLOGO`; os **NPCs** continuam com o modelo antigo. Os acessórios do Biólogo (`bone`, `oculos`, `barba`, `coque`, `orelhas`, `brinco`, `nariz`, `bolsosCargo`, `mangaCurta`, `mochilaGrande`, `binoculo`) nascem **desligados** em `CORES_PESQUISADOR`; um NPC pode ligar qualquer um passando a opção em `addNPC({ cores })`.
 - Fim da Missão 2 deixa o gancho: os equipamentos novos puxam muita energia (a Missão 3 começa daí).
 
 ## Como criar uma missão nova
@@ -58,6 +60,7 @@ Leia junto com o `CLAUDE.md` (organização dos arquivos) e o `PLANO_MISSOES.md`
 - O navegador de teste (sem placa de vídeo) roda a ~1 quadro por segundo. Nos testes, esperar por condição (`waitForFunction`), não por tempo fixo.
 - Abrir a prefeitura mudou o mapa: algumas árvores da floresta ficaram em outros lugares. A fazenda fez o mesmo (clareira nova em `canSpawnTree`).
 - A fazenda **aplaina o terreno** em `groundHeight` (`FAZENDA` em `mapa.js`). Se mudar a posição, confira o relevo (o terreno é bem ondulado ali).
+- No `boneco.js`, peças **coladas direto no grupo do boneco** balançam junto com o corpo (o `player.js` faz o "bob" em todos os filhos diretos). Peças que devem acompanhar uma perna ou braço (bolsos, antebraço) são filhas do pivô dele.
 - O `[E]` do NPC só aparece a até 2,4 m dele (`alcance`); nos testes, fique perto.
 - Nos testes, **feche as falas** (`#dlg`) antes de apertar E: fala aberta bloqueia a interação. O teste de infiltração leva ~4 s (mata) e ~19 s (lavoura) de tempo real.
 - `window.__game.A` é o estado da Missão 2. Atalho para testar o campo: `Object.assign(__game.A,{started:true,falou:true})` e `__game.eco.inv={pa:1,lupaCampo:1,kitInfiltracao:1,balancaSolo:1,sondaSolo:1}`.
@@ -81,4 +84,6 @@ Leia junto com o `CLAUDE.md` (organização dos arquivos) e o `PLANO_MISSOES.md`
 2. Ajustar o equilíbrio da verba da Missão 2 (ver Decisões) e, se precisar, **serviços extras** no mural.
 3. Depois: Clima, Vila, Fauna, Barranco e Rio.
 - **Missão 9 (ideia do Wesley, no plano):** fotografar espécies ameaçadas (lobo-guará) de forma furtiva, enviar pra prefeitura, ganhar verba e montar grades de proteção.
+- **Ideias da ficha do Biólogo ainda não feitas:** animações de plantar, regar, coletar e usar binóculo; equipamentos na mão (lupa, câmera, rede, luvas); a câmera fotográfica combina com a Missão 9.
+- **Qualidade gráfica (ideia, não feita):** seletor Alta/Média/Baixa (pixelRatio, sombras, antialias, quantidade de grama em `js/cena.js` e `js/vegetacao.js`). Rodar no PowerShell não melhora os gráficos; o que ajuda é o navegador usar a placa de vídeo certa (`chrome://gpu`).
 - Ideias soltas: relógio de sol, herbário, conquistas, modo professor, modelos `.glb`.

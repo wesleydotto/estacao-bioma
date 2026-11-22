@@ -26,7 +26,7 @@ O jogador é um pesquisador de campo. Tem um laboratório (Estação Bioma) no m
 - `js/utils.js` (matemática), `js/mapa.js` (posições e altura do chão), `js/cena.js` (renderizador, câmera, luz e céu).
 - `js/construcao.js`: ajudantes `addBox`/`addCyl`, texturas, placas e as listas `colliders`, `circles` e `animated`.
 - `js/terreno.js`, `js/lab.js` (prédio e porta), `js/lake.js` (lago e saúde do lago), `js/vegetacao.js`.
-- `js/player.js`: personagem, movimento, colisão e câmera. `js/boneco.js`: modelo de pessoa (jogador e NPCs).
+- `js/player.js`: personagem (o **Biólogo**), movimento, colisão e câmera. `js/boneco.js`: modelo de pessoa (jogador e NPCs; o preset `CORES_BIOLOGO` é o do jogador).
 - `js/npc.js`: `addNPC({nome, x, z, cores, falas | aoFalar, temMissao})`. `js/save.js`: salva no localStorage a cada 5 s.
 - `js/economia.js` (verba, inventário, loja, relatórios; itens do tipo `equipamento` liberam testes), `js/prefeitura.js` (prédio e secretária), `js/construir.js` (lugares marcados para construir).
 - `js/fazenda.js`: cenário da Fazenda Boa Safra (Missão 2), ao norte do lago (centro em (-45, 160), `FAZENDA` em `mapa.js`), com o fragmento de mata e os pontos de coleta. O fazendeiro (Seu Geraldo) e a bancada SOLO do laboratório são criados pela missão (`js/missoes/adubo/`).
