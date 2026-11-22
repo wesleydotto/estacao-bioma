@@ -1,10 +1,11 @@
 // Arquivo: personagem.js — o Biólogo em 3D "de verdade" (modelo .glb com esqueleto).
 //
 // Como funciona:
-//  - O modelo (js/modelos/biologo.glb) é uma pessoa com ossos (quadril, coluna, braços...).
+//  - O modelo (js/modelos/biologo.glb) é uma pessoa com ossos (quadril, coluna, braços...):
+//    o corpo base "Superhero_Male" da Quaternius (licença CC0, livre), com a roupa pintada na textura.
 //  - As animações de ficar parado, andar e correr (js/modelos/animacoes.json) mexem esses ossos.
 //    Elas vieram de outro modelo e foram convertidas para este esqueleto.
-//  - Trocamos as cores das roupas e penduramos nos ossos os acessórios do Biólogo
+//  - Penduramos nos ossos os acessórios do Biólogo
 //    (boné, óculos escuros, coque, mochila, garrafa e binóculo).
 //
 // O "rig" devolvido tem o mesmo formato do boneco antigo (boneco.js): armL, armR, legL e legR.
@@ -23,40 +24,31 @@ const COR = {
   bone: '#16181a', mochila: '#4f5d34', alca: '#3a4527',
 };
 
+// Nomes "de sempre" (usados aqui e no acoes.js) → nomes reais dos ossos do modelo da Quaternius
+const OSSO = {
+  Hips: 'pelvis', Spine1: 'spine_02', Spine2: 'spine_03', Head: 'Head',
+  LeftArm: 'upperarm_l', LeftForeArm: 'lowerarm_l', RightArm: 'upperarm_r', RightForeArm: 'lowerarm_r', RightHand: 'hand_r',
+  LeftUpLeg: 'thigh_l', LeftLeg: 'calf_l', RightUpLeg: 'thigh_r', RightLeg: 'calf_r',
+};
+
 export async function carregarBiologo() {
   const gltf = await new GLTFLoader().loadAsync(urlModelo);
   const modelo = gltf.scene;
   const g = new THREE.Group();   // grupo do personagem: o player.js move e gira este grupo
   g.add(modelo);
 
-  // ---------- 1) Roupas: troca as cores ----------
-  // Tiramos a textura (estampa) e deixamos só a cor; o "normalMap" (relevo das dobras do pano) continua.
-  // Corta a parte de baixo de uma roupa (o modelo original veste um paletó comprido, com "rabo"):
-  // apaga os triângulos que ficam abaixo da altura dada (em metros, com o personagem de pé).
-  const cortarAbaixo = (geo, altura) => {
-    const pos = geo.attributes.position, idx = geo.index.array, novo = [];
-    for (let i = 0; i < idx.length; i += 3) {
-      const y = (pos.getY(idx[i]) + pos.getY(idx[i + 1]) + pos.getY(idx[i + 2])) / 3;
-      if (y >= altura) novo.push(idx[i], idx[i + 1], idx[i + 2]);
-    }
-    geo.setIndex(novo);
-  };
-  const pintar = (mat, cor, aspereza = 0.85) => { mat.map = null; mat.color.set(cor); mat.roughness = aspereza; mat.metalness = 0; mat.needsUpdate = true; };
+  // ---------- 1) Corpo ----------
+  // A roupa do Biólogo (camiseta preta de manga curta, cinto, calça cargo verde-oliva e bota)
+  // já vem PINTADA na textura do corpo (feita a partir da pele do modelo da Quaternius).
   modelo.traverse(o => {
     if (!o.isMesh) return;
     o.castShadow = true; o.receiveShadow = true;
     o.frustumCulled = false;   // malha com ossos: evita sumir quando a animação sai da "caixa" original
-    const n = o.material.name;
-    if (n === 'Wolf3D_Outfit_Top') { pintar(o.material, COR.camiseta); cortarAbaixo(o.geometry, 0.93); }
-    else if (n === 'Wolf3D_Outfit_Bottom') pintar(o.material, COR.calca, 0.9);
-    else if (n === 'Wolf3D_Outfit_Footwear') pintar(o.material, COR.bota, 0.7);
-    else if (n === 'Wolf3D_Beard') { o.material.color.set('#5a4535'); }
-    else if (n === 'Wolf3D_Headwear') o.visible = false;   // tira o chapéu original (o Biólogo usa boné)
   });
 
   // ---------- 2) Acessórios presos nos ossos ----------
   modelo.updateMatrixWorld(true);
-  const osso = (nome) => modelo.getObjectByName(nome);
+  const osso = (nome) => modelo.getObjectByName(OSSO[nome] || nome);
   // Coloca uma peça num ponto do corpo (em metros, com o personagem de pé olhando para +Z)
   // e depois "gruda" a peça no osso: daí em diante ela acompanha a animação.
   const prender = (nomeOsso, malha, x, y, z, rx = 0, ry = 0, rz = 0) => {
@@ -70,34 +62,32 @@ export async function carregarBiologo() {
 
   // Cabelo: atrás da cabeça + coque no alto (aparece debaixo do boné)
   const cabelo = std(COR.cabelo, 0.9);
-  const tras = prender('Head', M(new THREE.SphereGeometry(0.105, 18, 12), cabelo), 0, 1.73, -0.0); tras.scale.set(1.0, 1.0, 1.08);
-  prender('Head', M(new THREE.SphereGeometry(0.045, 12, 10), cabelo), 0, 1.80, -0.1);
+  const tras = prender('Head', M(new THREE.SphereGeometry(0.097, 18, 12), cabelo), 0, 1.71, -0.025); tras.scale.set(0.98, 1.0, 1.05);
+  prender('Head', M(new THREE.SphereGeometry(0.045, 12, 10), cabelo), 0, 1.785, -0.11);
 
   // Boné: cúpula + aba curva na frente + plaquinha clara do logo
   const boneMat = std(COR.bone, 0.8);
-  const cupula = prender('Head', M(new THREE.SphereGeometry(0.112, 20, 12, 0, Math.PI * 2, 0, Math.PI / 2), boneMat), 0, 1.765, 0.025);
-  cupula.scale.set(1, 0.85, 1.08);
-  prender('Head', M(new THREE.CylinderGeometry(0.085, 0.085, 0.012, 18, 1, false, -Math.PI / 2, Math.PI), boneMat), 0, 1.772, 0.125, 0.12);
-  prender('Head', M(new THREE.BoxGeometry(0.06, 0.03, 0.006), std('#cfd4d8', 0.6)), 0, 1.81, 0.13, -0.35);
+  const cupula = prender('Head', M(new THREE.SphereGeometry(0.1, 20, 12, 0, Math.PI * 2, 0, Math.PI / 2), boneMat), 0, 1.742, -0.005);
+  cupula.scale.set(1, 0.85, 1.12);
+  prender('Head', M(new THREE.CylinderGeometry(0.08, 0.08, 0.012, 18, 1, false, -Math.PI / 2, Math.PI), boneMat), 0, 1.748, 0.095, 0.12);
+  prender('Head', M(new THREE.BoxGeometry(0.06, 0.03, 0.006), std('#cfd4d8', 0.6)), 0, 1.785, 0.1, -0.35);
 
   // Óculos escuros retangulares: duas lentes, ponte e hastes até as orelhas
   const lente = std('#0b0d0f', 0.15, 0.4);
   for (const s of [-1, 1]) {
-    prender('Head', M(new THREE.BoxGeometry(0.05, 0.03, 0.008), lente), s * 0.033, 1.727, 0.123);
-    prender('Head', M(new THREE.BoxGeometry(0.005, 0.006, 0.11), lente), s * 0.075, 1.732, 0.07, 0, -s * 0.2, 0);
+    prender('Head', M(new THREE.BoxGeometry(0.05, 0.03, 0.008), lente), s * 0.032, 1.702, 0.1);
+    prender('Head', M(new THREE.BoxGeometry(0.005, 0.006, 0.11), lente), s * 0.083, 1.706, 0.045, 0, -s * 0.12, 0);
   }
-  prender('Head', M(new THREE.BoxGeometry(0.02, 0.005, 0.006), lente), 0, 1.733, 0.126);
+  prender('Head', M(new THREE.BoxGeometry(0.02, 0.005, 0.006), lente), 0, 1.707, 0.103);
 
-  // Barba cheia (o modelo só tem bigode): meia-lua escura em volta do queixo
-  const barba = prender('Head', M(new THREE.SphereGeometry(0.092, 18, 12, 0, Math.PI, Math.PI * 0.5, Math.PI * 0.4), std(COR.cabelo, 0.95)), 0, 1.70, 0.04);
-  barba.scale.set(0.98, 1.0, 1.02);   // meia casca só na frente e embaixo (queixo e bochechas)
+  // (A barba e o bigode estão pintados na textura do rosto.)
 
   // Mochila verde com alças no peito e garrafa de água do lado
-  const mochila = prender('Spine2', M(new THREE.BoxGeometry(0.34, 0.44, 0.17), std(COR.mochila, 0.8)), 0, 1.24, -0.235);
-  prender('Spine2', M(new THREE.BoxGeometry(0.3, 0.12, 0.06), std('#45512d', 0.85)), 0, 1.1, -0.33);   // bolso da frente da mochila
-  for (const s of [-1, 1]) prender('Spine2', M(new THREE.BoxGeometry(0.04, 0.34, 0.02), std(COR.alca, 0.85)), s * 0.1, 1.3, 0.155, -0.12);
-  prender('Spine2', M(new THREE.CylinderGeometry(0.035, 0.035, 0.18, 10), std('#d9e3d0', 0.5)), 0.2, 1.12, -0.24);
-  prender('Spine2', M(new THREE.CylinderGeometry(0.037, 0.037, 0.03, 10), std('#2b8a3e', 0.6)), 0.2, 1.225, -0.24);
+  const mochila = prender('Spine2', M(new THREE.BoxGeometry(0.34, 0.44, 0.17), std(COR.mochila, 0.8)), 0, 1.24, -0.215);
+  prender('Spine2', M(new THREE.BoxGeometry(0.3, 0.12, 0.06), std('#45512d', 0.85)), 0, 1.1, -0.31);   // bolso da frente da mochila
+  for (const s of [-1, 1]) prender('Spine2', M(new THREE.BoxGeometry(0.04, 0.34, 0.02), std(COR.alca, 0.85)), s * 0.09, 1.3, 0.13, -0.12);
+  prender('Spine2', M(new THREE.CylinderGeometry(0.035, 0.035, 0.18, 10), std('#d9e3d0', 0.5)), 0.2, 1.12, -0.22);
+  prender('Spine2', M(new THREE.CylinderGeometry(0.037, 0.037, 0.03, 10), std('#2b8a3e', 0.6)), 0.2, 1.225, -0.22);
   void mochila;
 
   // Binóculo: um pendurado no peito (binPeito) e outro escondido na frente dos olhos (binOlhos)
@@ -110,8 +100,8 @@ export async function carregarBiologo() {
     }
     b.add(M(new THREE.BoxGeometry(0.04, 0.02, 0.04), binMat)); b.scale.setScalar(escala); return b;
   };
-  const binPeito = prender('Spine2', fazerBinoculo(1), 0, 1.2, 0.2);
-  const binOlhos = prender('Head', fazerBinoculo(1.1), 0, 1.728, 0.19); binOlhos.visible = false;
+  const binPeito = prender('Spine2', fazerBinoculo(1), 0, 1.2, 0.165);
+  const binOlhos = prender('Head', fazerBinoculo(1.1), 0, 1.70, 0.16); binOlhos.visible = false;
 
   // Objetos que aparecem na mão direita nas animações: garrafa (regar) e frasco (coletar)
   const mao = osso('RightHand').getWorldPosition(new THREE.Vector3());
