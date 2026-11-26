@@ -45,6 +45,41 @@ Ajudas ao jogador: marcador amarelo, lista de objetivos, falas da Dra. Iara, cad
 - [ ] Novos cenários com outros problemas (rio com metais pesados, área desmatada).
 - [ ] Perguntas/quiz ligados ao conteúdo de Ciências para uso em sala.
 
+## Ideia futura: pack de expansão "Soro antiofídico" (NÃO fazer ainda)
+
+Só desbloqueia depois da missão do lago. Ideia do Wesley, ainda em fase de conversa.
+
+**Conceito:** o laboratório passa a produzir soro contra picada de cobra. Os cavalos produzem os anticorpos e também servem de transporte para longas distâncias no mapa. Chamados de emergência aparecem no mapa.
+
+**Fluxo da missão**
+1. Chamado aparece no mapa (com timer).
+2. Ir até o local (de cavalo) e encontrar a vítima.
+3. Levar a vítima ao ambulatório do laboratório.
+4. Conversar com a vítima: ela dá a dica da cor da cobra que picou.
+5. Voltar ao local e identificar a cobra certa entre várias de cores diferentes.
+6. Coletar a cobra e extrair o veneno.
+7. Produzir o soro no laboratório.
+8. Aplicar a injeção na vítima.
+
+**Ciência (para acertar no jogo)**
+- O soro não vem direto do veneno: o veneno vai em doses pequenas no cavalo, o cavalo produz anticorpos, e do sangue dele se purifica o soro. Mostrar a cadeia veneno → cavalo → anticorpos → soro.
+- Cada tipo de cobra tem soro próprio (jararaca, cascavel, surucucu, coral). Acertar a cobra importa.
+- Cobras parecidas como pegadinha (falsa-coral x coral verdadeira). A cor sozinha nem sempre identifica na vida real, então usar o desenho (anéis, losangos) como segunda pista.
+- Segurança: ensinar o que fazer de verdade (manter a vítima calma, levar logo ao hospital, não cortar nem chupar a picada). A coleta da cobra aparece como trabalho de equipe treinada, sem incentivar aluno a capturar cobra.
+
+**Regras decididas**
+- Timer da vítima: se acabar, a vítima piora e o jogador tenta de novo. Não há morte na tela.
+- Tentar de novo reduz a recompensa: estrelas de 1 a 3, e cada nova tentativa tira 1 estrela do máximo.
+- Estrelas pelo tempo que sobrou e por acertar o soro de primeira.
+- Soro errado gasta tempo e material (o soro usado se perde).
+- Estrelas podem liberar itens do pack (novos cavalos, novos tipos de soro).
+
+**Ideias em aberto**
+- Preparar soro antes do chamado: o jogador mantém um estoque e escolhe quais soros produzir, para o chamado ser urgência de verdade.
+- Timer em etapas: um relógio geral da vítima e timers menores dentro de cada etapa.
+- Primeira versão enxuta: 2 tipos de cobra e 1 cavalo; o resto fica para depois.
+- Precisa de: estábulo/cavalos (e montaria), ambulatório, NPC da vítima, cobras e telas de laboratório novas.
+
 ## Observações
 - Código comentado em português, explicando para iniciante.
 - Antes de mudanças grandes, explicar o plano e pedir confirmação.
