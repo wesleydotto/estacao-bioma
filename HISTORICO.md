@@ -14,7 +14,13 @@ Leia junto com o `CLAUDE.md` (organização dos arquivos) e o `PLANO_MISSOES.md`
 - **Natureza com modelos da Quaternius: feita** (item 15) e já publicada. **Falta o Wesley ver e aprovar**, e conferir se o Médio
   continua leve (agora há mais triângulos perto do jogador). Se pesar: diminuir `natureza` e `enfeites` em `js/qualidade.js`.
 - NPCs no modelo novo: **feito** (item 18). Falta o Wesley aprovar.
-- Depois da remodelagem (falta o Wesley aprovar o visual): **Missão 3 (energia)**.
+- **PRÓXIMO PASSO (escolha do Wesley, 27/11): planejar a missão do GARIMPO (mercúrio e biomagnificação)**, antes da Missão 3.
+  Tudo sobre ela está no `PLANO_MISSOES.md`, dentro da Missão 8 ("Ideia do Wesley: garimpo abandonado..."). Já decidido: o chamado é
+  **moradores passando mal depois de comer peixe + peixes estranhos** (opção (a); não é mortandade). Ainda falta decidir com o Wesley:
+  (1) a **mitigação** (opções reais e pegadinhas listadas lá); (2) se é **uma missão só** com a Missão 8 (rio alaranjado, espectrofotômetro)
+  ou duas; (3) **só mercúrio** na 1ª versão ou outros metais; (4) onde fica o lago do garimpo no mapa. Comece explicando o plano em fatias
+  (como a Missão 2: A, B, C) e peça confirmação antes de programar.
+- Depois do garimpo: **Missão 3 (energia)**. A remodelagem visual ainda espera o Wesley aprovar (Médio, natureza, NPCs).
 - **Pendências de verificação:** regar e coletar ainda não foram vistos dentro do jogo com o Biólogo novo; nenhuma missão foi rodada inteira
   depois da troca do personagem. O Wesley jogou e aprovou, mas não detalhou o nível de gráficos que usou.
   Também falta conferir (vindo do antigo `NOTAS.md`): o **disco de Secchi com o mouse** (no teste automático não respondeu; o código já foi ajustado)
@@ -92,6 +98,7 @@ Leia junto com o `CLAUDE.md` (organização dos arquivos) e o `PLANO_MISSOES.md`
     Se os modelos falharem, os NPCs usam o boneco antigo (`boneco.js`).
 
 ## Decisões tomadas
+- **Garimpo:** o chamado da missão é "moradores passando mal depois de comer peixe + peixes estranhos" (o mercúrio age devagar; mortandade em massa seria falta de oxigênio). A missão do garimpo vem **antes** da Missão 3 (escolha do Wesley).
 - O **`NOTAS.md` foi aposentado** (ele só existe na branch `main`, de 21/11). O que ainda valia foi para o `PLANO_MISSOES.md` (garimpo/mercúrio na Missão 8, pack do soro antiofídico, quiz) e para as pendências acima. Use só o `HISTORICO.md` e o `PLANO_MISSOES.md`.
 - Dinheiro do jogo chama **Verba (R$)**.
 - A loja fica no **prédio da prefeitura** (não no lab).
@@ -171,7 +178,7 @@ Leia junto com o `CLAUDE.md` (organização dos arquivos) e o `PLANO_MISSOES.md`
 - **Atalho pra testar a Missão 2 sem repetir o lago:** abra o `estacao-bioma-teste.html` (veja acima) e clique em Continuar.
 
 ## Próximos passos (ordem do plano)
-0. **Terminar a remodelagem visual:** Wesley retestar o Médio e aprovar o visual; depois os NPCs no modelo novo.
+0. **Missão do garimpo (mercúrio)**: planejar e fazer (veja o topo). Remodelagem visual: só falta o Wesley aprovar (Médio, natureza, NPCs).
 1. **Missão 3: "Energia limpa para o laboratório"**: começa pelo gancho do fim da Missão 2 (equipamentos novos puxam mais energia do que o lab tem). Aí **destrava** a energia: placa solar e cata-vento saem do bloqueio em `ITENS` (`bloqueado`), as 2 bases de energia (`js/construir.js`) passam a ser usadas e o campo `watts` dos equipamentos ganha tela (consumo × geração). Veja o `PLANO_MISSOES.md`.
 2. Conferir as animações e os fluxos de plantar/coletar (veja "Se você está começando uma conversa nova" no topo).
 3. Ajustar o equilíbrio da verba da Missão 2 (ver Decisões) e, se precisar, **serviços extras** no mural.

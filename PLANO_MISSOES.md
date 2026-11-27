@@ -157,10 +157,10 @@ Base para o jogador **ganhar verba, comprar e construir**. As missões seguintes
 
 Haverá outros lagos e outros problemas no mapa. O primeiro novo problema é um garimpo abandonado perto de um lago. Ideia do Wesley, ainda em fase de conversa.
 
-**Conceito:** peixes morrendo ou estranhos num lago perto do garimpo. Pode ser eutrofização ou biomagnificação de metal, e o jogador precisa descobrir qual. O momento de "descartar a hipótese" é o ponto forte: ele testa a água, vê que está boa, e só então o problema real aparece.
+**Conceito:** peixes estranhos e moradores da beira do lago passando mal depois de comer peixe, num lago perto do garimpo. Pode ser eutrofização ou biomagnificação de metal, e o jogador precisa descobrir qual. O momento de "descartar a hipótese" é o ponto forte: ele testa a água, vê que está boa, e só então o problema real aparece.
 
 **Fluxo da missão**
-1. Chamado: peixes morrendo no lago do garimpo.
+1. Chamado: **moradores da beira do lago passando mal depois de comer peixe, e alguns peixes estranhos** (decidido: opção (a), veja "Ciência").
 2. Coletar água e testar. Resultado: a água está normal, então **não é eutrofização**.
 3. Um NPC **liga no celular do jogador** e pede para pegar uma vara de pesca, que cai no depósito.
 4. Pescar peixes (de espécies diferentes, para comparar).
@@ -177,7 +177,7 @@ Haverá outros lagos e outros problemas no mapa. O primeiro novo problema é um 
 
 **Ciência (para acertar no jogo)**
 - O mercúrio fica no **sedimento**, por isso a água pode dar normal.
-- Mercúrio costuma contaminar aos poucos, e não causar mortandade em massa. Mortandade em massa é mais típica de falta de oxigênio ou eutrofização. Dois jeitos de tratar isso no jogo: (a) trocar o alerta para "peixes estranhos e ribeirinhos passando mal depois de comer peixe", ou (b) manter a mortandade, só que vinda de outra causa (a pista falsa que a água revela). **Escolher um dos dois.**
+- Mercúrio costuma contaminar aos poucos, e não causar mortandade em massa. Mortandade em massa é mais típica de falta de oxigênio ou eutrofização. Dois jeitos de tratar isso no jogo: (a) trocar o alerta para "peixes estranhos e ribeirinhos passando mal depois de comer peixe", ou (b) manter a mortandade, só que vinda de outra causa (a pista falsa que a água revela). **DECIDIDO (27/11): opção (a).** Bate com a ciência (o mercúrio age devagar, acumulando no peixe e em quem come) e com o roteiro (a água dá normal, então descarta a eutrofização). A (b) foi descartada porque mortandade por falta de oxigênio faria o teste da água dar alterado.
 
 **PENDENTE — procedimento de mitigação (decidir depois)**
 O Wesley quer algo que ajude **na realidade** (placa de aviso para peixe foi descartada, por ser fraca e irreal). Mercúrio não some: o foco real é impedir que continue chegando e entrando na cadeia. Opções reais já levantadas:
