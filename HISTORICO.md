@@ -14,12 +14,9 @@ Leia junto com o `CLAUDE.md` (organização dos arquivos) e o `PLANO_MISSOES.md`
 - **Natureza com modelos da Quaternius: feita** (item 15) e já publicada. **Falta o Wesley ver e aprovar**, e conferir se o Médio
   continua leve (agora há mais triângulos perto do jogador). Se pesar: diminuir `natureza` e `enfeites` em `js/qualidade.js`.
 - NPCs no modelo novo: **feito** (item 18). Falta o Wesley aprovar.
-- **PRÓXIMO PASSO (escolha do Wesley, 27/11): planejar a missão do GARIMPO (mercúrio e biomagnificação)**, antes da Missão 3.
-  Tudo sobre ela está no `PLANO_MISSOES.md`, dentro da Missão 8 ("Ideia do Wesley: garimpo abandonado..."). Já decidido: o chamado é
-  **moradores passando mal depois de comer peixe + peixes estranhos** (opção (a); não é mortandade). Ainda falta decidir com o Wesley:
-  (1) a **mitigação** (opções reais e pegadinhas listadas lá); (2) se é **uma missão só** com a Missão 8 (rio alaranjado, espectrofotômetro)
-  ou duas; (3) **só mercúrio** na 1ª versão ou outros metais; (4) onde fica o lago do garimpo no mapa. Comece explicando o plano em fatias
-  (como a Missão 2: A, B, C) e peça confirmação antes de programar.
+- **PRÓXIMO PASSO: programar a missão do GARIMPO (mercúrio), começando pela fatia A** (cenário a leste + chamado + água dá normal).
+  O planejamento foi **decidido em 27/11** (missão separada da Missão 8, Hg + um 2º metal, lago a leste, mitigação em duas frentes) e
+  está no `PLANO_MISSOES.md` ("Missão do garimpo"). Falta o Wesley confirmar o 2º metal (As ou Pb) e dar o ok para começar a fatia A.
 - Depois do garimpo: **Missão 3 (energia)**. A remodelagem visual ainda espera o Wesley aprovar (Médio, natureza, NPCs).
 - **Pendências de verificação:** regar e coletar ainda não foram vistos dentro do jogo com o Biólogo novo; nenhuma missão foi rodada inteira
   depois da troca do personagem. O Wesley jogou e aprovou, mas não detalhou o nível de gráficos que usou.
@@ -178,7 +175,7 @@ Leia junto com o `CLAUDE.md` (organização dos arquivos) e o `PLANO_MISSOES.md`
 - **Atalho pra testar a Missão 2 sem repetir o lago:** abra o `estacao-bioma-teste.html` (veja acima) e clique em Continuar.
 
 ## Próximos passos (ordem do plano)
-0. **Missão do garimpo (mercúrio)**: planejar e fazer (veja o topo). Remodelagem visual: só falta o Wesley aprovar (Médio, natureza, NPCs).
+0. **Missão do garimpo (mercúrio)**: planejada (27/11); falta programar as fatias A, B e C (veja o topo). Remodelagem visual: só falta o Wesley aprovar (Médio, natureza, NPCs).
 1. **Missão 3: "Energia limpa para o laboratório"**: começa pelo gancho do fim da Missão 2 (equipamentos novos puxam mais energia do que o lab tem). Aí **destrava** a energia: placa solar e cata-vento saem do bloqueio em `ITENS` (`bloqueado`), as 2 bases de energia (`js/construir.js`) passam a ser usadas e o campo `watts` dos equipamentos ganha tela (consumo × geração). Veja o `PLANO_MISSOES.md`.
 2. Conferir as animações e os fluxos de plantar/coletar (veja "Se você está começando uma conversa nova" no topo).
 3. Ajustar o equilíbrio da verba da Missão 2 (ver Decisões) e, se precisar, **serviços extras** no mural.

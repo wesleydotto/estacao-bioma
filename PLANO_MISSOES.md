@@ -152,7 +152,22 @@ Base para o jogador **ganhar verba, comprar e construir**. As missões seguintes
 - **Reaproveita:** kit de campo, sonda, mural, mata ciliar (mudas), mudanças na cor da água.
 - **Atenção:** precisa de um terreno novo (o leito do rio) e é a maior das missões. Fica por último.
 
-### Ideia do Wesley: garimpo abandonado, mercúrio e biomagnificação (a decidir, NÃO fazer ainda)
+### Missão do garimpo: mercúrio e biomagnificação (DECIDIDA em 27/11, vem antes da Missão 3)
+**Decisões do Wesley (27/11):**
+- **Missão separada** da Missão 8. O rio alaranjado e o espectrofotômetro ficam para depois (o rio pode nascer do mesmo garimpo).
+- **Dois metais alterados**: o Hg e mais um (o Wesley sugeriu o Pb; a proposta é o **arsênio (As)**, que aparece de verdade junto do ouro, e falta ele confirmar). Fe e Al aparecem normais. Boa lição: o Hg **biomagnifica** (sobe na cadeia) e o outro metal fica mais no sedimento.
+- **Local:** a **leste**. Lago em ~(+110, +60) e garimpo abandonado rio acima, nos morros da borda (~x = +180), ligado por um córrego.
+- **Mitigação** (o Wesley não tinha preferência, então ficou assim): duas frentes obrigatórias.
+  *Ambiental:* conter o rejeito (barreira/bacia no garimpo) e replantar a área degradada.
+  *Social:* exame de mercúrio no cabelo dos moradores e tanque de criação de peixe em água limpa.
+  *Pegadinhas no mural:* dragar o fundo e criar wetland, com a explicação de por que pioram.
+
+**Fatias:**
+- **A — Cenário e chamado:** lago, córrego, garimpo, casas ribeirinhas e a NPC moradora. Coletar a água e testar no lab: dá normal, descarta a eutrofização.
+- **B — Peixe e metais:** ligação no celular, vara de pesca, minigame de pesca (3 espécies), bancada de preparo, analisador portátil, tabela periódica 3D com fichas, biomagnificação e relatório.
+- **C — Mitigação e medir de novo:** as duas frentes, as pegadinhas, nova análise dos peixes e a tela de antes e depois.
+
+#### Ideia original (do antigo NOTAS.md)
 *Veio do antigo `NOTAS.md`. Ainda precisa ser **unida** com a versão acima (rio alaranjado, espectrofotômetro, 3 pontos de coleta) numa conversa com o Wesley: pode ser a mesma missão (o rio desce do garimpo e chega no lago) ou duas missões separadas.*
 
 Haverá outros lagos e outros problemas no mapa. O primeiro novo problema é um garimpo abandonado perto de um lago. Ideia do Wesley, ainda em fase de conversa.
@@ -187,7 +202,7 @@ O Wesley quer algo que ajude **na realidade** (placa de aviso para peixe foi des
 - *Ideia de estrutura:* duas frentes que valem pontos separados, a ambiental (área do garimpo) e a social (comunidade); o jogador só fecha a missão fazendo as duas.
 
 **Ideias em aberto**
-- Só mercúrio na primeira versão, ou já outros metais? (Wesley ainda não respondeu.)
+- ~~Só mercúrio ou outros metais?~~ Decidido: Hg + um segundo metal (veja acima).
 - A estrutura é a mesma da missão do lago (investigar, descartar, analisar, diagnosticar, agir, medir de novo), então boa parte do código pode ser reaproveitada.
 - Precisa de: novo lago e garimpo no mapa, NPC com ligação de celular, item vara de pesca, minigame de pesca, bancada de preparo do peixe, analisador de metais, tabela periódica 3D, tela de relatório.
 
