@@ -19,6 +19,7 @@
 //    economia.js    verba (R$), inventário, loja e relatórios
 //    prefeitura.js  o prédio da prefeitura e a secretária
 //    fazenda.js     a Fazenda Boa Safra (lavoura, cerca, galpão e sacos de adubo)
+//    garimpo.js     a Lagoa Dourada, a comunidade, o córrego e o garimpo abandonado
 //    construir.js   lugares marcados onde se usa o que foi comprado
 //    audio.js       sons
 //    controles.js   teclado, mouse e toque
@@ -29,18 +30,20 @@
 //    missoes/       uma pasta para cada missão (lista em missoes/index.js)
 //      lago/        "Salvar o Lago da Mata": estado.js (Q e stage),
 //                   minigames.js (atividades) e index.js (o pacote da missão)
-//      adubo/       "De onde veio o adubo?" (monocultura e solo), em construção
+//      adubo/       "De onde veio o adubo?" (monocultura e solo)
+//      garimpo/     "O peixe que faz mal" (garimpo e mercúrio), em construção
 // =====================================================================
 import * as THREE from 'three';
 import { renderer, scene, camera, ceuTempo } from './cena.js';
 import { renderizar, redimensionar } from './graficos.js';
 import { NIVEIS, nivelAtual, trocarNivel } from './qualidade.js';
 import { animated } from './construcao.js';
-import { LAB, lakeNorm, distToFazenda } from './mapa.js';
+import { LAB, lakeNorm, distToFazenda, lagoaNorm, distGarimpo, GARIMPO, VILA_LAGOA } from './mapa.js';
 import { rr, isTouch } from './utils.js';
 import { input, cam, jogo } from './estado.js';
 import { Q, stage } from './missoes/lago/estado.js';
 import { A } from './missoes/adubo/estado.js';
+import { G } from './missoes/garimpo/estado.js';
 import { buildTerrain } from './terreno.js';
 import { buildLab, updateDoor } from './lab.js';
 import { buildLake, waterTime, lakeFx } from './lake.js';
@@ -57,6 +60,7 @@ import { addNPC, updateNPCs, trocarNPCsPor3D } from './npc.js';
 import { updateAcoes, acaoAtiva, binoculoLigado, fazerAcao, estadoAcao } from './acoes.js';
 import { buildPrefeitura } from './prefeitura.js';
 import { buildFazenda, carregarModelosFazenda } from './fazenda.js';
+import { buildGarimpo } from './garimpo.js';
 import { montarLotes, lotes } from './construir.js';
 import { eco, atualizarHudVerba } from './economia.js';
 import { temSave, salvar, carregar, apagarSave, updateSave } from './save.js';
@@ -76,6 +80,7 @@ buildLake();
 buildVegetation();
 buildPrefeitura();   // não usa o gerador com semente, então pode vir depois
 buildFazenda();      // idem (tem o gerador próprio, só da fazenda)
+buildGarimpo();      // idem: Lagoa Dourada e garimpo (gerador próprio)
 montarLotes();
 buildMapBg();
 atualizarHudVerba();
@@ -91,7 +96,7 @@ try { await carregarModelosFazenda(); } catch (e) { console.error('Não deu para
 try { await carregarPessoas(); trocarNPCsPor3D(); } catch (e) { console.error('Não deu para carregar os NPCs 3D:', e); }
 montarMissoes();
 setupInteractions();
-window.__game = { player, Q, A, lotes, fazerAcao, estadoAcao, camera, stage, openKit, microGame, chemGame, diagnosticoPanel, muralPanel, notebook, addNPC, eco, salvar, carregar, apagarSave, jogo, lakeFx, amostrasBench, winPanel, closePanel, cam: (y, p) => { cam.yaw = y; cam.pitch = p; } };   // atalho para testes no console
+window.__game = { player, Q, A, G, lotes, fazerAcao, estadoAcao, camera, stage, openKit, microGame, chemGame, diagnosticoPanel, muralPanel, notebook, addNPC, eco, salvar, carregar, apagarSave, jogo, lakeFx, amostrasBench, winPanel, closePanel, cam: (y, p) => { cam.yaw = y; cam.pitch = p; } };   // atalho para testes no console
 cam.yaw = 0;                          // câmera atrás do jogador, olhando para o laboratório
 player.yaw = Math.PI;
 
@@ -142,11 +147,14 @@ function updateWorld(dt) {
   const inLab = Math.abs(p.x) < LAB.w / 2 && Math.abs(p.z) < LAB.d / 2;
   const nearLake = lakeNorm(p.x, p.z) < 1.7;
   const naFazenda = distToFazenda(p.x, p.z) < 2;
-  const zone = naFazenda ? '🌾 Fazenda Boa Safra' : inLab ? '🔬 Laboratório · Estação Bioma' : nearLake ? (Q.health > 0.9 ? '💧 Lago da Mata (em recuperação)' : '🦠 Lago da Mata (eutrofizado)') : (Math.hypot(p.x, p.z) < 30 ? '🏢 Praça da Estação' : '🌳 Floresta');
+  const nearLagoa = lagoaNorm(p.x, p.z) < 1.7 || Math.hypot(p.x - VILA_LAGOA.x, p.z - VILA_LAGOA.z) < 16;
+  const noGarimpo = distGarimpo(p.x, p.z) < GARIMPO.r + 6;
+  const zone = naFazenda ? '🌾 Fazenda Boa Safra' : inLab ? '🔬 Laboratório · Estação Bioma' : nearLake ? (Q.health > 0.9 ? '💧 Lago da Mata (em recuperação)' : '🦠 Lago da Mata (eutrofizado)')
+    : nearLagoa ? '🎣 Lagoa Dourada' : noGarimpo ? '⛏️ Garimpo abandonado' : (Math.hypot(p.x, p.z) < 30 ? '🏢 Praça da Estação' : '🌳 Floresta');
   setZone(zone);
   updateHud(dt);
   tickWaterWarn(dt);
-  if (audioReady() && !inLab && (birdT -= dt) <= 0) { nearLake ? frog() : bird(); birdT = rr(2, 6); }
+  if (audioReady() && !inLab && (birdT -= dt) <= 0) { nearLake || nearLagoa ? frog() : bird(); birdT = rr(2, 6); }
 }
 
 // =====================================================================

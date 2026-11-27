@@ -144,7 +144,8 @@ export function muralPanel() {
       // botões extras da própria missão (ex.: diagnóstico do lago)
       for (const a of (m.acoesMural?.() || [])) botao(a.texto, a.acao, !a.destaque);
       if (!m.iniciada() && !sit.trava) botao('Começar', () => { jogo.ativa = m.id; closePanel(); m.iniciar(); });
-      else if (!m.concluida() && m.id !== jogo.ativa) botao('Seguir esta', () => { jogo.ativa = m.id; chime(); muralPanel(); });
+      // (só missões já começadas: uma bloqueada não pode virar a missão seguida)
+      else if (m.iniciada() && !m.concluida() && m.id !== jogo.ativa) botao('Seguir esta', () => { jogo.ativa = m.id; chime(); muralPanel(); });
       box.appendChild(d);
     }
   });

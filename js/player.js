@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { scene, camera, sky, seguirSol } from './cena.js';
 import { colliders, circles, camBlockers } from './construcao.js';
 import { criarBoneco, CORES_BIOLOGO } from './boneco.js';
-import { LAB, PLAZA_Y, WATER_Y, WORLD_R, groundHeight, onPier, walkHeight } from './mapa.js';
+import { LAB, PLAZA_Y, WORLD_R, onPier, walkHeight, aguaFunda, onTrapiche, lakeNorm } from './mapa.js';
 import { clamp } from './utils.js';
 import { keys, joy, input, cam } from './estado.js';
 import { showToast } from './interface.js';
@@ -26,7 +26,8 @@ export function buildPlayer(rig3d = null) {
 export const PR = 0.42; // raio do jogador
 export function blockedByWorld(x, z) {
   if (Math.hypot(x, z) > WORLD_R) return 'borda';
-  if (!onPier(x, z) && groundHeight(x, z) < WATER_Y - 0.45 && !(Math.abs(x) < 22 && z > -13 && z < 21)) return 'agua';
+  // só bloqueia onde existe água funda de verdade (lago, lagoa e cava do garimpo); píer e trapiche são chão
+  if (!onPier(x, z) && !onTrapiche(x, z) && aguaFunda(x, z) && !(Math.abs(x) < 22 && z > -13 && z < 21)) return 'agua';
   return null;
 }
 let waterWarnCD = 0;   // espera entre um aviso de "água poluída" e outro
@@ -71,7 +72,11 @@ export function updatePlayer(dt, rig) {
   if (!why) { p.x = nx; p.z = nz; }
   else if (!blockedByWorld(nx, p.z)) p.x = nx;
   else if (!blockedByWorld(p.x, nz)) p.z = nz;
-  if (why === 'agua' && waterWarnCD <= 0) { showToast('🤢 Água poluída demais para entrar!'); waterWarnCD = 3; }
+  if (why === 'agua' && waterWarnCD <= 0) {
+    // no Lago da Mata a água está poluída; na lagoa e na cava, é funda demais
+    showToast(lakeNorm(nx, nz) < 1.3 ? '🤢 Água poluída demais para entrar!' : '🌊 Funda demais para entrar a pé!');
+    waterWarnCD = 3;
+  }
   resolveCollisions(p);
 
   // pulo e gravidade

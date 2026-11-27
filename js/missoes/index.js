@@ -22,8 +22,9 @@
 // =====================================================================
 import { lago } from './lago/index.js';
 import { adubo } from './adubo/index.js';
+import { garimpo } from './garimpo/index.js';
 
-export const MISSOES = [lago, adubo];
+export const MISSOES = [lago, adubo, garimpo];
 
 // Procura uma missão pelo id (ex.: missao('lago'))
 export const missao = (id) => MISSOES.find(m => m.id === id);

@@ -15,9 +15,10 @@ Leia junto com o `CLAUDE.md` (organização dos arquivos) e o `PLANO_MISSOES.md`
   continua leve (agora há mais triângulos perto do jogador). Se pesar: diminuir `natureza` e `enfeites` em `js/qualidade.js`.
 - NPCs no modelo novo: **feito** (item 18). Falta o Wesley aprovar.
 - **Cores vivas estilo Palworld: feito** (item 19). Falta o Wesley aprovar.
-- **PRÓXIMO PASSO: programar a missão do GARIMPO (mercúrio), começando pela fatia A** (cenário a leste + chamado + água dá normal).
-  O planejamento foi **decidido em 27/11** (missão separada da Missão 8, Hg + um 2º metal, lago a leste, mitigação em duas frentes) e
-  está no `PLANO_MISSOES.md` ("Missão do garimpo"). 2º metal = **arsênio (As)** (confirmado). O Wesley deu o ok para a fatia A.
+- **Missão do garimpo ("O peixe que faz mal"): FATIA A pronta** (item 20). Falta o Wesley jogar e aprovar.
+  **PRÓXIMO PASSO: fatia B** (ligação no celular, vara de pesca, pesca de 3 espécies, preparo do peixe, analisador de metais
+  com Fe e Al normais e **Hg e As altos**, tabela periódica 3D, biomagnificação e relatório). Plano no `PLANO_MISSOES.md`.
+  Antes de programar a fatia B, explique o plano em poucas linhas e peça confirmação (como sempre).
 - Depois do garimpo: **Missão 3 (energia)**. A remodelagem visual ainda espera o Wesley aprovar (Médio, natureza, NPCs).
 - **Pendências de verificação:** regar e coletar ainda não foram vistos dentro do jogo com o Biólogo novo; nenhuma missão foi rodada inteira
   depois da troca do personagem. O Wesley jogou e aprovou, mas não detalhou o nível de gráficos que usou.
@@ -32,8 +33,8 @@ Leia junto com o `CLAUDE.md` (organização dos arquivos) e o `PLANO_MISSOES.md`
 - **Jogador:** o **Biólogo** em 3D com esqueleto (`js/personagem.js`: corpo da Quaternius, CC0, com a roupa e a barba pintadas na textura), animações parado/andar/correr e as ações de plantar, regar, coletar e binóculo (tecla **B** segurando, com zoom).
 - **Gráficos:** tela inicial tem **Gráficos: Alta / Média / Baixa** (`js/qualidade.js`, salvo no navegador). O Alto não foi testado aqui (o navegador de teste não tem placa de vídeo).
 - **Publicar:** o `dist/assets/index-XXXX.js` muda de nome a cada build. Ao republicar, mande o arquivo novo em `files` e apague o antigo com `null`.
-- **Missões prontas:** "Salvar o Lago da Mata" e "De onde veio o adubo?" (Missão 2, fatias A, B e C). A próxima é a Missão 3 (energia). Veja o `PLANO_MISSOES.md`.
-- **Arquivo único para jogar/testar sem instalar nada:** `npm run unico` cria, na pasta `dist-unico/`, o `estacao-bioma.html` (jogo normal) e o `estacao-bioma-teste.html` (já com save **depois do lago**: lago concluído, relatório entregue, R$ 1.500). Abre com duplo clique. O de teste tem um botão "🧪 Reiniciar o teste" na tela inicial e usa um save próprio (não mexe no jogo normal).
+- **Missões prontas:** "Salvar o Lago da Mata" e "De onde veio o adubo?" (Missão 2, fatias A, B e C). **Em construção:** "O peixe que faz mal" (garimpo; fatia A pronta). Depois dela vem a Missão 3 (energia). Veja o `PLANO_MISSOES.md`.
+- **Arquivo único para jogar/testar sem instalar nada:** `npm run unico` cria, na pasta `dist-unico/`, o `estacao-bioma.html` (jogo normal) e o `estacao-bioma-teste.html` (já com save **depois do lago**: lago concluído, relatório entregue, R$ 1.500). Abre com duplo clique. O de teste tem um botão "🧪 Reiniciar o teste" na tela inicial e usa um save próprio (não mexe no jogo normal). **Novo (27/11):** `estacao-bioma-teste-garimpo.html`, com lago e Missão 2 concluídos (R$ 2.500), para testar a missão do garimpo direto. (O botão de reiniciar estava sumido desde que a tela inicial mudou de classe; corrigido.)
 
 ## Linha do tempo (o que foi feito)
 1. **Protótipo original:** jogo inteiro em um `index.html` (mundo, laboratório, lago, personagem, controles e a missão do lago).
@@ -100,6 +101,22 @@ Leia junto com o `CLAUDE.md` (organização dos arquivos) e o `PLANO_MISSOES.md`
     Céu mais azul, horizonte `#9fd0f5`, névoa começando mais longe (110 → 650 m), luz do céu e do sol mais quentes, grama do chão
     e dos tufos mais verde e saturada, vinheta mais leve. Jogo publicado e arquivo único atualizados. **Falta o Wesley aprovar.**
     Para ajustar: mexa só nos dois números do `COR` (saturação 1,2 e contraste 1,07 hoje).
+20. **Missão do garimpo, fatia A** ("O peixe que faz mal", `js/missoes/garimpo/` e o cenário em `js/garimpo.js`):
+    - **Cenário a leste:** **Lagoa Dourada** (centro (92, 66), raio ~19, numa baixada natural do terreno), água azul e limpa;
+      **trapiche** com o kit de campo na ponta; **comunidade ribeirinha** (2 casas de madeira sobre estacas, varal, rede de pesca,
+      canoa, fogueira); **córrego** que desce do garimpo até a lagoa (a água acompanha o morro); **garimpo abandonado** em
+      (152, 40): terra pelada alaranjada, **cava** com água barrenta, montes de rejeito, calha de madeira, motor com mangueira,
+      tambores com o rótulo "…ÚRIO", barraco de lona, tocos e placa de aviso. Tudo em `LAGOA`, `GARIMPO`, `CAVA`, `CORREGO` e
+      `TRAP...` no `mapa.js`. Mini-mapa ampliado para mostrar a lagoa e o garimpo (`MAP_C`/`MAP_S` em `interface.js`).
+    - **Missão (etapas 1 a 4):** rádio da Dra. Iara → conversa com a **Dona Rosa** (sintomas: formigamento, tremedeira, vista
+      embaçada; comem peixe quase todo dia; peixes "tontos"; garimpo rio acima) → kit no trapiche (Secchi 210 cm, sonda OD 7,2,
+      pH 7,1, frasco na caixa térmica, sem prazo) → **ponta esquerda da bancada QUÍMICA** (fósforo, nitrogênio, coliformes e
+      microscópio, tudo normal) → **mural**: 2 perguntas (é eutrofização? não; o que explica? algo no peixe). A tabela compara
+      a Lagoa Dourada com o Lago da Mata. Etapa 5 = "Continua em breve: investigar os peixes".
+    - Só abre depois da Missão 2 concluída (`bloqueada()`). A placa do garimpo dá uma pista opcional que vai para o caderno.
+    - **Correção de bug antigo:** várias baixadas do mapa (inclusive a leste da prefeitura) eram "água invisível": o jogador batia
+      numa parede com o aviso "Água poluída". Agora só bloqueia onde existe água de verdade (`aguaFunda()` em `mapa.js`).
+    - **Correção:** no mural, missões bloqueadas mostravam o botão "Seguir esta".
 
 ## Decisões tomadas
 - **Garimpo:** o chamado da missão é "moradores passando mal depois de comer peixe + peixes estranhos" (o mercúrio age devagar; mortandade em massa seria falta de oxigênio). A missão do garimpo vem **antes** da Missão 3 (escolha do Wesley).
@@ -120,6 +137,10 @@ Leia junto com o `CLAUDE.md` (organização dos arquivos) e o `PLANO_MISSOES.md`
 - O **jogador** usa `CORES_BIOLOGO`; os **NPCs** continuam com o modelo antigo. Os acessórios do Biólogo (`bone`, `oculos`, `barba`, `coque`, `orelhas`, `brinco`, `nariz`, `bolsosCargo`, `mangaCurta`, `mochilaGrande`, `binoculo`) nascem **desligados** em `CORES_PESQUISADOR`; um NPC pode ligar qualquer um passando a opção em `addNPC({ cores })`.
 - **Binóculo:** tecla B **segurando** (não é liga/desliga), com zoom. Prepara a Missão 9 (fotografar animais). **Regar:** automático logo depois de plantar, sem item novo na loja (o Wesley escolheu assim).
 - Fim da Missão 2 deixa o gancho: os equipamentos novos puxam muita energia (a Missão 3 começa daí).
+
+- **Garimpo (fatia A):** a água da lagoa dá **normal** de propósito (o mercúrio fica no sedimento e nos peixes). A amostra vai na
+  caixa térmica e **não estraga** (o prazo de 3 min já foi ensinado no lago). A missão do garimpo **não termina** na fatia A
+  (`concluida()` devolve false até a fatia C).
 
 ## Como criar uma missão nova
 1. Copiar a pasta `js/missoes/lago/` e trocar o conteúdo.
@@ -171,6 +192,19 @@ Leia junto com o `CLAUDE.md` (organização dos arquivos) e o `PLANO_MISSOES.md`
 
 - **CSS:** não reaproveite nomes de classe genéricos (`card`, `row`, `tip`...) em telas novas: as regras dos painéis valem para o
   jogo inteiro e mudam o fundo e o tamanho sem avisar (foi o que deixou o menu inicial ilegível).
+
+- **Shader com `onBeforeCompile` usado em 2 materiais:** o Three.js guarda o shader pelo TEXTO da função. Se dois materiais usam a
+  mesma função (ex.: `criarAgua` da lagoa e da cava), ele reaproveita o 1º que compilou e o 2º fica errado (a lagoa sumia
+  quando o jogador via a cava antes). Solução: `mat.customProgramCacheKey = () => 'nome-unico'`.
+- **Água transparente com `receiveShadow`** quebrava a cor no gráfico Médio. A água não recebe sombra.
+- **Cores dentro do shader são "lineares":** bem mais escuras que o mesmo número em CSS (0,3 no shader parece cinza-claro na tela).
+- **GLSL `smoothstep(a, b, x)` precisa de a < b.** Para inverter, use `1.0 - smoothstep(b, a, x)`. (No JS do `utils.js` tanto faz.)
+- **Testes:** depois de editar um arquivo com o `npm run dev` ligado, o Vite passa a servir o módulo com `?t=...`. Um
+  `import('/js/cena.js')` no teste pega OUTRA cópia (cena vazia!). Use a URL real:
+  `performance.getEntriesByType('resource').map(e => e.name).filter(n => n.includes('/js/cena.js')).pop()`.
+- **Testes:** `page.click()` e `page.mouse` do Playwright travam com o jogo rodando. Clique pela página:
+  `p.evaluate(() => el.click())` e, para "segurar", `dispatchEvent(new PointerEvent('pointerdown'))`.
+- A sonda dos minigames anima por **quadros** (`t += 1/90`): no navegador de teste (~1 quadro/s) demora minutos. Espere bastante.
 
 ## Como testar sem gastar muito
 1. `npx vite build` (se der erro de "not exported", falta um `export` ou `import`).

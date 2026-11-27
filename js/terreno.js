@@ -1,7 +1,7 @@
 // Arquivo: terreno.js — o chão do mundo (relevo, cores e textura).
 import * as THREE from 'three';
 import { scene } from './cena.js';
-import { groundHeight, distToPath, lakeNorm, distToFazenda } from './mapa.js';
+import { groundHeight, distToPath, lakeNorm, distToFazenda, lagoaNorm, distGarimpo, distCava, infoCorrego, GARIMPO, CAVA } from './mapa.js';
 import { fbm, noise, smoothstep } from './utils.js';
 import { makeCanvas, toTex } from './construcao.js';
 import { nivelAtual } from './qualidade.js';
@@ -86,6 +86,8 @@ export function buildTerrain() {
   // cores da grama: verdes vivos e ensolarados (estilo Palworld)
   const grassA = new THREE.Color('#8cc84a'), grassB = new THREE.Color('#4f982e'), dry = new THREE.Color('#b8c24a');
   const soil = new THREE.Color('#a4533a'), dirt = new THREE.Color('#b9915b'), mud = new THREE.Color('#6b5a36'), deep = new THREE.Color('#38461f'), rock = new THREE.Color('#8f9580');
+  // cores da área do garimpo e da Lagoa Dourada
+  const garimpo = new THREE.Color('#c9783c'), cavaCor = new THREE.Color('#6e5236'), leito = new THREE.Color('#8f6a45'), mudLagoa = new THREE.Color('#9a8458');
   const c = new THREE.Color();
   for (let i = 0; i < pos.count; i++) {
     const x = pos.getX(i), z = pos.getZ(i);
@@ -102,9 +104,22 @@ export function buildTerrain() {
     const kMud = smoothstep(1.3, 1.0, ld);
     c.lerp(mud, kMud);
     c.lerp(deep, smoothstep(0.95, 0.7, ld));
+    // Lagoa Dourada: margem de areia/lama e fundo escuro
+    const lg = lagoaNorm(x, z);
+    const kLagoa = smoothstep(1.25, 1.0, lg);
+    c.lerp(mudLagoa, kLagoa);
+    c.lerp(deep, smoothstep(0.95, 0.7, lg));
+    // Garimpo: terra pelada alaranjada (sem vegetação), mais escura e molhada na cava
+    const dg = distGarimpo(x, z);
+    const kGar = smoothstep(GARIMPO.r + 7, GARIMPO.r - 1, dg) * (0.75 + 0.25 * noise(x * 0.15, z * 0.15));
+    c.lerp(garimpo, kGar);
+    c.lerp(cavaCor, smoothstep(CAVA.r * 1.3, CAVA.r * 0.8, distCava(x, z)));
+    // Córrego: leito de cascalho e lama (um pouco alaranjado: traz o sedimento do garimpo)
+    const kCor = 1 - smoothstep(1.2, 3.4, infoCorrego(x, z).d);
+    c.lerp(leito, kCor);
     col[i * 3] = c.r; col[i * 3 + 1] = c.g; col[i * 3 + 2] = c.b;
-    // onde for trilha, lavoura, lama ou pedra, usa a textura de terra
-    mist[i] = Math.max(kPath, kSoil, kMud, kRock);
+    // onde for trilha, lavoura, lama, pedra, garimpo ou córrego, usa a textura de terra
+    mist[i] = Math.max(kPath, kSoil, kMud, kRock, kLagoa, kGar, kCor);
   }
   geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
   geo.setAttribute('mistura', new THREE.BufferAttribute(mist, 1));

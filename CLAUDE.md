@@ -18,7 +18,7 @@ O jogador é um pesquisador de campo. Tem um laboratório (Estação Bioma) no m
 - Na primeira vez: `npm install`.
 - Desenvolver: `npm run dev` e abrir o endereço que aparecer (ex.: http://localhost:5173). A página recarrega sozinha ao salvar.
 - Versão final (para publicar): `npm run build`. Ela é gerada na pasta `dist/`.
-- Arquivo único para abrir com duplo clique (sem servidor): `npm run unico` → `dist-unico/estacao-bioma.html` e `estacao-bioma-teste.html` (este já com save depois do lago).
+- Arquivo único para abrir com duplo clique (sem servidor): `npm run unico` → `dist-unico/estacao-bioma.html`, `estacao-bioma-teste.html` (já com save depois do lago) e `estacao-bioma-teste-garimpo.html` (save depois da Missão 2).
 
 ## Organização dos arquivos
 - `index.html`: a tela (HUD, painéis, tela inicial) e o CSS. Carrega `js/main.js`.
@@ -33,6 +33,7 @@ O jogador é um pesquisador de campo. Tem um laboratório (Estação Bioma) no m
 - `js/npc.js`: `addNPC({nome, x, z, cores, falas | aoFalar, temMissao})`. Os NPCs são 3D (`js/pessoas.js`: corpos da Quaternius, roupa pintada com as `cores`; opções no topo do arquivo). `js/save.js`: salva no localStorage a cada 5 s.
 - `js/economia.js` (verba, inventário, loja, relatórios; itens do tipo `equipamento` liberam testes), `js/prefeitura.js` (prédio e secretária), `js/construir.js` (lugares marcados para construir).
 - `js/fazenda.js`: cenário da Fazenda Boa Safra (Missão 2), ao norte do lago (centro em (-45, 160), `FAZENDA` em `mapa.js`), com o fragmento de mata e os pontos de coleta. Celeiro, silo, cerca, garagem, galinheiro, caixa d'água e poço são modelos da Quaternius (`js/modelos/fazenda.glb`, feito por `scripts/montar-fazenda.py`). O fazendeiro (Seu Geraldo) e a bancada SOLO do laboratório são criados pela missão (`js/missoes/adubo/`).
+- `js/garimpo.js`: cenário da missão do garimpo ("O peixe que faz mal"), a leste: Lagoa Dourada (centro (92, 66)), trapiche, comunidade ribeirinha, córrego e garimpo abandonado com a cava (`LAGOA`, `GARIMPO`, `CAVA`, `CORREGO` em `mapa.js`). A Dona Rosa é criada pela missão (`js/missoes/garimpo/`).
 - `js/audio.js`, `js/controles.js` (teclado, mouse e toque), `js/interface.js` (zona, avisos, mini-mapa, diálogos `say()` e painéis `openPanel()`).
 - `js/estado.js`: estado compartilhado (`keys`, `input`, `cam` e `jogo.ativa` = missão seguida agora).
 - `js/quest.js`: **motor de missões** (interações com E, rastreador, marcador, falas por etapa, mural e caderno).

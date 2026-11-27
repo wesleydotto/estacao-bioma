@@ -163,7 +163,7 @@ Base para o jogador **ganhar verba, comprar e construir**. As missões seguintes
   *Pegadinhas no mural:* dragar o fundo e criar wetland, com a explicação de por que pioram.
 
 **Fatias:**
-- **A — Cenário e chamado:** lago, córrego, garimpo, casas ribeirinhas e a NPC moradora. Coletar a água e testar no lab: dá normal, descarta a eutrofização.
+- **A — Cenário e chamado:** ✔ PRONTA (27/11). Lagoa Dourada, córrego, garimpo, casas ribeirinhas e a Dona Rosa. Coletar a água e testar no lab: dá normal, descarta a eutrofização. Nome da missão: **"O peixe que faz mal"**.
 - **B — Peixe e metais:** ligação no celular, vara de pesca, minigame de pesca (3 espécies), bancada de preparo, analisador portátil, tabela periódica 3D com fichas, biomagnificação e relatório.
 - **C — Mitigação e medir de novo:** as duas frentes, as pegadinhas, nova análise dos peixes e a tela de antes e depois.
 

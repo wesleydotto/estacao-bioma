@@ -27,6 +27,62 @@ export function distToFazenda(x, z) {
   return Math.hypot(dx, dz);
 }
 
+// =====================================================================
+//  LAGOA DOURADA e GARIMPO ABANDONADO (missão do garimpo, a leste)
+//  A lagoa fica numa baixada natural do terreno. O córrego desce do garimpo
+//  (perto dos morros) até a lagoa, trazendo o sedimento da área degradada.
+// =====================================================================
+export const LAGOA = { x: 92, z: 66, r: 19 };
+// Formato irregular da lagoa (raio muda com o ângulo), igual ao do lago
+export function lagoaR(a) { return LAGOA.r + 2.5 * Math.sin(2 * a + 1.0) + 1.5 * Math.sin(5 * a + 0.3); }
+// 0 = centro da lagoa, 1 = margem, >1 = fora
+export function lagoaNorm(x, z) { const dx = x - LAGOA.x, dz = z - LAGOA.z; return Math.hypot(dx, dz) / lagoaR(Math.atan2(dz, dx)); }
+// Garimpo: um "patamar" de terra pelada; dentro dele, a CAVA (buraco cheio de água barrenta)
+export const GARIMPO = { x: 152, z: 40, r: 16, y: 4.0 };
+export const CAVA = { x: 156, z: 44, r: 6, agua: GARIMPO.y - 0.9, fundo: GARIMPO.y - 2.8 };
+// Trapiche (pontezinha de madeira) no lado oeste da lagoa, onde fica o ponto de coleta
+export const TRAPICHE_Y = 0.12;
+const TRAP_A = Math.PI + 0.12;                                     // ângulo da margem (oeste)
+export const TRAP_DIR = new THREE.Vector2(-Math.cos(TRAP_A), -Math.sin(TRAP_A));   // aponta para dentro da lagoa
+export const TRAP0 = new THREE.Vector2(LAGOA.x, LAGOA.z).addScaledVector(TRAP_DIR, -lagoaR(TRAP_A));   // ponto da margem
+export const TRAP_FIM = TRAP0.clone().addScaledVector(TRAP_DIR, 8.5);                              // ponta (dentro da água)
+export function onTrapiche(x, z) {
+  const px = x - TRAP0.x, pz = z - TRAP0.y;
+  const along = px * TRAP_DIR.x + pz * TRAP_DIR.y, across = px * -TRAP_DIR.y + pz * TRAP_DIR.x;
+  return along > -2.5 && along < 9.4 && Math.abs(across) < 1.1;
+}
+// Córrego: linha de pontos do garimpo até a lagoa. "nivel" = altura da água em cada ponto
+// (a água desce o morro: começa na altura da cava e termina na altura da lagoa).
+export const CORREGO = [[151, 46.5], [143, 46], [135, 47.5], [127, 52], [119, 55.5], [112, 60], [106, 63]].map(([x, z]) => new THREE.Vector2(x, z));
+const _compr = [0];
+for (let i = 1; i < CORREGO.length; i++) _compr.push(_compr[i - 1] + CORREGO[i].distanceTo(CORREGO[i - 1]));
+export const CORREGO_COMPR = _compr[_compr.length - 1];
+export const nivelCorrego = (t) => lerp(CAVA.agua - 0.15, WATER_Y, smoothstep(0.08, 0.85, t));
+// Distância até o córrego e "t" (0 = começo no garimpo, 1 = chegada na lagoa)
+export function infoCorrego(x, z) {
+  if (x < 95 || x > 160 || z < 35 || z > 75) return { d: 999, t: 0 };
+  let best = 1e9, bt = 0;
+  for (let i = 0; i < CORREGO.length - 1; i++) {
+    const A = CORREGO[i], B = CORREGO[i + 1], abx = B.x - A.x, abz = B.y - A.y;
+    const k = clamp(((x - A.x) * abx + (z - A.y) * abz) / (abx * abx + abz * abz), 0, 1);
+    const d = Math.hypot(x - (A.x + abx * k), z - (A.y + abz * k));
+    if (d < best) { best = d; bt = (_compr[i] + k * (_compr[i + 1] - _compr[i])) / CORREGO_COMPR; }
+  }
+  return { d: best, t: bt };
+}
+export const distGarimpo = (x, z) => Math.hypot(x - GARIMPO.x, z - GARIMPO.z);
+export const distCava = (x, z) => Math.hypot(x - CAVA.x, z - CAVA.z);
+// Comunidade ribeirinha (casas dos moradores), a oeste da lagoa
+export const VILA_LAGOA = { x: 62, z: 64 };
+
+// Água funda de verdade (onde o jogador não pode entrar): só dentro do lago, da lagoa e da cava.
+// Antes, qualquer baixada do terreno virava "água" invisível (o jogador batia numa parede no meio do mato).
+export function aguaFunda(x, z) {
+  if (lakeNorm(x, z) < 1.3 || lagoaNorm(x, z) < 1.3) return groundHeight(x, z) < WATER_Y - 0.45;
+  if (distCava(x, z) < CAVA.r * 1.3) return groundHeight(x, z) < CAVA.agua - 0.45;
+  return false;
+}
+
 // Distância de um ponto até a "caixa" da prefeitura (0 = dentro dela)
 export function distToPref(x, z) {
   const dx = Math.max(Math.abs(x - PREF.x) - PREF.w / 2, 0), dz = Math.max(Math.abs(z - PREF.z) - PREF.d / 2, 0);
@@ -86,6 +142,29 @@ export function groundHeight(x, z) {
   h = lerp(FAZENDA.y, h, smoothstep(0, 14, distToFazenda(x, z)));
   // suaviza a trilha
   h = lerp(h * 0.35, h, smoothstep(2, 12, distToPath(x, z)));
+  // ---- Leste: lagoa, córrego e garimpo ----
+  const dLagoa = Math.hypot(x - LAGOA.x, z - LAGOA.z);
+  if (dLagoa < 140) {
+    // a baixada em volta da lagoa vira um campo quase plano (sem buracos mais fundos que a água)
+    const piso = h > 0 ? h : -0.4 * (1 - Math.exp(h / 0.4));
+    h = lerp(piso, h, smoothstep(55, 80, dLagoa));
+    // patamar do garimpo (terra aplainada pelas máquinas) e a cava (buraco que encheu de água)
+    const dg = distGarimpo(x, z);
+    h = lerp(GARIMPO.y, h, smoothstep(GARIMPO.r * 0.7, GARIMPO.r + 10, dg));
+    h = lerp(h, CAVA.fundo, smoothstep(CAVA.r * 1.15, CAVA.r * 0.35, distCava(x, z)));
+    // bacia da lagoa (igual à do lago)
+    const lg = lagoaNorm(x, z);
+    h *= smoothstep(1.0, 1.8, lg);
+    h -= 3.0 * smoothstep(1.15, 0.5, lg);
+    // córrego (depois da bacia, para a lagoa não "levantar" o leito perto da foz):
+    // margens um pouco acima da água (só fora da lagoa) e o leito cavado no meio (só cava, nunca levanta)
+    const c = infoCorrego(x, z);
+    if (c.d < 10) {
+      const nv = nivelCorrego(c.t);
+      h = lerp(h, Math.max(h, nv + 0.35), (1 - smoothstep(5, 10, c.d)) * smoothstep(0.95, 1.2, lg));   // margens
+      h = lerp(h, Math.min(h, nv - 0.45), 1 - smoothstep(2.0, 5.0, c.d));                             // leito
+    }
+  }
   // margem plana + bacia do lago
   const ld = lakeNorm(x, z);
   h *= smoothstep(1.0, 1.8, ld);
@@ -102,6 +181,7 @@ export function walkHeight(x, z) {
   if (Math.abs(x) < LAB.w / 2 && Math.abs(z) < LAB.d / 2) return FLOOR_Y;
   if (x > -21.6 && x < 21.6 && z > -12.6 && z < 21) return PLAZA_Y;
   if (onPier(x, z)) return PIER_Y;
+  if (onTrapiche(x, z)) return TRAPICHE_Y;                // trapiche da Lagoa Dourada
   if (distToPref(x, z) === 0) return FLOOR_Y;            // piso da prefeitura
   if (onPrefWalk(x, z)) return PLAZA_Y;                  // calçada até a prefeitura
   return groundHeight(x, z);

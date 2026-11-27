@@ -4,7 +4,7 @@ import { qualidade } from './qualidade.js';
 import { mergeGeometries, mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
 import { scene } from './cena.js';
 import { std, circles, animated } from './construcao.js';
-import { LAB, LAKE, WORLD_R, lakeR, lakeNorm, distToPath, onPier, groundHeight, P0, PIPE_M, PIPE_DIR, distToPref, onPrefWalk, distToFazenda, PONTO_MATA } from './mapa.js';
+import { LAB, LAKE, WORLD_R, lakeR, lakeNorm, distToPath, onPier, groundHeight, P0, PIPE_M, PIPE_DIR, distToPref, onPrefWalk, distToFazenda, PONTO_MATA, lagoaNorm, distGarimpo, infoCorrego, onTrapiche, GARIMPO, VILA_LAGOA } from './mapa.js';
 import { rand, rr, smoothstep, isTouch, mulberry32 } from './utils.js';
 
 // =====================================================================
@@ -35,6 +35,9 @@ export function canSpawnTree(x, z) {
   if (distToFazenda(x, z) < 5) return false;              // clareira da fazenda
   if (Math.hypot(x - PONTO_MATA.x, z - PONTO_MATA.z) < 13) return false;   // o fragmento de mata é desenhado em fazenda.js
   if (Math.hypot(x - (PIPE_M.x + PIPE_DIR.x * 8), z - (PIPE_M.y + PIPE_DIR.y * 8)) < 10) return false;
+  // Lagoa Dourada, comunidade ribeirinha, córrego e garimpo (área degradada: sem árvores)
+  if (lagoaNorm(x, z) < 1.3 || Math.hypot(x - VILA_LAGOA.x, z - VILA_LAGOA.z) < 13) return false;
+  if (distGarimpo(x, z) < GARIMPO.r + 8 || infoCorrego(x, z).d < 4) return false;
   return true;
 }
 export function buildVegetation() {
@@ -181,6 +184,7 @@ export function buildVegetation() {
     const ld = lakeNorm(x, z); if (ld < 1.03 || onPier(x, z)) return false;
     if (distToPref(x, z) < 0.3 || onPrefWalk(x, z)) return false;     // sem grama dentro da prefeitura e na calçada
     if (distToFazenda(x, z) < 1) return false;                        // sem grama dentro da fazenda (é terra de lavoura)
+    if (lagoaNorm(x, z) < 1.03 || onTrapiche(x, z) || infoCorrego(x, z).d < 1.6 || distGarimpo(x, z) < GARIMPO.r + 3) return false;   // sem grama na água e no garimpo
     if (distToPath(x, z) < 1.4 && rnd() < 0.9) return false;
     const entre = (lo, hi) => lo + (hi - lo) * rnd();
     const sc = entre(0.7, 1.5);
@@ -220,6 +224,7 @@ export function buildVegetation() {
     if (x > -21.8 && x < 21.8 && z > -12.8 && z < 21.2) continue;
     if (lakeNorm(x, z) < 1.25 || distToPath(x, z) < 2) continue;
     if (distToPref(x, z) < 1 || onPrefWalk(x, z) || distToFazenda(x, z) < 1) continue;
+    if (lagoaNorm(x, z) < 1.2 || infoCorrego(x, z).d < 2) continue;
     flowers.setMatrixAt(n, m4.compose(v.set(x, groundHeight(x, z) + rr(0.25, 0.45), z), q.identity(), s.set(1, 1, 1)));
     flowers.setColorAt(n, new THREE.Color(pal[Math.floor(rand() * pal.length)]));
     vegetacao.flores.push({ x, y: groundHeight(x, z), z, i: n });

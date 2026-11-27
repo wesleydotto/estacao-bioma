@@ -2,7 +2,7 @@
 // avisos, mini-mapa, diálogos da Dra. Iara e as janelas (painéis) dos minigames.
 import { makeCanvas } from './construcao.js';
 import { rand, rr, clamp, lerp, FONT } from './utils.js';
-import { PATH, LAKE, lakeR, PREF, FAZENDA } from './mapa.js';
+import { PATH, LAKE, lakeR, PREF, FAZENDA, LAGOA, lagoaR, GARIMPO, CORREGO } from './mapa.js';
 import { keys } from './estado.js';
 import { blip } from './audio.js';
 
@@ -23,7 +23,7 @@ export function updateHud(dt) {
 }
 
 export const mm = document.getElementById('minimap'), mctx = mm.getContext('2d'), mapInfo = document.getElementById('mapInfo');
-export const MAP_C = { x: -27, z: 42 }, MAP_S = 340 / 250;           // centro e escala do mini-mapa
+export const MAP_C = { x: -2, z: 45 }, MAP_S = 340 / 320;            // centro e escala do mini-mapa (cobre do lago até o garimpo)
 export const toMap = (x, z) => [170 + (x - MAP_C.x) * MAP_S, 170 + (z - MAP_C.z) * MAP_S];
 let mapBg = null;
 export function buildMapBg() {
@@ -45,6 +45,14 @@ export function buildMapBg() {
   // fazenda (terra vermelha)
   const [fx0, fy0] = toMap(FAZENDA.x - FAZENDA.w / 2, FAZENDA.z - FAZENDA.d / 2); g.fillStyle = '#a4533a'; g.fillRect(fx0, fy0, FAZENDA.w * MAP_S, FAZENDA.d * MAP_S);
   g.fillStyle = '#fff'; g.font = `700 15px ${FONT}`; g.fillText('FAZENDA', ...toMap(FAZENDA.x, FAZENDA.z - 4));
+  // garimpo (terra alaranjada), córrego e Lagoa Dourada
+  g.fillStyle = '#c9783c'; g.beginPath(); g.arc(...toMap(GARIMPO.x, GARIMPO.z), GARIMPO.r * MAP_S, 0, 7); g.fill();
+  g.strokeStyle = '#4fb3c9'; g.lineWidth = 3; g.beginPath(); CORREGO.forEach((p, i) => { const [x, y] = toMap(p.x, p.y); i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.stroke();
+  g.fillStyle = '#3fa6b8'; g.beginPath();
+  for (let i = 0; i <= 64; i++) { const a = i / 64 * Math.PI * 2, r = lagoaR(a); const [x, y] = toMap(LAGOA.x + Math.cos(a) * r, LAGOA.z + Math.sin(a) * r); i ? g.lineTo(x, y) : g.moveTo(x, y); }
+  g.fill(); g.strokeStyle = '#1e6f80'; g.lineWidth = 3; g.stroke();
+  g.fillStyle = '#fff'; g.font = `700 14px ${FONT}`; g.fillText('LAGOA', ...toMap(LAGOA.x, LAGOA.z + 4));
+  g.fillText('GARIMPO', ...toMap(GARIMPO.x, GARIMPO.z - GARIMPO.r - 4));
   mapBg = c;
 }
 // Desenha o mini-mapa: jogador (seta amarela) e objetivo atual (bolinha que pisca)
