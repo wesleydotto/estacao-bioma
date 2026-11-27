@@ -14,9 +14,11 @@ Leia junto com o `CLAUDE.md` (organização dos arquivos) e o `PLANO_MISSOES.md`
 - **Natureza com modelos da Quaternius: feita** (item 15) e já publicada. **Falta o Wesley ver e aprovar**, e conferir se o Médio
   continua leve (agora há mais triângulos perto do jogador). Se pesar: diminuir `natureza` e `enfeites` em `js/qualidade.js`.
 - NPCs no modelo novo: **feito** (item 18). Falta o Wesley aprovar.
-- Depois da remodelagem: NPCs com modelo novo (ainda usam o boneco antigo de `boneco.js`) e então a **Missão 3 (energia)**.
+- Depois da remodelagem (falta o Wesley aprovar o visual): **Missão 3 (energia)**.
 - **Pendências de verificação:** regar e coletar ainda não foram vistos dentro do jogo com o Biólogo novo; nenhuma missão foi rodada inteira
   depois da troca do personagem. O Wesley jogou e aprovou, mas não detalhou o nível de gráficos que usou.
+  Também falta conferir (vindo do antigo `NOTAS.md`): o **disco de Secchi com o mouse** (no teste automático não respondeu; o código já foi ajustado)
+  e os **controles no celular/tablet** (toque e tamanho dos painéis).
 
 ## Estado atual
 - **Tecnologia:** Vite + Three.js 0.170 (instalado pelo npm). Rodar: `npm install` (1ª vez) e `npm run dev`.
@@ -90,6 +92,7 @@ Leia junto com o `CLAUDE.md` (organização dos arquivos) e o `PLANO_MISSOES.md`
     Se os modelos falharem, os NPCs usam o boneco antigo (`boneco.js`).
 
 ## Decisões tomadas
+- O **`NOTAS.md` foi aposentado** (ele só existe na branch `main`, de 21/11). O que ainda valia foi para o `PLANO_MISSOES.md` (garimpo/mercúrio na Missão 8, pack do soro antiofídico, quiz) e para as pendências acima. Use só o `HISTORICO.md` e o `PLANO_MISSOES.md`.
 - Dinheiro do jogo chama **Verba (R$)**.
 - A loja fica no **prédio da prefeitura** (não no lab).
 - A **Dra. Iara só fala pelo rádio** (não é NPC visível).
