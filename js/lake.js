@@ -35,7 +35,7 @@ export function buildLake() {
     sh.uniforms.tProf = { value: texProf };
     sh.uniforms.uSol = { value: SUN_DIR };
     sh.uniforms.uCeuH = { value: HORIZON };                       // cor do céu no horizonte
-    sh.uniforms.uCeuT = { value: new THREE.Color('#2f7fd6') };    // cor do céu lá no alto (a mesma do céu em cena.js)
+    sh.uniforms.uCeuT = { value: new THREE.Color('#1c6fe6') };    // cor do céu lá no alto (a mesma do céu em cena.js)
     sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vWPos;')
       .replace('#include <begin_vertex>', '#include <begin_vertex>\nvWPos = (modelMatrix * vec4(transformed, 1.0)).xyz;');
     sh.fragmentShader = sh.fragmentShader.replace('#include <common>', `#include <common>

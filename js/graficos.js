@@ -4,8 +4,8 @@
 //   1. RenderPass  → desenha a cena normalmente
 //   2. GTAOPass    → oclusão de ambiente: escurece cantos, frestas e o contato com o chão (só na Alta)
 //   3. Bloom       → brilho suave em volta do que é muito claro (Alta e Média)
-//   4. OutputPass  → converte as cores para a tela (tom de cinema "ACES")
-//   5. Acabamento  → cores um pouco mais vivas e bordas da tela levemente escuras (vinheta)
+//   4. OutputPass  → converte as cores para a tela (tom "Neutral" com cores vivas, veja cena.js)
+//   5. Acabamento  → bordas da tela levemente escuras (vinheta). A saturação agora fica no cena.js (vale para todos os níveis)
 // No nível Baixo nada disso roda: a cena vai direto para a tela (mais leve).
 import * as THREE from 'three';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
@@ -43,7 +43,7 @@ if (usarFiltros) {
 
   // Acabamento: saturação (cores mais vivas) e vinheta (cantos um pouco mais escuros)
   composer.addPass(new ShaderPass({
-    uniforms: { tDiffuse: { value: null }, saturacao: { value: 1.06 }, vinheta: { value: 0.28 } },
+    uniforms: { tDiffuse: { value: null }, saturacao: { value: 1.0 }, vinheta: { value: 0.18 } },
     vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
     fragmentShader: `uniform sampler2D tDiffuse; uniform float saturacao, vinheta; varying vec2 vUv;
       void main(){

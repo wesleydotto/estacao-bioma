@@ -155,7 +155,7 @@ Base para o jogador **ganhar verba, comprar e construir**. As missões seguintes
 ### Missão do garimpo: mercúrio e biomagnificação (DECIDIDA em 27/11, vem antes da Missão 3)
 **Decisões do Wesley (27/11):**
 - **Missão separada** da Missão 8. O rio alaranjado e o espectrofotômetro ficam para depois (o rio pode nascer do mesmo garimpo).
-- **Dois metais alterados**: o Hg e mais um (o Wesley sugeriu o Pb; a proposta é o **arsênio (As)**, que aparece de verdade junto do ouro, e falta ele confirmar). Fe e Al aparecem normais. Boa lição: o Hg **biomagnifica** (sobe na cadeia) e o outro metal fica mais no sedimento.
+- **Dois metais alterados**: o Hg e mais um **arsênio (As)** (confirmado pelo Wesley; aparece de verdade junto do ouro). Fe e Al aparecem normais. Boa lição: o Hg **biomagnifica** (sobe na cadeia) e o outro metal fica mais no sedimento.
 - **Local:** a **leste**. Lago em ~(+110, +60) e garimpo abandonado rio acima, nos morros da borda (~x = +180), ligado por um córrego.
 - **Mitigação** (o Wesley não tinha preferência, então ficou assim): duas frentes obrigatórias.
   *Ambiental:* conter o rejeito (barreira/bacia no garimpo) e replantar a área degradada.
@@ -202,7 +202,7 @@ O Wesley quer algo que ajude **na realidade** (placa de aviso para peixe foi des
 - *Ideia de estrutura:* duas frentes que valem pontos separados, a ambiental (área do garimpo) e a social (comunidade); o jogador só fecha a missão fazendo as duas.
 
 **Ideias em aberto**
-- ~~Só mercúrio ou outros metais?~~ Decidido: Hg + um segundo metal (veja acima).
+- ~~Só mercúrio ou outros metais?~~ Decidido: Hg + As (veja acima).
 - A estrutura é a mesma da missão do lago (investigar, descartar, analisar, diagnosticar, agir, medir de novo), então boa parte do código pode ser reaproveitada.
 - Precisa de: novo lago e garimpo no mapa, NPC com ligação de celular, item vara de pesca, minigame de pesca, bancada de preparo do peixe, analisador de metais, tabela periódica 3D, tela de relatório.
 

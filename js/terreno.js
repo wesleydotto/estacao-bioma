@@ -83,8 +83,8 @@ export function buildTerrain() {
   const col = new Float32Array(pos.count * 3);
   // "mistura" de cada vértice: 0 = textura de grama, 1 = textura de terra
   const mist = new Float32Array(pos.count);
-  // cores da grama um pouco menos amarelas e saturadas (puxadas para o verde-oliva)
-  const grassA = new THREE.Color('#7fb552'), grassB = new THREE.Color('#4a8a36'), dry = new THREE.Color('#a3ac5c');
+  // cores da grama: verdes vivos e ensolarados (estilo Palworld)
+  const grassA = new THREE.Color('#8cc84a'), grassB = new THREE.Color('#4f982e'), dry = new THREE.Color('#b8c24a');
   const soil = new THREE.Color('#a4533a'), dirt = new THREE.Color('#b9915b'), mud = new THREE.Color('#6b5a36'), deep = new THREE.Color('#38461f'), rock = new THREE.Color('#8f9580');
   const c = new THREE.Color();
   for (let i = 0; i < pos.count; i++) {

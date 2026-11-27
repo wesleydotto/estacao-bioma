@@ -14,9 +14,10 @@ Leia junto com o `CLAUDE.md` (organização dos arquivos) e o `PLANO_MISSOES.md`
 - **Natureza com modelos da Quaternius: feita** (item 15) e já publicada. **Falta o Wesley ver e aprovar**, e conferir se o Médio
   continua leve (agora há mais triângulos perto do jogador). Se pesar: diminuir `natureza` e `enfeites` em `js/qualidade.js`.
 - NPCs no modelo novo: **feito** (item 18). Falta o Wesley aprovar.
+- **Cores vivas estilo Palworld: feito** (item 19). Falta o Wesley aprovar.
 - **PRÓXIMO PASSO: programar a missão do GARIMPO (mercúrio), começando pela fatia A** (cenário a leste + chamado + água dá normal).
   O planejamento foi **decidido em 27/11** (missão separada da Missão 8, Hg + um 2º metal, lago a leste, mitigação em duas frentes) e
-  está no `PLANO_MISSOES.md` ("Missão do garimpo"). Falta o Wesley confirmar o 2º metal (As ou Pb) e dar o ok para começar a fatia A.
+  está no `PLANO_MISSOES.md` ("Missão do garimpo"). 2º metal = **arsênio (As)** (confirmado). O Wesley deu o ok para a fatia A.
 - Depois do garimpo: **Missão 3 (energia)**. A remodelagem visual ainda espera o Wesley aprovar (Médio, natureza, NPCs).
 - **Pendências de verificação:** regar e coletar ainda não foram vistos dentro do jogo com o Biólogo novo; nenhuma missão foi rodada inteira
   depois da troca do personagem. O Wesley jogou e aprovou, mas não detalhou o nível de gráficos que usou.
@@ -93,6 +94,12 @@ Leia junto com o `CLAUDE.md` (organização dos arquivos) e o `PLANO_MISSOES.md`
     **Lúcia**: `corpo: 'mulher'`, blusa azul, cabelo comprido. **Seu Geraldo**: camisa vermelha de manga longa, calça jeans,
     chapéu de palha, cabelo e barba grisalhos. NPCs criados antes de carregar (Lúcia) são trocados por `trocarNPCsPor3D()`.
     Se os modelos falharem, os NPCs usam o boneco antigo (`boneco.js`).
+19. **Cores vivas, estilo Palworld** (pedido do Wesley, 27/11: "o tom pastel não está bonito"). O tom de cor passou de ACES
+    (que lava a saturação) para **Neutral** com um "tempero" próprio: em `js/cena.js`, `COR = { saturacao, contraste }`
+    troca a função `NeutralToneMapping` do Three.js (vale para **todos os níveis**, inclusive o Baixo, o céu e a água).
+    Céu mais azul, horizonte `#9fd0f5`, névoa começando mais longe (110 → 650 m), luz do céu e do sol mais quentes, grama do chão
+    e dos tufos mais verde e saturada, vinheta mais leve. Jogo publicado e arquivo único atualizados. **Falta o Wesley aprovar.**
+    Para ajustar: mexa só nos dois números do `COR` (saturação 1,2 e contraste 1,07 hoje).
 
 ## Decisões tomadas
 - **Garimpo:** o chamado da missão é "moradores passando mal depois de comer peixe + peixes estranhos" (o mercúrio age devagar; mortandade em massa seria falta de oxigênio). A missão do garimpo vem **antes** da Missão 3 (escolha do Wesley).

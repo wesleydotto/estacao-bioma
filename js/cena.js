@@ -11,22 +11,39 @@ renderer.setPixelRatio(Math.min(devicePixelRatio, qualidade.pixelRatio));
 renderer.setSize(innerWidth, innerHeight);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.05;
+// Tom de cor: o "Neutral" mantém as cores vivas (o ACES antigo deixava tudo meio pastel).
+// Logo abaixo ele ganha um "tempero": mais saturação e um pouco de contraste, estilo Palworld.
+renderer.toneMapping = THREE.NeutralToneMapping;
+renderer.toneMappingExposure = 1.0;
 document.getElementById('game').appendChild(renderer.domElement);
 
+// AJUSTE DE COR (vale para todos os níveis de gráficos, inclusive o Baixo):
+// trocamos a função "NeutralToneMapping" do Three.js por uma versão nossa que chama a original
+// e depois deixa as cores mais saturadas e com um pouco mais de contraste.
+// Para mexer no visual, mude estes dois números:
+export const COR = { saturacao: 1.2, contraste: 1.07 };
+THREE.ShaderChunk.tonemapping_pars_fragment = THREE.ShaderChunk.tonemapping_pars_fragment
+  .replace('vec3 NeutralToneMapping( vec3 color ) {', 'vec3 NeutralOriginal( vec3 color ) {') + `
+vec3 NeutralToneMapping( vec3 color ) {
+  vec3 c = NeutralOriginal( color );
+  float cinza = dot( c, vec3( 0.2126, 0.7152, 0.0722 ) );
+  c = mix( vec3( cinza ), c, ${COR.saturacao.toFixed(3)} );          // saturação: afasta a cor do cinza
+  c = ( c - 0.5 ) * ${COR.contraste.toFixed(3)} + 0.5;               // contraste: claro mais claro, escuro mais escuro
+  return clamp( c, 0.0, 1.0 );
+}`;
+
 export const scene = new THREE.Scene();
-export const HORIZON = new THREE.Color('#c9e1f2');
+export const HORIZON = new THREE.Color('#9fd0f5');   // azul do horizonte (mais vivo)
 // Névoa: longe, as coisas vão ganhando a cor do horizonte (dá sensação de distância)
-scene.fog = new THREE.Fog(HORIZON, 60, 420);
+scene.fog = new THREE.Fog(HORIZON, 110, 650);        // começa mais longe: a paisagem fica mais nítida
 export const camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 1600);
 
 export const SUN_DIR = new THREE.Vector3(0.6, 0.62, 0.45).normalize();   // direção de onde vem o sol (mais baixo = sombras mais compridas)
 // Luz do céu: azulada de cima e esverdeada de baixo (reflexo da grama)
-export const hemi = new THREE.HemisphereLight('#bcdcff', '#5a7a3a', 0.75);
+export const hemi = new THREE.HemisphereLight('#c4e2ff', '#5f9a32', 0.85);
 scene.add(hemi);
 // Sol: luz amarelada e forte, que faz as sombras
-export const sun = new THREE.DirectionalLight('#ffe9c4', 3.0);
+export const sun = new THREE.DirectionalLight('#fff0d2', 3.1);
 sun.castShadow = true;
 const ALC = qualidade.sombraAlc;   // metros de sombra para cada lado do jogador
 sun.shadow.mapSize.set(qualidade.sombraMapa, qualidade.sombraMapa);
@@ -59,7 +76,7 @@ export function makeSky() {
   const mat = new THREE.ShaderMaterial({
     side: THREE.BackSide, depthWrite: false, fog: false,
     uniforms: {
-      top: { value: new THREE.Color('#2f7fd6') }, horizon: { value: HORIZON.clone() }, ground: { value: new THREE.Color('#a7c9a2') },
+      top: { value: new THREE.Color('#1c6fe6') }, horizon: { value: HORIZON.clone() }, ground: { value: new THREE.Color('#9cc98a') },
       sunDir: { value: SUN_DIR }, uTime: ceuTempo,
     },
     vertexShader: `varying vec3 vDir; void main(){ vDir = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }`,

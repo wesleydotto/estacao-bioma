@@ -146,7 +146,7 @@ export function buildVegetation() {
       const lean = rr(0.05, 0.16), hgt = rr(0.32, 0.5);
       g.setAttribute('position', new THREE.Float32BufferAttribute([-0.045, 0, 0, 0.045, 0, 0, 0, hgt, lean, 0.045, 0, 0, -0.045, 0, 0, 0, hgt, lean], 3));
       // cor da raiz (escura, quase a cor do chão) e da ponta (clara): o degradê vai de uma para a outra
-      const R = [0.11, 0.24, 0.06], P = [0.58, 0.82, 0.32];
+      const R = [0.12, 0.28, 0.05], P = [0.62, 0.88, 0.26];
       g.setAttribute('color', new THREE.Float32BufferAttribute([...R, ...R, ...P, ...R, ...R, ...P], 3));
       g.setAttribute('normal', new THREE.Float32BufferAttribute([0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0], 3));
       g.translate(rr(-0.12, 0.12), 0, rr(-0.12, 0.12));
@@ -186,8 +186,8 @@ export function buildVegetation() {
     const sc = entre(0.7, 1.5);
     q.setFromAxisAngle(up, entre(0, 6.28));
     malha.setMatrixAt(i, m4.compose(v.set(x, groundHeight(x, z) - 0.03, z), q, s.set(sc, sc * entre(0.8, 1.4), sc)));
-    // cor de cada tufo: verde menos amarelo e menos saturado que antes
-    malha.setColorAt(i, new THREE.Color().setHSL(entre(0.24, 0.30), 0.42, entre(0.75, 1.0)));
+    // cor de cada tufo: verde vivo, variando um pouco entre amarelado e azulado
+    malha.setColorAt(i, new THREE.Color().setHSL(entre(0.23, 0.30), 0.6, entre(0.72, 0.95)));
     return true;
   }
 
